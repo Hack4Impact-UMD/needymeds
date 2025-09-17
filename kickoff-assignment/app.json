@@ -4,7 +4,6 @@
     "slug": "kickoff-assignment",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
     "scheme": "kickoffassignment",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,

@@ -1,19 +1,50 @@
-import { View, Text } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { Link } from "expo-router";
 
 export default function HomeScreen() {
   return (
-    <View style={{ padding: 20 }}>
-      <Text style={{ fontSize: 24, marginBottom: 20 }}>Welcome to NeedyMeds!</Text>
-      <Link href="/">NM Engineer Display</Link>
-      <Link href="/NMEngineerDisplay">NM Engineer Display</Link>
-      <Link href="/angela">Angela's Page</Link>
-      <Link href="/ayaan">Ayaan's Page</Link>
-      <Link href="/bhavya">Bhavya's Page</Link>
-      <Link href="/dhanya">Dhanya's Page</Link>
-      <Link href="/eileen">Eileen's Page</Link>
-      <Link href="/parsa">Parsa's Page</Link>
-      <Link href="/samarth">Samarth's Page</Link>
-    </View>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Welcome to NeedyMeds!</Text>
+
+      <Link href="/NMEngineerDisplay" style={styles.link}>
+        NM Engineer Display
+      </Link>
+      <Link href="/angela" style={styles.link}>
+        Angela's Page
+      </Link>
+      <Link href="/ayaan" style={styles.link}>
+        Ayaan's Page
+      </Link>
+      <Link href="/bhavya" style={styles.link}>
+        Bhavya's Page
+      </Link>
+      <Link href="/dhanya" style={styles.link}>
+        Dhanya's Page
+      </Link>
+      <Link href="/eileen" style={styles.link}>
+        Eileen's Page
+      </Link>
+      <Link href="/parsa" style={styles.link}>
+        Parsa's Page
+      </Link>
+      <Link href="/samarth" style={styles.link}>
+        Samarth's Page
+      </Link>
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    marginBottom: 20,
+  },
+  link: {
+    fontSize: 18,
+    marginBottom: 15,
+    color: "#1E90FF",
+  },
+});
