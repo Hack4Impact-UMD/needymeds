@@ -14,6 +14,15 @@ export default function NMEngineerDisplay() {
         email="om.arya0577@gmail.com"
         profilePictureURL={require("../assets/images/om-arya.jpg")}
       />
+      <NMEngineer
+        name="Samarth Kolanupaka"
+        year="Freshman"
+        position="Engineer"
+        linkedin="https://www.linkedin.com/in/samarth-kolanupaka-0b2019259/"
+        github="https://github.com/samarth212"
+        email="samarth212@gmail.com"
+        profilePictureURL={require("../assets/images/samarth-kolanupaka.jpg")}
+      />
     </ScrollView>
   );
 }
