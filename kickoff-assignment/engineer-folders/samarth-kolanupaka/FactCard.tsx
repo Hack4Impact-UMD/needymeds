@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, Linking, TouchableOpacity } from "react-native";
-import { Fact } from "./client"
+import type { Fact } from "./client"
 
 interface FactCardProps {
   fact: Fact;
@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
-    elevation: 3, // Android shadow
+    elevation: 3, 
   },
   text: {
     fontSize: 16,
