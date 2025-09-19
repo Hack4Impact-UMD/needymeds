@@ -27,8 +27,11 @@ We're building a cross-platform mobile application that allows users to digitall
 </details>
 
 <a id="core-features"></a>
+
 ## 📊 Core Features
+
 The NeedyMeds DDC Mobile App offers the following primary features:
+
 <ul>
     <li><b>Medication Lookup:</b> Enter a drug name, quantity, and location, sorting results by price or distance.</li>
     <li><b>Digital DDC Card:</b> Display a pharmacy's DDC card, formatted for easy presentation.</li>
@@ -37,20 +40,27 @@ The NeedyMeds DDC Mobile App offers the following primary features:
 </ul>
 
 <a id="system-design"></a>
+
 ## 📃 System Design
+
 Here's a high-level overview of the application's technical architecture (subject to change):
+
 <p align = "center"> 
-  <img src="images/9.15.25 NM DDC App Architecture.png" alt="A diagram of the NeedyMeds DDC Mobile App's technical architecture" width="600">
+  <img src="images/architecture-diagrams/9.19.25 NM DDC App Architecture.png" alt="A diagram of the NeedyMeds DDC Mobile App's technical architecture" width="600">
 </p>
 
 <a id="engineer-guide"></a>
+
 ## ⚙️ Engineer Guide
+
 The [NeedyMeds Engineer Guide](https://docs.google.com/document/d/1U8ROkY-1AyOx248cWPwQGruHruOauTcGFEeTcWGZrpo/edit?tab=t.0) contains guidelines for this project's engineers to follow for style, development, and more.
 
 <a id="contact"></a>
+
 ## 📬 Contact
+
 For inquiries about this project, contact our Tech Leads:
-| Name        | Email                  |
+| Name | Email |
 | ----------- | ---------------------- |
 | Om Arya | omarya@umd.edu |
 | Adyasha Mishra | adyasha9@umd.edu |
