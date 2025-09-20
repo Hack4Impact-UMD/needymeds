@@ -1,11 +1,13 @@
-import { View } from 'react-native';
-
-import { Link } from 'expo-router';
+import { Text, ScrollView } from 'react-native';
+import { Stack } from 'expo-router';
 
 export default function HomeScreen() {
   return (
-    <View>
-
-    </View>
+    <>
+      <Stack.Screen options={{ title: 'Home' }} />
+      <ScrollView>
+        <Text>Welcome!</Text>
+      </ScrollView>
+    </>
   );
 }
