@@ -1,5 +1,13 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, Linking, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Linking,
+  TouchableOpacity,
+} from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 interface NMEngineerProps {
   name: string;
@@ -8,7 +16,7 @@ interface NMEngineerProps {
   linkedin: string;
   github: string;
   email: string;
-  profilePictureURL: any; // use require("path/to/image") when passing local images
+  profilePictureURL: any; // use require("path/to/image") for local images
 }
 
 const NMEngineer: React.FC<NMEngineerProps> = ({
@@ -29,13 +37,15 @@ const NMEngineer: React.FC<NMEngineerProps> = ({
 
       <View style={styles.links}>
         <TouchableOpacity onPress={() => Linking.openURL(linkedin)}>
-          <Text style={styles.link}>LinkedIn</Text>
+          <Icon name="linkedin-square" size={28} color="#0077b5" />
         </TouchableOpacity>
+
         <TouchableOpacity onPress={() => Linking.openURL(github)}>
-          <Text style={styles.link}>GitHub</Text>
+          <Icon name="github" size={28} color="#333" />
         </TouchableOpacity>
+
         <TouchableOpacity onPress={() => Linking.openURL(`mailto:${email}`)}>
-          <Text style={styles.link}>Email</Text>
+          <Icon name="envelope" size={28} color="#d44638" />
         </TouchableOpacity>
       </View>
     </View>
@@ -73,13 +83,8 @@ const styles = StyleSheet.create({
   },
   links: {
     flexDirection: "row",
-    gap: 12,
-  },
-  link: {
-    fontSize: 14,
-    color: "#0077b5",
-    marginHorizontal: 8,
-    textDecorationLine: "underline",
+    justifyContent: "center",
+    gap: 20,
   },
 });
 
