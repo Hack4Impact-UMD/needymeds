@@ -2,24 +2,20 @@ import { Platform } from 'react-native';
 
 export const Colors = {
   default: {
-    text: '#11181C',
-    background: '#fff',
-    tint: '#0a7ea4',
-    icon: '#687076',
-    tabIconDefault: '#687076',
+    neutrallt: '#FFFFFF',
+    primary: '#6E9FC0',
+    secondary: '#3A6270',
+    neutraldk: '#000000',
+    accent: '#FE6300',
     tabIconSelected: '#0a7ea4',
   },
 };
 
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
     sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
     serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
     rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
     mono: 'ui-monospace',
   },
   default: {
