@@ -29,6 +29,17 @@ export default function NMEngineerDisplay() {
           email="samarth212@gmail.com"
           profilePictureURL={require("../assets/images/samarth-kolanupaka.jpg")}
         />
+
+        <NMEngineer
+          name="Bhavya Tanugula"
+          year="Sophomore"
+          position="Engineer"
+          linkedin="https://www.linkedin.com/in/bhavya-tanugula-3650b3306/"
+          github="https://github.com/bhavyat-01"
+          email="bhavya.tanugula@gmail.com"
+          profilePictureURL={require("../assets/images/bhavya-tanugula.jpg")}
+        />
+
       </ScrollView>
     </>
   );
