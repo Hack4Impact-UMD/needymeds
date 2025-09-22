@@ -40,6 +40,15 @@ export default function NMEngineerDisplay() {
           profilePictureURL={require("../assets/images/bhavya-tanugula.jpg")}
         />
 
+        <NMEngineer
+          name="Parsa Sedghi"
+          year="Senior"
+          position="Engineer"
+          linkedin="https://linkedin.com/in/parsa-sedghi"
+          github="https://github.com/psedghi"
+          email="psedghi@umd.edu"
+          profilePictureURL={require("../assets/images/parsa-sedghi.jpg")}
+        />
       </ScrollView>
     </>
   );
