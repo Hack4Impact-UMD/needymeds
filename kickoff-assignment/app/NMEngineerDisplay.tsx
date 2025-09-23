@@ -40,6 +40,16 @@ export default function NMEngineerDisplay() {
           profilePictureURL={require("../assets/images/bhavya-tanugula.jpg")}
         />
 
+        <NMEngineer
+          name="Angela Ngo"
+          year="Sophomore"
+          position="Engineer"
+          linkedin="https://www.linkedin.com/in/ngo-angela/"
+          github="https://github.com/ango06"
+          email="ngoangela6@gmail.com"
+          profilePictureURL={require("../assets/images/angela-ngo.jpg")}
+        />
+        
       </ScrollView>
     </>
   );
