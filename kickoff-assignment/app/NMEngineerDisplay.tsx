@@ -40,6 +40,16 @@ export default function NMEngineerDisplay() {
           profilePictureURL={require("../assets/images/bhavya-tanugula.jpg")}
         />
 
+        <NMEngineer 
+          name="Ayaan Hussain"
+          year="Senior"
+          position="Engineer"
+          linkedin="https://www.linkedin.com/in/ayaan-z-hussain/"
+          github="https://github.com/ayaanh-03"
+          email="ayaanzh13@gmail.com"
+          profilePictureURL={require("../assets/images/ayaan-hussain.jpg")}
+        />
+
       </ScrollView>
     </>
   );
