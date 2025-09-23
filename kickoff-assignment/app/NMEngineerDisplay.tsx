@@ -49,6 +49,16 @@ export default function NMEngineerDisplay() {
           email="psedghi@umd.edu"
           profilePictureURL={require("../assets/images/parsa-sedghi.jpg")}
         />
+
+        <NMEngineer
+          name="Dhanya Desai"
+          year="Junior"
+          position="Engineer"
+          linkedin="https://www.linkedin.com/in/dhanyadesai/"
+          github="https://github.com/dhanyades"
+          email="dhanya.desai@gmail.com"
+          profilePictureURL={require("../assets/images/dhanya-desai.jpg")}
+        />
       </ScrollView>
     </>
   );
