@@ -19,8 +19,7 @@ const styles = StyleSheet.create({
         paddingVertical: 40,
         justifyContent: 'center',
         backgroundColor: 'pink',
-        height: 400,
-        width: 'fit'
+        height: 400
     },
     text: {
         textAlign: 'center',
