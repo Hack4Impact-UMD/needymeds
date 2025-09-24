@@ -51,6 +51,15 @@ export default function NMEngineerDisplay() {
         />
 
         <NMEngineer
+          name="Angela Ngo"
+          year="Sophomore"
+          position="Engineer"
+          linkedin="https://www.linkedin.com/in/ngo-angela/"
+          github="https://github.com/ango06"
+          email="ngoangela6@gmail.com"
+          profilePictureURL={require("../assets/images/angela-ngo.jpg")}
+        />
+        
           name="Parsa Sedghi"
           year="Senior"
           position="Engineer"
