@@ -69,6 +69,16 @@ export default function NMEngineerDisplay() {
           email="dhanya.desai@gmail.com"
           profilePictureURL={require("../assets/images/dhanya-desai.jpg")}
         />
+
+        <NMEngineer
+          name="Eileen Chen"
+          year="Masters"
+          position="Engineer"
+          linkedin="https://www.linkedin.com/in/eileendchen/"
+          github="https://github.com/eileendchen"
+          email="eileendchen@gmail.com"
+          profilePictureURL={require("../assets/images/eileen-chen.jpg")}
+        />
       </ScrollView>
     </>
   );
