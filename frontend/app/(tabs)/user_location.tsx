@@ -8,7 +8,7 @@ import { Stack } from 'expo-router';
 export default function UserLocation() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [address, setAddress] = useState<Location.LocationGeocodedAddress[] | null>(null);
+  const [address, setAddress] = useState<any | null>(null);
 
   // update current location
   useEffect(() => {
@@ -21,7 +21,7 @@ export default function UserLocation() {
         return;
       }
 
-      let currentLocation = await Location.getCurrentPositionAsync({}); // no dependencies
+      let currentLocation = await Location.getCurrentPositionAsync({});
       setLocation(currentLocation);
       console.log('Current Location: ' + JSON.stringify(currentLocation));
     };
@@ -34,17 +34,29 @@ export default function UserLocation() {
     if (!location) {
       return;
     }
+
+    const lat = location.coords.latitude;
+    const lon = location.coords.longitude;
+    const format = 'json';
+
+    const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=${format}`;
+    console.log(url);
+
     const fetchAddress = async () => {
       try {
-        const reversedGeocode = await Location.reverseGeocodeAsync({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        });
-        console.log('Fetch address: ', reversedGeocode);
-        setAddress(reversedGeocode);
+        const response = await fetch(url); // add headers
+
+        if (!response.ok) {
+          console.log('ERROR');
+          return;
+        }
+
+        const data = await response.json();
+        setAddress(data);
+        console.log('Fetched address: ', data);
       } catch (err) {
         setError('Failed to get address: ' + err);
-        console.log('Geocoding error: ', error);
+        console.log('Geocoding error: ', err);
       }
     };
 
@@ -55,14 +67,13 @@ export default function UserLocation() {
   let loc = 'Location...';
   let addy = 'Address...';
   if (error) {
-    loc = error;
+    loc = JSON.stringify(location);
+    addy = error;
   } else if (location) {
     loc = JSON.stringify(location);
     addy = JSON.stringify(address);
   }
 
-  // <Text style={styles.text}>Address: {address[0].postalCode}</Text>
-  // <Text style={styles.text}>Address: {JSON.stringify(address)}</Text>
   return (
     <>
       <Stack.Screen options={{ title: 'User Location' }} />
