@@ -9,6 +9,7 @@ export default function UserLocation() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [address, setAddress] = useState<any | null>(null);
+  const [zipcode, setZipcode] = useState('');
 
   // update current location
   useEffect(() => {
@@ -45,6 +46,7 @@ export default function UserLocation() {
     const fetchAddress = async () => {
       try {
         const response = await fetch(url); // add headers
+        // need 'Access-Control-Allow-Origin' from source?
 
         if (!response.ok) {
           console.log('ERROR');
@@ -52,8 +54,10 @@ export default function UserLocation() {
         }
 
         const data = await response.json();
-        setAddress(data);
-        console.log('Fetched address: ', data);
+        setAddress(data.display_name);
+        setZipcode(data.address.postcode);
+
+        console.log('Fetched full address info: ', data);
       } catch (err) {
         setError('Failed to get address: ' + err);
         console.log('Geocoding error: ', err);
@@ -83,6 +87,7 @@ export default function UserLocation() {
         <Text style={styles.text}>Latitude: {location?.coords.latitude}</Text>
         <Text style={styles.text}>Longitude: {location?.coords.longitude}</Text>
         <Text style={styles.text}>Address: {addy}</Text>
+        <Text style={styles.text}>Zipcode: {zipcode}</Text>
       </ScrollView>
     </>
   );
