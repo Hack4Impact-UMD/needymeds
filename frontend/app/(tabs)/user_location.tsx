@@ -1,26 +1,19 @@
-import { ScrollView, StyleSheet, Text } from 'react-native';
-
 import { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 
 import * as Location from 'expo-location';
 import { Stack } from 'expo-router';
 
-import { useDispatch, useSelector } from 'react-redux';
-import { setZipCode } from '../redux/locationSlice';
-import { type Dispatch, type RootState } from '../redux/store';
-
 export default function UserLocation() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [address, setAddress] = useState<any | null>(null);
+  const [zipcode, setZipcode] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [address, setAddress] = useState<Location.LocationGeocodedAddress[] | null>(null);
 
-  const dispatch = useDispatch<Dispatch>();
-  const zipCode = useSelector((state: RootState) => state.location.zipCode);
-
-  // update current location
+  // update the user's current location
   useEffect(() => {
     const fetchCurrentLocation = async () => {
-      // get permission from user
+      // get permissions from user
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         setError('Permission to access location was denied. Please grant permissions.');
@@ -28,7 +21,7 @@ export default function UserLocation() {
         return;
       }
 
-      let currentLocation = await Location.getCurrentPositionAsync({}); // no dependencies
+      let currentLocation = await Location.getCurrentPositionAsync({});
       setLocation(currentLocation);
       console.log('Current Location: ' + JSON.stringify(currentLocation));
     };
@@ -36,26 +29,37 @@ export default function UserLocation() {
     fetchCurrentLocation();
   }, []);
 
-  // reverse geocode the location coordinates to get the address
+  // reverse geocode the location coordinates into the human-readable address
   useEffect(() => {
     if (!location) {
       return;
     }
+
+    const lat = location.coords.latitude;
+    const lon = location.coords.longitude;
+    const format = 'json';
+    const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=${format}`;
+
     const fetchAddress = async () => {
       try {
-        const reversedGeocode = await Location.reverseGeocodeAsync({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        });
-        console.log('Fetch address: ', reversedGeocode);
-        setAddress(reversedGeocode);
-
-        if (reversedGeocode.length > 0 && reversedGeocode[0].postalCode) {
-          dispatch(setZipCode(reversedGeocode[0].postalCode));
+        const response = await fetch(url); // add headers or do I need 'Access-Control-Allow-Origin'?
+        if (!response.ok) {
+          setError('Request failed.');
+          return;
         }
+
+        const result = await response.json();
+        const add = result.address;
+        setAddress(result.display_name);
+        setZipcode(add.postcode);
+        console.log(
+          `Formatted address: ${result.address.house_number} ${result.address.road}, ${add.city}, ${add.state} ${add.postcode}`
+        );
+
+        console.log('Fetched full address info: ', result);
       } catch (err) {
-        setError('Failed to get address: ' + err);
-        console.log('Geocoding error: ', error);
+        setError('Failed to fetch address due to: ' + err);
+        console.log('Failed to fetch address due to: ', err);
       }
     };
 
@@ -65,25 +69,21 @@ export default function UserLocation() {
   // Testing to print to screen
   let loc = 'Location...';
   let addy = 'Address...';
-  if (error) {
-    loc = error;
-  } else if (location) {
+  if (!error) {
     loc = JSON.stringify(location);
     addy = JSON.stringify(address);
   }
 
-  // <Text style={styles.text}>Address: {address[0].postalCode}</Text>
-  // <Text style={styles.text}>Address: {JSON.stringify(address)}</Text>
   return (
     <>
       <Stack.Screen options={{ title: 'User Location' }} />
       <ScrollView style={styles.container}>
-        <Text style={styles.text}>User Location</Text>
-        <Text style={styles.text}>{loc}</Text>
+        <Text style={styles.text}>Full Location: {loc}</Text>
         <Text style={styles.text}>Latitude: {location?.coords.latitude}</Text>
         <Text style={styles.text}>Longitude: {location?.coords.longitude}</Text>
-        <Text style={styles.text}>Address: {addy}</Text>
-        <Text style={styles.text}>Zip Code: {zipCode}</Text>
+        <Text style={styles.text}>Address Display Name: {addy}</Text>
+        <Text style={styles.text}>Zipcode: {zipcode}</Text>
+        <Text style={styles.text}>Error: {error}</Text>
       </ScrollView>
     </>
   );
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'pink',
   },
   text: {
-    textAlign: 'center',
+    textAlign: 'left',
     margin: 10,
   },
 });
