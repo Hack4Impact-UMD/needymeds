@@ -1,14 +1,21 @@
-import { Text, ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import * as Location from 'expo-location';
 import { Stack } from 'expo-router';
+
+import { useDispatch, useSelector } from 'react-redux';
+import { setZipCode } from '../redux/locationSlice';
+import { type Dispatch, type RootState } from '../redux/store';
 
 export default function UserLocation() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [address, setAddress] = useState<Location.LocationGeocodedAddress[] | null>(null);
+
+  const dispatch = useDispatch<Dispatch>();
+  const zipCode = useSelector((state: RootState) => state.location.zipCode);
 
   // update current location
   useEffect(() => {
@@ -42,6 +49,10 @@ export default function UserLocation() {
         });
         console.log('Fetch address: ', reversedGeocode);
         setAddress(reversedGeocode);
+
+        if (reversedGeocode.length > 0 && reversedGeocode[0].postalCode) {
+          dispatch(setZipCode(reversedGeocode[0].postalCode));
+        }
       } catch (err) {
         setError('Failed to get address: ' + err);
         console.log('Geocoding error: ', error);
@@ -72,6 +83,7 @@ export default function UserLocation() {
         <Text style={styles.text}>Latitude: {location?.coords.latitude}</Text>
         <Text style={styles.text}>Longitude: {location?.coords.longitude}</Text>
         <Text style={styles.text}>Address: {addy}</Text>
+        <Text style={styles.text}>Zip Code: {zipCode}</Text>
       </ScrollView>
     </>
   );
