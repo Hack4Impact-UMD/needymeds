@@ -1,5 +1,4 @@
 import { Text, ScrollView, StyleSheet } from 'react-native';
-
 import { useState, useEffect } from 'react';
 
 import * as Location from 'expo-location';
@@ -7,14 +6,14 @@ import { Stack } from 'expo-router';
 
 export default function UserLocation() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [address, setAddress] = useState<any | null>(null);
   const [zipcode, setZipcode] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
-  // update current location
+  // update the user's current location
   useEffect(() => {
     const fetchCurrentLocation = async () => {
-      // get permission from user
+      // get permissions from user
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         setError('Permission to access location was denied. Please grant permissions.');
@@ -30,7 +29,7 @@ export default function UserLocation() {
     fetchCurrentLocation();
   }, []);
 
-  // reverse geocode the location coordinates to get the address
+  // reverse geocode the location coordinates into the human-readable address
   useEffect(() => {
     if (!location) {
       return;
@@ -39,28 +38,28 @@ export default function UserLocation() {
     const lat = location.coords.latitude;
     const lon = location.coords.longitude;
     const format = 'json';
-
     const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=${format}`;
-    console.log(url);
 
     const fetchAddress = async () => {
       try {
-        const response = await fetch(url); // add headers
-        // need 'Access-Control-Allow-Origin' from source?
-
+        const response = await fetch(url); // add headers or do I need 'Access-Control-Allow-Origin'?
         if (!response.ok) {
-          console.log('ERROR');
+          setError('Request failed.');
           return;
         }
 
-        const data = await response.json();
-        setAddress(data.display_name);
-        setZipcode(data.address.postcode);
+        const result = await response.json();
+        const add = result.address;
+        setAddress(result.display_name);
+        setZipcode(add.postcode);
+        console.log(
+          `Formatted address: ${result.address.house_number} ${result.address.road}, ${add.city}, ${add.state} ${add.postcode}`
+        );
 
-        console.log('Fetched full address info: ', data);
+        console.log('Fetched full address info: ', result);
       } catch (err) {
-        setError('Failed to get address: ' + err);
-        console.log('Geocoding error: ', err);
+        setError('Failed to fetch address due to: ' + err);
+        console.log('Failed to fetch address due to: ', err);
       }
     };
 
@@ -70,10 +69,7 @@ export default function UserLocation() {
   // Testing to print to screen
   let loc = 'Location...';
   let addy = 'Address...';
-  if (error) {
-    loc = JSON.stringify(location);
-    addy = error;
-  } else if (location) {
+  if (!error) {
     loc = JSON.stringify(location);
     addy = JSON.stringify(address);
   }
@@ -82,12 +78,12 @@ export default function UserLocation() {
     <>
       <Stack.Screen options={{ title: 'User Location' }} />
       <ScrollView style={styles.container}>
-        <Text style={styles.text}>User Location</Text>
-        <Text style={styles.text}>{loc}</Text>
+        <Text style={styles.text}>Full Location: {loc}</Text>
         <Text style={styles.text}>Latitude: {location?.coords.latitude}</Text>
         <Text style={styles.text}>Longitude: {location?.coords.longitude}</Text>
-        <Text style={styles.text}>Address: {addy}</Text>
+        <Text style={styles.text}>Address Display Name: {addy}</Text>
         <Text style={styles.text}>Zipcode: {zipcode}</Text>
+        <Text style={styles.text}>Error: {error}</Text>
       </ScrollView>
     </>
   );
@@ -98,7 +94,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'pink',
   },
   text: {
-    textAlign: 'center',
+    textAlign: 'left',
     margin: 10,
   },
 });
