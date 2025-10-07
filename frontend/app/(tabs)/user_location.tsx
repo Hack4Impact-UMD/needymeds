@@ -4,11 +4,17 @@ import { ScrollView, StyleSheet, Text } from 'react-native';
 import * as Location from 'expo-location';
 import { Stack } from 'expo-router';
 
+import { useDispatch, useSelector } from 'react-redux';
+import { setAddress, setZipCode } from '../redux/locationSlice';
+import { RootState } from '../redux/store';
+
 export default function UserLocation() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
-  const [address, setAddress] = useState<any | null>(null);
-  const [zipcode, setZipcode] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  const dispatch = useDispatch();
+  const zipcode = useSelector((state: RootState) => state.location.zipCode);
+  const address = useSelector((state: RootState) => state.location.address);
 
   // update the user's current location
   useEffect(() => {
@@ -50,8 +56,8 @@ export default function UserLocation() {
 
         const result = await response.json();
         const add = result.address;
-        setAddress(result.display_name);
-        setZipcode(add.postcode);
+        dispatch(setAddress(result.display_name));
+        dispatch(setZipCode(add.postcode));
         console.log(
           `Formatted address: ${result.address.house_number} ${result.address.road}, ${add.city}, ${add.state} ${add.postcode}`
         );
@@ -81,8 +87,10 @@ export default function UserLocation() {
         <Text style={styles.text}>Full Location: {loc}</Text>
         <Text style={styles.text}>Latitude: {location?.coords.latitude}</Text>
         <Text style={styles.text}>Longitude: {location?.coords.longitude}</Text>
-        <Text style={styles.text}>Address Display Name: {addy}</Text>
-        <Text style={styles.text}>Zipcode: {zipcode}</Text>
+        {/* <Text style={styles.text}>Address Display Name: {addy}</Text> */}
+        {/* <Text style={styles.text}>Zipcode: {zipcode}</Text> */}
+        <Text style={styles.text}>Redux Zipcode: {zipcode ?? 'Loading...'}</Text>
+        <Text style={styles.text}>Redux Address: {address ?? 'Loading...'}</Text>
         <Text style={styles.text}>Error: {error}</Text>
       </ScrollView>
     </>
