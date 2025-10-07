@@ -48,7 +48,8 @@ export async function getPriceByNdc(opts: {
   if (res.status >= 200 && res.status < 300) return res.data;
 
   const msg =
-    (res.data && (res.data.message || res.data.error)) || `DSNT request failed (${res.status})`;
+    (res.data && ((res.data as any)?.message || (res.data as any)?.error)) ||
+    `DSNT request failed (${res.status})`;
   const err: any = new Error(msg);
   err.status = res.status;
   throw err;
@@ -79,7 +80,8 @@ export async function priceByNdcAndNpiList(opts: {
   if (res.status >= 200 && res.status < 300) return res.data;
 
   const msg =
-    (res.data && (res.data.message || res.data.error)) || `DSNT request failed (${res.status})`;
+    (res.data && ((res.data as any)?.message || (res.data as any)?.error)) ||
+    `DSNT request failed (${res.status})`;
   const err: any = new Error(msg);
   err.status = res.status;
   throw err;
