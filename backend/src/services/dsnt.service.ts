@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getDsntSecret } from '../secrets/secrets.js';
+import { getDsntSecret } from '../secrets/secrets';
 
 function basicHeader(user: string, pass: string) {
   const b64 = Buffer.from(`${user}:${pass}`).toString('base64');
@@ -9,7 +9,6 @@ function basicHeader(user: string, pass: string) {
 async function client() {
   const { baseUrl, username, password } = await getDsntSecret();
 
-  // Guard: your Postman host is argusprod.dstsystems.com
   if (!/^https:\/\/argusprod\.dstsystems\.com\b/.test(baseUrl)) {
     const err: any = new Error('Invalid DS&T baseUrl (expected argusprod.dstsystems.com)');
     err.status = 500;
@@ -27,7 +26,7 @@ async function client() {
   });
 }
 
-/** Price by NDC */
+// Price by NDC
 export async function getPriceByNdc(opts: {
   quantity: string | number;
   ndc: string;
@@ -55,11 +54,9 @@ export async function getPriceByNdc(opts: {
   throw err;
 }
 
-/** Price by NDC and NPI List
- * NOTE: DS&T expects the query key **npilist** (all lowercase), not camelCase.
- */
+// Price by NDC and NPI List
 export async function priceByNdcAndNpiList(opts: {
-  npilist: string; // comma-separated (e.g., "1326064445" or "123,456")
+  npilist: string;
   quantity: string | number;
   ndc: string;
   radius?: string | number;
@@ -69,7 +66,7 @@ export async function priceByNdcAndNpiList(opts: {
 
   const res = await c.get('/pharmacy-drug-pricing/1.0/service/PharmacyPricing', {
     params: {
-      npilist: opts.npilist, // << exact key your Postman uses
+      npilist: opts.npilist,
       quantity: String(opts.quantity),
       ndc: opts.ndc,
       radius: opts.radius !== undefined ? String(opts.radius) : undefined,

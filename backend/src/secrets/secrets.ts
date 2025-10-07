@@ -1,7 +1,7 @@
 import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 
 type DsntSecret = {
-  baseUrl: string; // e.g., "https://argusprod.dtsystems.com"
+  baseUrl: string;
   username: string;
   password: string;
 };
@@ -11,7 +11,6 @@ const secretName = process.env.DSNT_SECRET_NAME || 'needy-meds/dsnt';
 
 const client = new SecretsManagerClient({ region });
 
-// simple in-memory cache to avoid hitting SM on every request
 let cache: { secret: DsntSecret; exp: number } | null = null;
 const TTL_MS = 5 * 60 * 1000; // 5 minutes
 

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getPriceByNdc, priceByNdcAndNpiList } from '../services/dsnt.service.js';
+import { getPriceByNdc, priceByNdcAndNpiList } from '../services/dsnt.service';
 
 const router = Router();
 
@@ -29,7 +29,6 @@ router.get('/price', async (req, res, next) => {
 
 /** GET /api/dsnt/price-ndc-npi
  *  Query: npilist (req), quantity (req), ndc (req), radius?, zipCode?
- *  (Key name must be 'npilist' to match DS&T exactly.)
  */
 router.get('/price-ndc-npi', async (req, res, next) => {
   try {

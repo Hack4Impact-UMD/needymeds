@@ -18,6 +18,7 @@
   "description": "<p align = \"center\">    <img src=\"images/needymeds-logo.jpg\" alt=\"The NeedyMeds logo\" width=\"300\"> </p>",
   "main": "index.js",
   "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.901.0",
     "accepts": "^2.0.0",
     "ansi-escapes": "^7.1.0",
     "ansi-regex": "^6.2.2",
