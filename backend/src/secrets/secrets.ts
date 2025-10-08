@@ -35,3 +35,7 @@ export async function getDsntSecret(): Promise<DsntSecret> {
   cache = { secret, exp: now + TTL_MS };
   return secret;
 }
+
+// Backward-compatible alias (tests or older code may mock/get `getDSNTSecret`)
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const getDSNTSecret = getDsntSecret; // legacy name expected by older tests
