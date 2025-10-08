@@ -12,7 +12,10 @@
     "test": "jest"
   },
   "jest": {
-    "preset": "react-native"
+    "preset": "jest-expo",
+    "transformIgnorePatterns": [
+      "node_modules/(?!(immer|@reduxjs/toolkit|react-redux|expo-location|expo-modules-core|expo|@expo)/)"
+    ]
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
@@ -33,7 +36,7 @@
     "expo-symbols": "~1.0.7",
     "expo-system-ui": "~6.0.7",
     "expo-web-browser": "~15.0.7",
-    "react": "19.1.0",
+    "react": "^19.1.1",
     "react-dom": "19.1.0",
     "react-native": "0.81.4",
     "react-native-gesture-handler": "~2.28.0",
@@ -42,14 +45,18 @@
     "react-native-screens": "~4.16.0",
     "react-native-web": "~0.21.0",
     "react-native-worklets": "0.5.1",
-    "react-redux": "^9.2.0"
+    "react-redux": "^9.2.0",
+    "react-test-renderer": "^19.1.1"
   },
   "devDependencies": {
     "@testing-library/react-native": "^13.3.3",
+    "@types/jest": "^30.0.0",
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
     "jest": "29.7.0",
+    "jest-expo": "^54.0.12",
+    "ts-jest": "^29.4.4",
     "typescript": "~5.9.2"
   },
   "private": true
