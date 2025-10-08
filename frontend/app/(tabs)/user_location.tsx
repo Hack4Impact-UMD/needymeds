@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
 
 import * as Location from 'expo-location';
-import { Stack } from 'expo-router';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { setAddress, setZipCode } from '../redux/locationSlice';
@@ -80,29 +78,34 @@ export default function UserLocation() {
     addy = JSON.stringify(address);
   }
 
-  return (
-    <>
-      <Stack.Screen options={{ title: 'User Location' }} />
-      <ScrollView style={styles.container}>
-        <Text style={styles.text}>Full Location: {loc}</Text>
-        <Text style={styles.text}>Latitude: {location?.coords.latitude}</Text>
-        <Text style={styles.text}>Longitude: {location?.coords.longitude}</Text>
-        {/* <Text style={styles.text}>Address Display Name: {addy}</Text> */}
-        {/* <Text style={styles.text}>Zipcode: {zipcode}</Text> */}
-        <Text style={styles.text}>Redux Zipcode: {zipcode ?? 'Loading...'}</Text>
-        <Text style={styles.text}>Redux Address: {address ?? 'Loading...'}</Text>
-        <Text style={styles.text}>Error: {error}</Text>
-      </ScrollView>
-    </>
-  );
+  return {
+    zipcode: zipcode,
+    address: address
+  };
+
+  // return (
+  //   <>
+  //     <Stack.Screen options={{ title: 'User Location' }} />
+  //     <ScrollView style={styles.container}>
+  //       <Text style={styles.text}>Full Location: {loc}</Text>
+  //       <Text style={styles.text}>Latitude: {location?.coords.latitude}</Text>
+  //       <Text style={styles.text}>Longitude: {location?.coords.longitude}</Text>
+  //       {/* <Text style={styles.text}>Address Display Name: {addy}</Text> */}
+  //       {/* <Text style={styles.text}>Zipcode: {zipcode}</Text> */}
+  //       <Text style={styles.text}>Redux Zipcode: {zipcode ?? 'Loading...'}</Text>
+  //       <Text style={styles.text}>Redux Address: {address ?? 'Loading...'}</Text>
+  //       <Text style={styles.text}>Error: {error}</Text>
+  //     </ScrollView>
+  //   </>
+  // );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: 'pink',
-  },
-  text: {
-    textAlign: 'left',
-    margin: 10,
-  },
-});
+// const styles = StyleSheet.create({
+//   container: {
+//     backgroundColor: 'pink',
+//   },
+//   text: {
+//     textAlign: 'left',
+//     margin: 10,
+//   },
+// });
