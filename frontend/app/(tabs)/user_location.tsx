@@ -1,87 +1,59 @@
-import { useEffect, useState } from 'react';
-
 import * as Location from 'expo-location';
-
-import { useDispatch, useSelector } from 'react-redux';
 import { setAddress, setZipCode } from '../redux/locationSlice';
-import { RootState } from '../redux/store';
+import { store } from '../redux/store';
 
-export default function UserLocation() {
-  const [location, setLocation] = useState<Location.LocationObject | null>(null);
-  const [error, setError] = useState<string | null>(null);
+export interface UserLocationResult {
+  zipcode?: string;
+  address?: string;
+  error?: string;
+}
 
-  const dispatch = useDispatch();
-  const zipcode = useSelector((state: RootState) => state.location.zipCode);
-  const address = useSelector((state: RootState) => state.location.address);
+export default async function getUserLocation(): Promise<UserLocationResult> {
+  let zipcode: string | undefined;
+  let address: string | undefined;
+  let error: string | undefined;
 
-  // update the user's current location
-  useEffect(() => {
-    const fetchCurrentLocation = async () => {
-      // get permissions from user
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setError('Permission to access location was denied. Please grant permissions.');
-        console.log(error);
-        return;
-      }
-
-      let currentLocation = await Location.getCurrentPositionAsync({});
-      setLocation(currentLocation);
-      console.log('Current Location: ' + JSON.stringify(currentLocation));
-    };
-
-    fetchCurrentLocation();
-  }, []);
-
-  // reverse geocode the location coordinates into the human-readable address
-  useEffect(() => {
-    if (!location) {
-      return;
+  try {
+    // Request location permissions
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      return { error: 'Permission to access location was denied. Please grant permissions.' };
     }
 
+    // Get current location
+    const location = await Location.getCurrentPositionAsync({});
+    if (!location) {
+      return { error: 'Error fetching current location.' }
+    }
+
+    // Extract latitude and longitude
     const lat = location.coords.latitude;
     const lon = location.coords.longitude;
-    const format = 'json';
+    const format = "json";
     const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=${format}`;
 
-    const fetchAddress = async () => {
-      try {
-        const response = await fetch(url); // add headers or do I need 'Access-Control-Allow-Origin'?
-        if (!response.ok) {
-          setError('Request failed.');
-          return;
-        }
+    // API Request to Nominatim
+    const response = await fetch(url);
+    if (!response.ok) {
+      return { error: 'Request to Nominatim failed.' };
+    }
 
-        const result = await response.json();
-        const add = result.address;
-        dispatch(setAddress(result.display_name));
-        dispatch(setZipCode(add.postcode));
-        console.log(
-          `Formatted address: ${result.address.house_number} ${result.address.road}, ${add.city}, ${add.state} ${add.postcode}`
-        );
+    const result = await response.json();
 
-        console.log('Fetched full address info: ', result);
-      } catch (err) {
-        setError('Failed to fetch address due to: ' + err);
-        console.log('Failed to fetch address due to: ', err);
-      }
-    };
+    const addy = result.address;
+    address = result.display_name;
+    zipcode = addy?.postcode;
 
-    fetchAddress();
-  }, [location]);
+    if (zipcode) store.dispatch(setZipCode(zipcode));
+    if (address) store.dispatch(setAddress(address));
 
-  // Testing to print to screen
-  let loc = 'Location...';
-  let addy = 'Address...';
-  if (!error) {
-    loc = JSON.stringify(location);
-    addy = JSON.stringify(address);
+  } catch (err: any) {
+    error = 'Failed to get location/address: ' + (err.message ?? err);
   }
 
-  return {
-    zipcode: zipcode,
-    address: address
-  };
+  return { zipcode, address, error };
+
+}
 
   // return (
   //   <>
@@ -98,7 +70,6 @@ export default function UserLocation() {
   //     </ScrollView>
   //   </>
   // );
-}
 
 // const styles = StyleSheet.create({
 //   container: {
