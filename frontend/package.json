@@ -14,7 +14,7 @@
   "jest": {
     "preset": "jest-expo",
     "transformIgnorePatterns": [
-      "node_modules/(?!(immer|@reduxjs/toolkit|react-redux|expo-location|expo-modules-core|expo|@expo)/)"
+      "node_modules/(?!(immer|@reduxjs/toolkit|react-redux|expo-location|expo-modules-core|expo|@expo|react-native|@react-native)/)"
     ]
   },
   "dependencies": {
