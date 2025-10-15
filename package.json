@@ -9,8 +9,5 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.1.6",
     "prettier": "^3.6.2"
-  },
-  "dependencies": {
-    "expo": "^54.0.12"
   }
 }
