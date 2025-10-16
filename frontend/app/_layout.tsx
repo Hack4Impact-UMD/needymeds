@@ -10,14 +10,14 @@ import {
 
 import { Colors, Fonts } from '../constants/theme';
 
-const scheme = useColorScheme();
-const basePaperTheme = scheme === 'dark' ? PaperDarkTheme : PaperDefaultTheme;
-
 export const unstable_settings = {
   anchor: '(tabs)',
 };
 
 export default function RootLayout() {
+  const scheme = useColorScheme();
+  const basePaperTheme = scheme === 'dark' ? PaperDarkTheme : PaperDefaultTheme;
+
   const paperTheme = {
     ...basePaperTheme,
     colors: {
