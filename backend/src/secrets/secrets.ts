@@ -18,19 +18,6 @@ export async function getDsntSecret(): Promise<DsntSecret> {
   const now = Date.now();
   if (cache && cache.exp > now) return cache.secret;
 
-  // Local development fallback (DO NOT use in production):
-  // If developers export DSNT_USERNAME / DSNT_PASSWORD / DSNT_BASE_URL locally,
-  // we short-circuit secrets manager to allow manual curl testing without real AWS creds.
-  if (process.env.DSNT_USERNAME && process.env.DSNT_PASSWORD && process.env.DSNT_BASE_URL) {
-    const secret: DsntSecret = {
-      baseUrl: process.env.DSNT_BASE_URL,
-      username: process.env.DSNT_USERNAME,
-      password: process.env.DSNT_PASSWORD,
-    };
-    cache = { secret, exp: now + TTL_MS };
-    return secret;
-  }
-
   const cmd = new GetSecretValueCommand({ SecretId: secretName });
   const res = await client.send(cmd);
 

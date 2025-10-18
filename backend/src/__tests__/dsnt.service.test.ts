@@ -1,7 +1,7 @@
 import nock from "nock";
 import request from "supertest";
 import app from "../app";
-import { DSNTService } from "../services/dsnt.service";
+import { getPriceByNdc, priceByNdcAndNpiList } from "../services/dsnt.service";
 
 // mock the secrets module so we don't hit AWS locally
 jest.mock("../secrets/secrets", () => ({
@@ -11,28 +11,27 @@ jest.mock("../secrets/secrets", () => ({
   })
 }));
 
-describe("GET /dsnt/price-by-ndc", () => {
+describe("GET /api/dsnt/price", () => {
   const host = "https://argusprod.dstsystems.com";
   afterEach(() => nock.cleanAll());
 
   it("200 happy path", async () => {
     nock(host).get(/PharmacyPricing/).reply(200, { foo: "bar" });
-    const res = await request(app).get("/dsnt/price-by-ndc")
+  const res = await request(app).get("/api/dsnt/price")
       .query({ ndc: "59148000713", quantity: 100, radius: 100, zipCode: "10003" });
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ ok: true, data: { foo: "bar" } });
   });
 
   it("400 on bad input", async () => {
-    const res = await request(app).get("/dsnt/price-by-ndc")
+  const res = await request(app).get("/api/dsnt/price")
       .query({ ndc: "bad", quantity: -1, radius: 0, zipCode: "abc" });
     expect(res.status).toBe(400);
     expect(res.body.ok).toBe(false);
   });
 });
 
-describe("DSNTService.priceByNDC", () => {
-  const service = new DSNTService();
+describe("getPriceByNdc", () => {
   const host = "https://argusprod.dstsystems.com";
 
   afterEach(() => nock.cleanAll());
@@ -43,7 +42,7 @@ describe("DSNTService.priceByNDC", () => {
       .query({ quantity: "100", ndc: "59148000713", radius: "100", zipCode: "10003" })
       .reply(200, { prices: [{ pharmacyId: "X", price: 12.34 }] });
 
-    const data = await service.priceByNDC({
+  const data = await getPriceByNdc({
       ndc: "59148000713", quantity: 100, radius: 100, zipCode: "10003",
     });
     expect(data).toEqual({ prices: [{ pharmacyId: "X", price: 12.34 }] });
@@ -55,7 +54,7 @@ describe("DSNTService.priceByNDC", () => {
       .query({ quantity: "100", ndc: "59148000713", radius: "100", zipCode: "10003" })
       .reply(400, { message: "bad request" });
 
-    await expect(service.priceByNDC({
+  await expect(getPriceByNdc({
       ndc: "59148000713", quantity: 100, radius: 100, zipCode: "10003",
     })).rejects.toMatchObject({ message: "DS&T returned 400", status: 400 });
   });
@@ -66,7 +65,7 @@ describe("DSNTService.priceByNDC", () => {
       .query({ quantity: "100", ndc: "59148000713", radius: "100", zipCode: "10003" })
       .reply(503, {});
 
-    await expect(service.priceByNDC({
+  await expect(getPriceByNdc({
       ndc: "59148000713", quantity: 100, radius: 100, zipCode: "10003",
     })).rejects.toMatchObject({ status: 503 });
     expect(scope.isDone()).toBe(true);
@@ -77,7 +76,7 @@ describe("DSNTService.priceByNDC", () => {
       .get(/PharmacyPricing/).twice().reply(502, {})
       .get(/PharmacyPricing/).reply(200, { ok: true });
 
-    const data = await service.priceByNDC({
+  const data = await getPriceByNdc({
       ndc: "59148000713", quantity: 100, radius: 5, zipCode: "10003",
     });
     expect(data).toEqual({ ok: true });
@@ -85,8 +84,7 @@ describe("DSNTService.priceByNDC", () => {
   });
 });
 
-describe("DSNTService.priceByNdcAndNpiListQuery", () => {
-  const service = new DSNTService();
+describe("priceByNdcAndNpiList", () => {
   const host = "https://argusprod.dstsystems.com";
   afterEach(() => nock.cleanAll());
 
@@ -96,7 +94,7 @@ describe("DSNTService.priceByNdcAndNpiListQuery", () => {
       .query({ quantity: "100", ndc: "59148000713", npilist: "1326064445" })
       .reply(200, { DrugPricing: [{ npi: "1326064445", ndc: "59148000713", price: "2087.39" }] });
 
-    const data = await service.priceByNdcAndNpiListQuery({
+  const data = await priceByNdcAndNpiList({
       ndc: "59148000713", quantity: 100, npilist: "1326064445",
     });
     expect(data).toEqual({ DrugPricing: [{ npi: "1326064445", ndc: "59148000713", price: "2087.39" }] });
@@ -108,14 +106,14 @@ describe("DSNTService.priceByNdcAndNpiListQuery", () => {
       .query({ quantity: "45", ndc: "00591405289", npilist: "1013431949,1326064445" })
       .reply(200, { DrugPricing: [] });
 
-    const data = await service.priceByNdcAndNpiListQuery({
+  const data = await priceByNdcAndNpiList({
       ndc: "00591405289", quantity: 45, npilist: "1013431949,1326064445",
     });
     expect(data).toEqual({ DrugPricing: [] });
   });
 
   it("validates bad npi", async () => {
-    await expect(service.priceByNdcAndNpiListQuery({ ndc: "00591405289", quantity: 45, npilist: "abc" }))
+  await expect(priceByNdcAndNpiList({ ndc: "00591405289", quantity: 45, npilist: "abc" }))
       .rejects.toMatchObject({ status: 400 });
   });
 });

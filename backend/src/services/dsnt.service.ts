@@ -133,21 +133,4 @@ export async function priceByNdcAndNpiList(opts: {
 // ---------------------------------------------------------------------------
 // Compatibility class (legacy interface expected by existing tests/routes)
 // ---------------------------------------------------------------------------
-export class DSNTService {
-  async priceByNDC(p: { ndc: string; quantity: number; radius: number; zipCode: string }) {
-    return getPriceByNdc({
-      ndc: p.ndc,
-      quantity: p.quantity,
-      radius: p.radius,
-      zipCode: p.zipCode,
-    });
-  }
-
-  async priceByNdcAndNpiListQuery(p: { ndc: string; quantity: number; npilist: string | string[] }) {
-    return priceByNdcAndNpiList({
-      ndc: p.ndc,
-      quantity: p.quantity,
-      npilist: Array.isArray(p.npilist) ? p.npilist.join(',') : p.npilist,
-    });
-  }
-}
+// legacy DSNTService class removed; prefer functional exports above

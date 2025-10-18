@@ -17,13 +17,11 @@ app.get('/', (_req, res) => res.status(200).json({ ok: true, route: 'root' }));
 
 // New preferred base path
 app.use('/api/dsnt', dsntRouter);
-// Legacy base path (backward compatibility for existing tests/clients)
-app.use('/dsnt', dsntRouter);
 
 app.use((err: any, _req: any, res: any, _next: any) => {
   const status = err?.status ?? err?.response?.status ?? 500;
   const message = err?.message || err?.response?.data?.message || 'Internal Server Error';
-  res.status(status).json({ error: message });
+  res.status(status).json({ ok: false, error: message });
 });
 
 export default app;
