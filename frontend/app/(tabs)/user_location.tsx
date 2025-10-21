@@ -23,13 +23,13 @@ export default async function getUserLocation(): Promise<UserLocationResult> {
     // Get current location
     const location = await Location.getCurrentPositionAsync({});
     if (!location) {
-      return { error: 'Error fetching current location.' }
+      return { error: 'Error fetching current location.' };
     }
 
     // Extract latitude and longitude
     const lat = location.coords.latitude;
     const lon = location.coords.longitude;
-    const format = "json";
+    const format = 'json';
     const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=${format}`;
 
     // API Request to Nominatim
@@ -46,30 +46,28 @@ export default async function getUserLocation(): Promise<UserLocationResult> {
 
     if (zipcode) store.dispatch(setZipCode(zipcode));
     if (address) store.dispatch(setAddress(address));
-
   } catch (err: any) {
     error = 'Failed to get location/address: ' + (err.message ?? err);
   }
 
   return { zipcode, address, error };
-
 }
 
-  // return (
-  //   <>
-  //     <Stack.Screen options={{ title: 'User Location' }} />
-  //     <ScrollView style={styles.container}>
-  //       <Text style={styles.text}>Full Location: {loc}</Text>
-  //       <Text style={styles.text}>Latitude: {location?.coords.latitude}</Text>
-  //       <Text style={styles.text}>Longitude: {location?.coords.longitude}</Text>
-  //       {/* <Text style={styles.text}>Address Display Name: {addy}</Text> */}
-  //       {/* <Text style={styles.text}>Zipcode: {zipcode}</Text> */}
-  //       <Text style={styles.text}>Redux Zipcode: {zipcode ?? 'Loading...'}</Text>
-  //       <Text style={styles.text}>Redux Address: {address ?? 'Loading...'}</Text>
-  //       <Text style={styles.text}>Error: {error}</Text>
-  //     </ScrollView>
-  //   </>
-  // );
+// return (
+//   <>
+//     <Stack.Screen options={{ title: 'User Location' }} />
+//     <ScrollView style={styles.container}>
+//       <Text style={styles.text}>Full Location: {loc}</Text>
+//       <Text style={styles.text}>Latitude: {location?.coords.latitude}</Text>
+//       <Text style={styles.text}>Longitude: {location?.coords.longitude}</Text>
+//       {/* <Text style={styles.text}>Address Display Name: {addy}</Text> */}
+//       {/* <Text style={styles.text}>Zipcode: {zipcode}</Text> */}
+//       <Text style={styles.text}>Redux Zipcode: {zipcode ?? 'Loading...'}</Text>
+//       <Text style={styles.text}>Redux Address: {address ?? 'Loading...'}</Text>
+//       <Text style={styles.text}>Error: {error}</Text>
+//     </ScrollView>
+//   </>
+// );
 
 // const styles = StyleSheet.create({
 //   container: {
