@@ -1,14 +1,14 @@
 import axios from 'axios';
-import { getJWToken } from '../auth/scriptsave.tokenManager'; // placeholder
+import { scriptSaveTokenManager } from '../auth/scriptsave.tokenManager'; // placeholder
 import { getScriptSaveSecret } from '../secrets/secrets'; // placeholder
 
 async function client() {
-  const { baseURL, subscriptionKey } = await getScriptSaveSecret();
+  const { baseUrl, subscriptionKey } = await getScriptSaveSecret();
 
-  const JWToken = getJWToken();
+  const JWToken = scriptSaveTokenManager.getToken();
 
   return axios.create({
-    baseURL,
+    baseURL: baseUrl,
     timeout: 12000,
     headers: {
       Authorization: `Bearer ${JWToken}`,
@@ -95,6 +95,14 @@ async function performRequest(method: httpMethod, path: string, params: Record<s
   err.status = res.status;
   throw err;
 }
+
+// 001 AutoComplete
+
+// 002a FindDrugs - Using NDC11
+
+// 002b FindDrugs - Using DrugName
+
+// 002c FindDrugs - Using GSN and ReferencedBN
 
 // 003 GetDrugFormStrength
 export async function getDrugFormStrength(opts: { groupID: string; gsn: string }) {
