@@ -1,6 +1,6 @@
-import { getPriceByNdc, getPriceByNdcAndNpi } from '../dsnt';
+import { getPriceByNdc, getPriceByNdcAndNpi } from '../dsntClient';
 import { apiGet } from '../http';
-import { DsntPriceRequest, DsntPriceNpiRequest } from '../types';
+import { DsntPriceNpiRequest, DsntPriceRequest } from '../types';
 
 describe('dsnt api', () => {
   it('calls /api/price', async () => {

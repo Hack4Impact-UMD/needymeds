@@ -1,4 +1,4 @@
-import { scriptsaveSearch } from '../scriptsave';
+import { scriptsaveSearch } from '../scriptSaveClient';
 
 describe('scriptsave api', () => {
   it('calls /scriptsave/search', async () => {
