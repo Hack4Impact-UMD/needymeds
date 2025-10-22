@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import {
   autoComplete,
+  findDrugsUsingDrugName,
+  findDrugsUsingGSNAndReferencedBN,
+  findDrugsUsingNDC11,
   generateCardholder,
   getDrugFormStrength,
   priceDrug,
@@ -32,17 +35,161 @@ router.get('/autoComplete', async (req, res, next) => {
 
 // ------------------- 002a FindDrugs - Using NDC11 -------------------
 router.get('/findDrugsUsingNDC11', async (req, res, next) => {
-  return res.status(501).json({ ok: false, error: 'This function is not implemented yet' });
+  try {
+    const {
+      groupID,
+      brandIndicator,
+      ndc,
+      includeDrugInfo,
+      includeDrugImage,
+      quantity,
+      numPharm,
+      zipCode,
+      useUC,
+      ndcOverride,
+    } = req.query;
+
+    const required = [
+      'groupID',
+      'brandIndicator',
+      'ndc',
+      'includeDrugInfo',
+      'includeDrugImage',
+      'quantity',
+      'numPharm',
+      'zipCode',
+      'useUC',
+      'ndcOverride',
+    ];
+
+    for (const key of required) {
+      if (!req.query[key]) {
+        return res.status(400).json({ ok: false, error: `${key} is required` });
+      }
+    }
+
+    const data = await findDrugsUsingNDC11({
+      groupID: String(groupID),
+      brandIndicator: String(brandIndicator),
+      ndc: String(ndc),
+      includeDrugInfo: String(includeDrugInfo),
+      includeDrugImage: String(includeDrugImage),
+      quantity: String(quantity),
+      numPharm: String(numPharm),
+      zipCode: String(zipCode),
+      useUC: String(useUC),
+      ndcOverride: String(ndcOverride),
+    });
+
+    res.json({ ok: true, data });
+  } catch (err: any) {
+    next(err);
+  }
 });
 
 // ------------------- 002b FindDrugs - Using DrugName -------------------
 router.get('/findDrugsUsingDrugName', async (req, res, next) => {
-  return res.status(501).json({ ok: false, error: 'This function is not implemented yet' });
+  try {
+    const {
+      groupID,
+      brandIndicator,
+      drugName,
+      includeDrugInfo,
+      includeDrugImage,
+      quantity,
+      numPharm,
+      zipCode,
+      useUC,
+    } = req.query;
+
+    const required = [
+      'groupID',
+      'brandIndicator',
+      'drugName',
+      'includeDrugInfo',
+      'includeDrugImage',
+      'quantity',
+      'numPharm',
+      'zipCode',
+      'useUC',
+    ];
+
+    for (const key of required) {
+      if (!req.query[key]) {
+        return res.status(400).json({ ok: false, error: `${key} is required` });
+      }
+    }
+
+    const data = await findDrugsUsingDrugName({
+      groupID: String(groupID),
+      brandIndicator: String(brandIndicator),
+      drugName: String(drugName),
+      includeDrugInfo: String(includeDrugInfo),
+      includeDrugImage: String(includeDrugImage),
+      quantity: String(quantity),
+      numPharm: String(numPharm),
+      zipCode: String(zipCode),
+      useUC: String(useUC),
+    });
+
+    res.json({ ok: true, data });
+  } catch (err: any) {
+    next(err);
+  }
 });
 
 // ------------------- 002c FindDrugs - Using GSN and ReferencedBN -------------------
 router.get('/findDrugsUsingGSNAndReferencedBN', async (req, res, next) => {
-  return res.status(501).json({ ok: false, error: 'This function is not implemented yet' });
+  try {
+    const {
+      groupID,
+      brandIndicator,
+      gsn,
+      referencedBN,
+      includeDrugInfo,
+      includeDrugImage,
+      quantity,
+      numPharm,
+      zipCode,
+      useUC,
+    } = req.query;
+
+    const required = [
+      'groupID',
+      'brandIndicator',
+      'gsn',
+      'referencedBN',
+      'includeDrugInfo',
+      'includeDrugImage',
+      'quantity',
+      'numPharm',
+      'zipCode',
+      'useUC',
+    ];
+
+    for (const key of required) {
+      if (!req.query[key]) {
+        return res.status(400).json({ ok: false, error: `${key} is required` });
+      }
+    }
+
+    const data = await findDrugsUsingGSNAndReferencedBN({
+      groupID: String(groupID),
+      brandIndicator: String(brandIndicator),
+      gsn: String(gsn),
+      referencedBN: String(referencedBN),
+      includeDrugInfo: String(includeDrugInfo),
+      includeDrugImage: String(includeDrugImage),
+      quantity: String(quantity),
+      numPharm: String(numPharm),
+      zipCode: String(zipCode),
+      useUC: String(useUC),
+    });
+
+    res.json({ ok: true, data });
+  } catch (err: any) {
+    next(err);
+  }
 });
 
 // ------------------- 003 GetDrugFormStrength -------------------
