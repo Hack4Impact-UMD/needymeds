@@ -1,15 +1,4 @@
-// https://nominatim.openstreetmap.org/search?<params>
-// query:
-/*
-q       free form query
-street	housenumber and streetname
-city	city
-county	county
-state	state
-country	country
-postalcode	postal code
-*/
-
+// return type
 export interface Coordinates {
   lat: string;
   lon: string;
@@ -24,8 +13,8 @@ export async function zipToCoords(zipcode: string): Promise<Coordinates> {
     error: '',
   };
 
-  const f = 'jsonv2';
-  const url = `https://nominatim.openstreetmap.org/search?postalcode=${zipcode}&format=${f}`;
+  const format = 'jsonv2';
+  const url = `https://nominatim.openstreetmap.org/search?postalcode=${zipcode}&format=${format}`;
 
   const response = await fetch(url);
   if (!response.ok) {
@@ -35,35 +24,7 @@ export async function zipToCoords(zipcode: string): Promise<Coordinates> {
 
   const data = await response.json();
   if (!data || data.length === 0) {
-    coords.error = 'No results.';
-    return coords;
-  }
-
-  coords.lat = data[0].lat;
-  coords.lon = data[0].lon;
-
-  return coords;
-}
-
-// convert string to coordinates
-export async function addrToCoords(address: string): Promise<Coordinates> {
-  const coords: Coordinates = {
-    lat: '',
-    lon: '',
-    error: '',
-  };
-  const f = 'jsonv2';
-  const url = `https://nominatim.openstreetmap.org/search?q=${address}&format=${f}`;
-
-  const response = await fetch(url);
-  if (!response.ok) {
-    coords.error = 'Request to Nominatim failed';
-    return coords;
-  }
-
-  const data = await response.json();
-  if (!data || data.length === 0) {
-    coords.error = 'No results';
+    coords.error = 'No location results.';
     return coords;
   }
 
@@ -75,7 +36,8 @@ export async function addrToCoords(address: string): Promise<Coordinates> {
 
 // calculate distance between two coordinates with the Haversin formula
 export function haversine(coords1: Coordinates, coords2: Coordinates): number {
-  const R = 6371000; // radius of earth in meters
+  // radius of earth in meters
+  const R = 6371000;
 
   // convert from string to float
   const lat1 = parseFloat(coords1.lat);
