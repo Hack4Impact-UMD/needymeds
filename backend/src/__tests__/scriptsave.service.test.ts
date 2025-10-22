@@ -1,6 +1,10 @@
 import nock from 'nock';
 import { getScriptSaveSecret } from '../secrets/secrets'; // placeholder
 import {
+  autoComplete,
+  findDrugsUsingDrugName,
+  findDrugsUsingGSNAndReferencedBN,
+  findDrugsUsingNDC11,
   generateCardholder,
   getDrugFormStrength,
   priceDrug,
@@ -8,10 +12,196 @@ import {
   priceDrugsByNCPDP,
 } from '../services/scriptsave.service';
 
-describe('scriptsave.service', () => {
-  const { host, _ } = getScriptSaveSecret();
+describe('scriptsave.service', async () => {
+  const { baseUrl, subscriptionKey } = await getScriptSaveSecret();
+  const host = baseUrl;
 
   afterEach(() => nock.cleanAll());
+
+  // -------------------- autoComplete --------------------
+  describe('autoComplete', () => {
+    it('returns list of suggestions', async () => {
+      nock(host)
+        .get('/PricingAPI/api/PricingEngineExternal/AutoComplete')
+        .query({ PrefixText: 'asp', groupID: '1', Count: '5' })
+        .reply(200, ['aspirin', 'aspartame']);
+
+      const data = await autoComplete({ prefixText: 'asp', groupID: '1', count: '5' });
+      expect(data).toEqual(['aspirin', 'aspartame']);
+    });
+
+    it('fails validation when prefixText empty', async () => {
+      await expect(
+        autoComplete({ prefixText: '', groupID: '1', count: '5' })
+      ).rejects.toMatchObject({ status: 400 });
+    });
+
+    it('throws safe error on 4xx', async () => {
+      nock(host)
+        .get(/AutoComplete/)
+        .reply(400, { message: 'Bad request' });
+
+      await expect(
+        autoComplete({ prefixText: 'asp', groupID: '1', count: '5' })
+      ).rejects.toMatchObject({
+        message: expect.stringContaining('ScriptSave returned 400'),
+        status: 400,
+      });
+    });
+  });
+
+  // -------------------- findDrugsUsingNDC11 --------------------
+  describe('findDrugsUsingNDC11', () => {
+    it('returns drug data', async () => {
+      nock(host)
+        .get('/PricingAPI/api/PricingEngineExternal/FindDrugs')
+        .query({
+          groupID: '1',
+          BrandIndicator: 'B',
+          NDC: '12345678901',
+          IncludeDrugInfo: 'true',
+          IncludeDrugImage: 'false',
+          qty: '30',
+          numPharm: '5',
+          zip: '12345',
+          UseUC: 'false',
+          NDCOverride: 'true',
+        })
+        .reply(200, { drug: 'Aspirin' });
+
+      const data = await findDrugsUsingNDC11({
+        groupID: '1',
+        brandIndicator: 'B',
+        ndc: '12345678901',
+        includeDrugInfo: 'true',
+        includeDrugImage: 'false',
+        quantity: '30',
+        numPharm: '5',
+        zipCode: '12345',
+        useUC: 'false',
+        ndcOverride: 'true',
+      });
+      expect(data).toEqual({ drug: 'Aspirin' });
+    });
+
+    it('fails validation on bad ndc', async () => {
+      await expect(
+        findDrugsUsingNDC11({
+          groupID: '1',
+          brandIndicator: 'B',
+          ndc: 'bad',
+          includeDrugInfo: 'true',
+          includeDrugImage: 'false',
+          quantity: '30',
+          numPharm: '5',
+          zipCode: '12345',
+          useUC: 'false',
+          ndcOverride: 'true',
+        })
+      ).rejects.toMatchObject({ status: 400 });
+    });
+  });
+
+  // -------------------- findDrugsUsingDrugName --------------------
+  describe('findDrugsUsingDrugName', () => {
+    it('returns data successfully', async () => {
+      nock(host)
+        .get('/PricingAPI/api/PricingEngineExternal/FindDrugs')
+        .query({
+          groupID: '2',
+          BrandIndicator: 'G',
+          DrugName: 'acetaminophen',
+          IncludeDrugInfo: 'true',
+          IncludeDrugImage: 'false',
+          qty: '15',
+          numPharm: '3',
+          zip: '67890',
+          UseUC: 'true',
+        })
+        .reply(200, { results: ['drugX'] });
+
+      const data = await findDrugsUsingDrugName({
+        groupID: '2',
+        brandIndicator: 'G',
+        drugName: 'acetaminophen',
+        includeDrugInfo: 'true',
+        includeDrugImage: 'false',
+        quantity: '15',
+        numPharm: '3',
+        zipCode: '67890',
+        useUC: 'true',
+      });
+      expect(data).toEqual({ results: ['drugX'] });
+    });
+
+    it('throws 400 when zip invalid', async () => {
+      await expect(
+        findDrugsUsingDrugName({
+          groupID: '2',
+          brandIndicator: 'G',
+          drugName: 'acetaminophen',
+          includeDrugInfo: 'true',
+          includeDrugImage: 'false',
+          quantity: '15',
+          numPharm: '3',
+          zipCode: 'ABCDE',
+          useUC: 'true',
+        })
+      ).rejects.toMatchObject({ status: 400 });
+    });
+  });
+
+  // -------------------- findDrugsUsingGSNAndReferencedBN --------------------
+  describe('findDrugsUsingGSNAndReferencedBN', () => {
+    it('returns results successfully', async () => {
+      nock(host)
+        .get('/PricingAPI/api/PricingEngineExternal/FindDrugs')
+        .query({
+          groupID: '3',
+          BrandIndicator: 'B',
+          GSN: '12345',
+          referencedBN: 'BN123',
+          IncludeDrugInfo: 'true',
+          IncludeDrugImage: 'true',
+          qty: '10',
+          numPharm: '2',
+          zip: '10101',
+          UseUC: 'false',
+        })
+        .reply(200, { drugs: ['X'] });
+
+      const data = await findDrugsUsingGSNAndReferencedBN({
+        groupID: '3',
+        brandIndicator: 'B',
+        gsn: '12345',
+        referencedBN: 'BN123',
+        includeDrugInfo: 'true',
+        includeDrugImage: 'true',
+        quantity: '10',
+        numPharm: '2',
+        zipCode: '10101',
+        useUC: 'false',
+      });
+      expect(data).toEqual({ drugs: ['X'] });
+    });
+
+    it('throws 400 for invalid zipCode', async () => {
+      await expect(
+        findDrugsUsingGSNAndReferencedBN({
+          groupID: '3',
+          brandIndicator: 'B',
+          gsn: '12345',
+          referencedBN: 'BN123',
+          includeDrugInfo: 'true',
+          includeDrugImage: 'true',
+          quantity: '10',
+          numPharm: '2',
+          zipCode: 'ABCDE',
+          useUC: 'false',
+        })
+      ).rejects.toMatchObject({ status: 400 });
+    });
+  });
 
   // -------------------- getDrugFormStrength --------------------
   describe('getDrugFormStrength', () => {
