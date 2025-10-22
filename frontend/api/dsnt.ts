@@ -1,23 +1,15 @@
 import { apiGet } from './http';
+import {
+  DsntPriceRequest,
+  DsntPriceNpiRequest,
+  DsntPriceResponse,
+  DsntPriceNpiResponse,
+} from './types';
 
-export type DsntPriceResponse = unknown;
-export type DsntPriceNpiResponse = unknown; // add types?
-
-export function getPriceByNdc(q: {
-  quantity: string | number;
-  ndc: string;
-  radius: string | number;
-  zipCode: string;
-}) {
+export function getPriceByNdc(q: DsntPriceRequest) {
   return apiGet<DsntPriceResponse>('/api/price', q);
 }
 
-export function getPriceByNdcAndNpi(q: {
-  npilist: string;
-  quantity: string | number;
-  ndc: string;
-  radius?: string | number;
-  zipCode?: string;
-}) {
+export function getPriceByNdcAndNpi(q: DsntPriceNpiRequest) {
   return apiGet<DsntPriceNpiResponse>('/api/price-ndc-npi', q);
 }
