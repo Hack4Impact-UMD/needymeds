@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import {
+  autoComplete,
   generateCardholder,
   getDrugFormStrength,
   priceDrug,
@@ -8,6 +9,41 @@ import {
 } from '../services/scriptsave.service';
 
 const router = Router();
+
+// ------------------- 001 AutoComplete -------------------
+router.get('/autoComplete', async (req, res, next) => {
+  try {
+    const { prefixText, groupID, count } = req.query;
+    if (!prefixText || !groupID) {
+      return res.status(400).json({ ok: false, error: 'prefixText and groupID are required' });
+    }
+
+    const data = await autoComplete({
+      prefixText: String(prefixText),
+      groupID: String(groupID),
+      count: count !== undefined ? String(count) : undefined,
+    });
+
+    res.json({ ok: true, data });
+  } catch (err: any) {
+    next(err);
+  }
+});
+
+// ------------------- 002a FindDrugs - Using NDC11 -------------------
+router.get('/findDrugsUsingNDC11', async (req, res, next) => {
+  return res.status(501).json({ ok: false, error: 'This function is not implemented yet' });
+});
+
+// ------------------- 002b FindDrugs - Using DrugName -------------------
+router.get('/findDrugsUsingDrugName', async (req, res, next) => {
+  return res.status(501).json({ ok: false, error: 'This function is not implemented yet' });
+});
+
+// ------------------- 002c FindDrugs - Using GSN and ReferencedBN -------------------
+router.get('/findDrugsUsingGSNAndReferencedBN', async (req, res, next) => {
+  return res.status(501).json({ ok: false, error: 'This function is not implemented yet' });
+});
 
 // ------------------- 003 GetDrugFormStrength -------------------
 router.get('/getDrugFormStrength', async (req, res, next) => {

@@ -26,7 +26,9 @@ const NCPDP_RE = /^\[("(\d)+")*\]$/;
 const ZIP_RE = /^\d{5}$/; // simple 5-digit US zip
 
 function validateCommon(opts: {
+  prefixText?: string;
   groupID?: string;
+  count?: string;
   gsn?: string;
   ndc?: string;
   ncpdp?: string;
@@ -36,11 +38,16 @@ function validateCommon(opts: {
   zipCode?: string;
 }) {
   const numericGroupID = Number(opts.groupID);
+  const numericCount = Number(opts.count);
   const numericQuantity = Number(opts.quantity);
   const numericNumResults = Number(opts.numResults);
 
+  if (opts.prefixText !== undefined && opts.prefixText === '')
+    return 'Invalid prefixText (must be non-empty)';
   if (opts.groupID !== undefined && !Number.isFinite(numericGroupID))
     return 'Invalid groupID (must be >0)';
+  if (opts.count !== undefined && !(Number.isFinite(numericCount) && numericCount > 0))
+    return 'Invalid count (must be >0)';
   if (opts.gsn !== undefined && !GSN_RE.test(opts.gsn)) return 'Invalid gsn (expect 6 digits)';
   if (opts.ndc !== undefined && !NDC_RE.test(opts.ndc)) return 'Invalid ndc (expect 11 digits)';
   if (opts.ncpdp !== undefined && !NCPDP_RE.test(opts.ncpdp))
@@ -97,12 +104,138 @@ async function performRequest(method: httpMethod, path: string, params: Record<s
 }
 
 // 001 AutoComplete
+export async function autoComplete(opts: { prefixText: string; groupID: string; count?: string }) {
+  const validationError = validateCommon({
+    prefixText: opts.prefixText,
+    groupID: opts.groupID,
+    count: opts.count,
+  });
+  if (validationError) {
+    const err: any = new Error(validationError);
+    err.status = 400;
+    throw err;
+  }
+
+  return performRequest('GET', '/PricingAPI/api/PricingEngineExternal/AutoComplete', {
+    PrefixText: opts.prefixText,
+    groupID: opts.groupID,
+    Count: opts.count,
+  });
+}
 
 // 002a FindDrugs - Using NDC11
+export async function findDrugsUsingNDC11(opts: {
+  groupID: string;
+  brandIndicator: string;
+  ndc: string;
+  includeDrugInfo: string;
+  includeDrugImage: string;
+  quantity: string;
+  numPharm: string;
+  zipCode: string;
+  useUC: string;
+  ndcOverride: string;
+}) {
+  const validationError = validateCommon({
+    groupID: opts.groupID,
+    ndc: opts.ndc,
+    quantity: opts.quantity,
+    zipCode: opts.zipCode,
+    ndcOverride: opts.ndcOverride,
+  });
+  if (validationError) {
+    const err: any = new Error(validationError);
+    err.status = 400;
+    throw err;
+  }
+
+  return performRequest('GET', '/PricingAPI/api/PricingEngineExternal/FindDrugs', {
+    groupID: opts.groupID,
+    BrandIndicator: opts.brandIndicator,
+    NDC: opts.ndc,
+    IncludeDrugInfo: opts.includeDrugInfo,
+    IncludeDrugImage: opts.includeDrugImage,
+    qty: opts.quantity,
+    numPharm: opts.numPharm,
+    zip: opts.zipCode,
+    UseUC: opts.useUC,
+    NDCOverride: opts.ndcOverride,
+  });
+}
 
 // 002b FindDrugs - Using DrugName
+export async function findDrugsUsingDrugName(opts: {
+  groupID: string;
+  brandIndicator: string;
+  drugName: string;
+  includeDrugInfo: string;
+  includeDrugImage: string;
+  quantity: string;
+  numPharm: string;
+  zipCode: string;
+  useUC: string;
+}) {
+  const validationError = validateCommon({
+    groupID: opts.groupID,
+    quantity: opts.quantity,
+    zipCode: opts.zipCode,
+  });
+  if (validationError) {
+    const err: any = new Error(validationError);
+    err.status = 400;
+    throw err;
+  }
+
+  return performRequest('GET', '/PricingAPI/api/PricingEngineExternal/FindDrugs', {
+    groupID: opts.groupID,
+    BrandIndicator: opts.brandIndicator,
+    DrugName: opts.drugName,
+    IncludeDrugInfo: opts.includeDrugInfo,
+    IncludeDrugImage: opts.includeDrugImage,
+    qty: opts.quantity,
+    numPharm: opts.numPharm,
+    zip: opts.zipCode,
+    UseUC: opts.useUC,
+  });
+}
 
 // 002c FindDrugs - Using GSN and ReferencedBN
+export async function findDrugsUsingGSNAndReferencedBN(opts: {
+  groupID: string;
+  brandIndicator: string;
+  gsn: string;
+  referencedBN: string;
+  includeDrugInfo: string;
+  includeDrugImage: string;
+  quantity: string;
+  numPharm: string;
+  zipCode: string;
+  useUC: string;
+}) {
+  const validationError = validateCommon({
+    groupID: opts.groupID,
+    quantity: opts.quantity,
+    zipCode: opts.zipCode,
+  });
+  if (validationError) {
+    const err: any = new Error(validationError);
+    err.status = 400;
+    throw err;
+  }
+
+  return performRequest('GET', '/PricingAPI/api/PricingEngineExternal/FindDrugs', {
+    groupID: opts.groupID,
+    BrandIndicator: opts.brandIndicator,
+    GSN: opts.gsn,
+    referencedBN: opts.referencedBN,
+    IncludeDrugInfo: opts.includeDrugInfo,
+    IncludeDrugImage: opts.includeDrugImage,
+    qty: opts.quantity,
+    numPharm: opts.numPharm,
+    zip: opts.zipCode,
+    UseUC: opts.useUC,
+  });
+}
 
 // 003 GetDrugFormStrength
 export async function getDrugFormStrength(opts: { groupID: string; gsn: string }) {
