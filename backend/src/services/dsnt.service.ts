@@ -31,21 +31,29 @@ async function client() {
 
 // ----------------------------- Validation helpers -------------------------
 const NDC_RE = /^\d{11}$/; // 11 digit ndc (no dashes)
-const ZIP_RE = /^\d{5}$/;  // simple 5-digit US zip
+const ZIP_RE = /^\d{5}$/; // simple 5-digit US zip
 const NPI_RE = /^\d{10}$/; // 10 digit NPI
 
-function validateCommon(opts: { ndc: string; quantity: number; radius?: number; zipCode?: string }) {
+function validateCommon(opts: {
+  ndc: string;
+  quantity: number;
+  radius?: number;
+  zipCode?: string;
+}) {
   if (!NDC_RE.test(opts.ndc)) return 'Invalid ndc (expect 11 digits)';
-  if (!(Number.isFinite(opts.quantity) && opts.quantity > 0)) return 'Invalid quantity (must be >0)';
-  if (opts.radius !== undefined && !(Number.isFinite(opts.radius) && opts.radius > 0)) return 'Invalid radius (must be >0)';
-  if (opts.zipCode !== undefined && opts.zipCode !== '' && !ZIP_RE.test(opts.zipCode)) return 'Invalid zipCode (expect 5 digits)';
+  if (!(Number.isFinite(opts.quantity) && opts.quantity > 0))
+    return 'Invalid quantity (must be >0)';
+  if (opts.radius !== undefined && !(Number.isFinite(opts.radius) && opts.radius > 0))
+    return 'Invalid radius (must be >0)';
+  if (opts.zipCode !== undefined && opts.zipCode !== '' && !ZIP_RE.test(opts.zipCode))
+    return 'Invalid zipCode (expect 5 digits)';
   return null;
 }
 
 function validateNpiList(npilist: string) {
   if (!npilist) return 'npilist required';
   const parts = npilist.split(',');
-  if (parts.some(p => !NPI_RE.test(p))) return 'Invalid npi in list (10 digits each)';
+  if (parts.some((p) => !NPI_RE.test(p))) return 'Invalid npi in list (10 digits each)';
   return null;
 }
 
@@ -58,7 +66,8 @@ function endpointPath(baseUrl: string) {
 
 async function performRequest(path: string, params: Record<string, any>) {
   const c = await client();
-  const fullPath = endpointPath(c.defaults.baseURL || '') === '/PharmacyPricing' ? '/PharmacyPricing' : path; // safety
+  const fullPath =
+    endpointPath(c.defaults.baseURL || '') === '/PharmacyPricing' ? '/PharmacyPricing' : path; // safety
 
   const MAX_ATTEMPTS = 3;
   let lastError: any;
@@ -89,7 +98,12 @@ export async function getPriceByNdc(opts: {
 }) {
   const numericQuantity = Number(opts.quantity);
   const numericRadius = opts.radius !== undefined ? Number(opts.radius) : undefined;
-  const validationError = validateCommon({ ndc: opts.ndc, quantity: numericQuantity, radius: numericRadius, zipCode: opts.zipCode });
+  const validationError = validateCommon({
+    ndc: opts.ndc,
+    quantity: numericQuantity,
+    radius: numericRadius,
+    zipCode: opts.zipCode,
+  });
   if (validationError) {
     const err: any = new Error(validationError);
     err.status = 400;
@@ -114,7 +128,13 @@ export async function priceByNdcAndNpiList(opts: {
 }) {
   const numericQuantity = Number(opts.quantity);
   const numericRadius = opts.radius !== undefined ? Number(opts.radius) : undefined;
-  const validationError = validateCommon({ ndc: opts.ndc, quantity: numericQuantity, radius: numericRadius, zipCode: opts.zipCode }) || validateNpiList(opts.npilist);
+  const validationError =
+    validateCommon({
+      ndc: opts.ndc,
+      quantity: numericQuantity,
+      radius: numericRadius,
+      zipCode: opts.zipCode,
+    }) || validateNpiList(opts.npilist);
   if (validationError) {
     const err: any = new Error(validationError);
     err.status = 400;
