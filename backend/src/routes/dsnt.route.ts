@@ -19,7 +19,9 @@ router.get('/price', async (req, res, next) => {
       zipCode: zipCode ? String(zipCode) : undefined,
     });
     res.json({ ok: true, data });
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.get('/price-ndc-npi', async (req, res, next) => {
@@ -36,7 +38,9 @@ router.get('/price-ndc-npi', async (req, res, next) => {
       zipCode: zipCode ? String(zipCode) : undefined,
     });
     res.json({ ok: true, data });
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 });
 
 export default router;
