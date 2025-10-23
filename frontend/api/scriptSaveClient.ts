@@ -1,17 +1,21 @@
 import { apiGet } from './http';
-import { ScriptSaveFindDrugsResponse, ScriptSavePriceResponse } from './types';
+import {
+  ScriptSaveFindDrugsRequest,
+  ScriptSaveFindDrugsResponse,
+  ScriptSavePriceRequest,
+  ScriptSavePriceResponse,
+} from './types';
 
-// TODO: ask NPO about these
 export const groupID = 4295;
 export const ncpdp = 1918119;
 export const ndcOverride = true;
 
 class ScriptSaveClient {
-  getDrugsByName(q: any) {
+  getDrugsByName(q: ScriptSaveFindDrugsRequest) {
     return apiGet<ScriptSaveFindDrugsResponse>('/findDrugsUsingDrugName', q);
   }
 
-  getDrugPrices(q: any) {
+  getDrugPrices(q: ScriptSavePriceRequest) {
     return apiGet<ScriptSavePriceResponse>('/priceDrugs', q);
   }
 }

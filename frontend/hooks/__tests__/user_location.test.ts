@@ -1,4 +1,4 @@
-import useUserLocation from '../../hooks/user_location';
+import useUserLocation from '../user_location';
 
 // Mock Expo Location
 jest.mock('expo-location', () => ({
@@ -11,13 +11,13 @@ jest.mock('expo-location', () => ({
 }));
 
 // Mock Redux store and actions
-jest.mock('../redux/store', () => ({
+jest.mock('../../redux/store', () => ({
   store: {
     dispatch: jest.fn(),
   },
 }));
 
-jest.mock('../redux/locationSlice', () => ({
+jest.mock('../../redux/locationSlice', () => ({
   setZipCode: jest.fn((zip: string) => ({ type: 'location/setZipCode', payload: zip })),
   setAddress: jest.fn((addr: string) => ({ type: 'location/setAddress', payload: addr })),
 }));
@@ -43,8 +43,8 @@ test('fetches user address and zipcode successfully', async () => {
   expect(result.error).toBeUndefined();
 
   // Verify Redux dispatches were called
-  const { store } = require('../redux/store');
-  const { setAddress, setZipCode } = require('../redux/locationSlice');
+  const { store } = require('../../redux/store');
+  const { setAddress, setZipCode } = require('../../redux/locationSlice');
   expect(store.dispatch).toHaveBeenCalledWith(setZipCode('12345'));
   expect(store.dispatch).toHaveBeenCalledWith(setAddress('123 Main St, Test City, TS 12345'));
 });

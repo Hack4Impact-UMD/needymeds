@@ -9,10 +9,7 @@ async function handle<T>(res: Response): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export async function apiGet<T>(
-  path: string,
-  params?: Record<string, string | number | undefined>
-) {
+export async function apiGet<T>(path: string, params?: Record<string, any>) {
   const url = new URL(path, API_BASE);
   if (params) {
     for (const [k, v] of Object.entries(params)) {

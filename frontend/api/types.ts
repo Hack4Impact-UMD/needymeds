@@ -4,7 +4,7 @@ type Adjudicator = 'DSNT' | 'ScriptSave';
 
 export interface DrugSearchResult {
   adjudicator: Adjudicator;
-  pharmacyName: string; // primary field for de-duplicatin
+  pharmacyName: string; // primary field for de-duplication
   ndc: string;
   labelName: string;
   price: string;
@@ -19,7 +19,6 @@ export interface DsntPriceRequest {
   ndc: string;
   radius: string | number;
   zipCode: string;
-  [key: string]: string | number | undefined;
 }
 
 export interface DsntPriceNpiRequest {
@@ -28,7 +27,18 @@ export interface DsntPriceNpiRequest {
   ndc: string;
   radius?: string | number;
   zipCode?: string;
-  [key: string]: string | number | undefined;
+}
+
+export interface ScriptSaveFindDrugsRequest {
+  groupID: string | number;
+  brandIndicator?: string;
+  drugName: string;
+  includeDrugInfo?: string | boolean;
+  includeDrugImage?: string | boolean;
+  quantity?: string | number;
+  numPharm?: string | number;
+  zipCode?: string | number;
+  useUC?: string | boolean;
 }
 
 export interface ScriptSavePriceRequest {
@@ -37,7 +47,7 @@ export interface ScriptSavePriceRequest {
   quantity: string | number;
   numResults: string | number;
   zipCode: string | number;
-  ndcOverride: string | boolean;
+  ndcOverride?: string | boolean;
 }
 
 /* Responses */

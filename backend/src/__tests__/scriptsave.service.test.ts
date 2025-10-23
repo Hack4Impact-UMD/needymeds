@@ -1,5 +1,5 @@
 import nock from 'nock';
-import { getScriptSaveSecret } from '../secrets/secrets'; // placeholder
+import { getScriptSaveSecret } from '../secrets/secrets';
 import {
   autoComplete,
   findDrugsUsingDrugName,
@@ -16,7 +16,6 @@ describe('scriptsave.service', () => {
   let host: string;
   let subscriptionKey: string;
 
-  // ✅ Move async call into beforeAll (Jest doesn’t allow async describe callbacks)
   beforeAll(async () => {
     const secrets = await getScriptSaveSecret();
     host = secrets.baseUrl;
