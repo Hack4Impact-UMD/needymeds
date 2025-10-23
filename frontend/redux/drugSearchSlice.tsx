@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { DrugSearchResult } from '../../api/types';
+import { DrugSearchResult } from '../api/types';
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 1 day
 const MAX_CACHE_ENTRIES = 10;

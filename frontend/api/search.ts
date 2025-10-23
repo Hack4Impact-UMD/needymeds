@@ -1,5 +1,5 @@
-import { setCacheEntry } from '@/app/redux/drugSearchSlice';
-import { store } from '../app/redux/store';
+import { setCacheEntry } from '../redux/drugSearchSlice';
+import { store } from '../redux/store';
 import { dsntClient } from './dsntClient';
 import { groupID, ndcOverride, scriptSaveClient } from './scriptSaveClient';
 import {
