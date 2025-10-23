@@ -10,6 +10,7 @@ import {
   priceDrugs,
   priceDrugsByNCPDP,
 } from '../services/scriptsave.service';
+import { stringIfDefined } from '../utils/stringIfDefined';
 
 const router = Router();
 
@@ -24,7 +25,7 @@ router.get('/autoComplete', async (req, res, next) => {
     const data = await autoComplete({
       prefixText: String(prefixText),
       groupID: String(groupID),
-      count: count !== undefined ? String(count) : undefined,
+      count: stringIfDefined(count),
     });
 
     res.json({ ok: true, data });
@@ -49,36 +50,21 @@ router.get('/findDrugsUsingNDC11', async (req, res, next) => {
       ndcOverride,
     } = req.query;
 
-    const required = [
-      'groupID',
-      'brandIndicator',
-      'ndc',
-      'includeDrugInfo',
-      'includeDrugImage',
-      'quantity',
-      'numPharm',
-      'zipCode',
-      'useUC',
-      'ndcOverride',
-    ];
-
-    for (const key of required) {
-      if (!req.query[key]) {
-        return res.status(400).json({ ok: false, error: `${key} is required` });
-      }
+    if (!groupID || !ndc) {
+      return res.status(400).json({ ok: false, error: 'groupID and ndc are required' });
     }
 
     const data = await findDrugsUsingNDC11({
       groupID: String(groupID),
-      brandIndicator: String(brandIndicator),
+      brandIndicator: stringIfDefined(brandIndicator),
       ndc: String(ndc),
-      includeDrugInfo: String(includeDrugInfo),
-      includeDrugImage: String(includeDrugImage),
-      quantity: String(quantity),
-      numPharm: String(numPharm),
-      zipCode: String(zipCode),
-      useUC: String(useUC),
-      ndcOverride: String(ndcOverride),
+      includeDrugInfo: stringIfDefined(includeDrugInfo),
+      includeDrugImage: stringIfDefined(includeDrugImage),
+      quantity: stringIfDefined(quantity),
+      numPharm: stringIfDefined(numPharm),
+      zipCode: stringIfDefined(zipCode),
+      useUC: stringIfDefined(useUC),
+      ndcOverride: stringIfDefined(ndcOverride),
     });
 
     res.json({ ok: true, data });
@@ -102,34 +88,20 @@ router.get('/findDrugsUsingDrugName', async (req, res, next) => {
       useUC,
     } = req.query;
 
-    const required = [
-      'groupID',
-      'brandIndicator',
-      'drugName',
-      'includeDrugInfo',
-      'includeDrugImage',
-      'quantity',
-      'numPharm',
-      'zipCode',
-      'useUC',
-    ];
-
-    for (const key of required) {
-      if (!req.query[key]) {
-        return res.status(400).json({ ok: false, error: `${key} is required` });
-      }
+    if (!groupID || !drugName) {
+      return res.status(400).json({ ok: false, error: 'groupID and drugName are required' });
     }
 
     const data = await findDrugsUsingDrugName({
       groupID: String(groupID),
-      brandIndicator: String(brandIndicator),
+      brandIndicator: stringIfDefined(brandIndicator),
       drugName: String(drugName),
-      includeDrugInfo: String(includeDrugInfo),
-      includeDrugImage: String(includeDrugImage),
-      quantity: String(quantity),
-      numPharm: String(numPharm),
-      zipCode: String(zipCode),
-      useUC: String(useUC),
+      includeDrugInfo: stringIfDefined(includeDrugInfo),
+      includeDrugImage: stringIfDefined(includeDrugImage),
+      quantity: stringIfDefined(quantity),
+      numPharm: stringIfDefined(numPharm),
+      zipCode: stringIfDefined(zipCode),
+      useUC: stringIfDefined(useUC),
     });
 
     res.json({ ok: true, data });
@@ -154,36 +126,21 @@ router.get('/findDrugsUsingGSNAndReferencedBN', async (req, res, next) => {
       useUC,
     } = req.query;
 
-    const required = [
-      'groupID',
-      'brandIndicator',
-      'gsn',
-      'referencedBN',
-      'includeDrugInfo',
-      'includeDrugImage',
-      'quantity',
-      'numPharm',
-      'zipCode',
-      'useUC',
-    ];
-
-    for (const key of required) {
-      if (!req.query[key]) {
-        return res.status(400).json({ ok: false, error: `${key} is required` });
-      }
+    if (!groupID || !gsn) {
+      return res.status(400).json({ ok: false, error: 'groupID and gsn are required' });
     }
 
     const data = await findDrugsUsingGSNAndReferencedBN({
       groupID: String(groupID),
-      brandIndicator: String(brandIndicator),
+      brandIndicator: stringIfDefined(brandIndicator),
       gsn: String(gsn),
-      referencedBN: String(referencedBN),
-      includeDrugInfo: String(includeDrugInfo),
-      includeDrugImage: String(includeDrugImage),
-      quantity: String(quantity),
-      numPharm: String(numPharm),
-      zipCode: String(zipCode),
-      useUC: String(useUC),
+      referencedBN: stringIfDefined(referencedBN),
+      includeDrugInfo: stringIfDefined(includeDrugInfo),
+      includeDrugImage: stringIfDefined(includeDrugImage),
+      quantity: stringIfDefined(quantity),
+      numPharm: stringIfDefined(numPharm),
+      zipCode: stringIfDefined(zipCode),
+      useUC: stringIfDefined(useUC),
     });
 
     res.json({ ok: true, data });
@@ -215,10 +172,10 @@ router.get('/getDrugFormStrength', async (req, res, next) => {
 router.get('/priceDrug', async (req, res, next) => {
   try {
     const { ndc, ncpdp, groupID, quantity, ndcOverride } = req.query;
-    if (!ndc || !ncpdp || !groupID || !quantity || !ndcOverride) {
+    if (!ndc || !ncpdp || !groupID || !quantity) {
       return res
         .status(400)
-        .json({ ok: false, error: 'ndc, ncpdp, groupID, quantity, and ndcOverride are required' });
+        .json({ ok: false, error: 'ndc, ncpdp, groupID, and quantity are required' });
     }
 
     const data = await priceDrug({
@@ -226,7 +183,7 @@ router.get('/priceDrug', async (req, res, next) => {
       ncpdp: String(ncpdp),
       groupID: String(groupID),
       quantity: String(quantity),
-      ndcOverride: String(ndcOverride),
+      ndcOverride: stringIfDefined(ndcOverride),
     });
 
     res.json({ ok: true, data });
@@ -239,10 +196,10 @@ router.get('/priceDrug', async (req, res, next) => {
 router.get('/priceDrugs', async (req, res, next) => {
   try {
     const { ndc, groupID, quantity, numResults, zipCode, ndcOverride } = req.query;
-    if (!ndc || !groupID || !quantity || !numResults || !zipCode || !ndcOverride) {
+    if (!ndc || !groupID || !quantity || !numResults || !zipCode) {
       return res.status(400).json({
         ok: false,
-        error: 'ndc, groupID, quantity, numResults, zipCode, and ndcOverride are required',
+        error: 'ndc, groupID, quantity, numResults and zipCode are required',
       });
     }
 
@@ -252,7 +209,7 @@ router.get('/priceDrugs', async (req, res, next) => {
       quantity: String(quantity),
       numResults: String(numResults),
       zipCode: String(zipCode),
-      ndcOverride: String(ndcOverride),
+      ndcOverride: stringIfDefined(ndcOverride),
     });
 
     res.json({ ok: true, data });
@@ -265,10 +222,10 @@ router.get('/priceDrugs', async (req, res, next) => {
 router.post('/priceDrugsByNCPDP', async (req, res, next) => {
   try {
     const { ndc, ncpdp, groupID, quantity, ndcOverride } = req.body;
-    if (!ndc || !ncpdp || !groupID || !quantity || !ndcOverride) {
+    if (!ndc || !ncpdp || !groupID || !quantity) {
       return res.status(400).json({
         ok: false,
-        error: 'ndc, ncpdp, groupID, quantity, and ndcOverride are required',
+        error: 'ndc, ncpdp, groupID, and quantity are required',
       });
     }
 
@@ -277,7 +234,7 @@ router.post('/priceDrugsByNCPDP', async (req, res, next) => {
       ncpdp: String(ncpdp),
       groupID: String(groupID),
       quantity: String(quantity),
-      ndcOverride: String(ndcOverride),
+      ndcOverride: stringIfDefined(ndcOverride),
     });
 
     res.json({ ok: true, data });

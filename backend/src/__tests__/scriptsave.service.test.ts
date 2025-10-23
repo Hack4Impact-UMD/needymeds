@@ -12,9 +12,16 @@ import {
   priceDrugsByNCPDP,
 } from '../services/scriptsave.service';
 
-describe('scriptsave.service', async () => {
-  const { baseUrl, subscriptionKey } = await getScriptSaveSecret();
-  const host = baseUrl;
+describe('scriptsave.service', () => {
+  let host: string;
+  let subscriptionKey: string;
+
+  // ✅ Move async call into beforeAll (Jest doesn’t allow async describe callbacks)
+  beforeAll(async () => {
+    const secrets = await getScriptSaveSecret();
+    host = secrets.baseUrl;
+    subscriptionKey = secrets.subscriptionKey;
+  });
 
   afterEach(() => nock.cleanAll());
 

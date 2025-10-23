@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { scriptSaveTokenManager } from '../auth/scriptsave.tokenManager'; // placeholder
-import { getScriptSaveSecret } from '../secrets/secrets'; // placeholder
+import { scriptSaveTokenManager } from '../auth/scriptsave.tokenManager';
+import { getScriptSaveSecret } from '../secrets/secrets';
 
 async function client() {
   const { baseUrl, subscriptionKey } = await getScriptSaveSecret();
@@ -19,57 +19,6 @@ async function client() {
   });
 }
 
-// ----------------------------- Validation helpers -------------------------
-const GSN_RE = /^\d{5}$/; // 6-digit GSN
-const NDC_RE = /^\d{11}$/; // 11 digit ndc (no dashes)
-const NCPDP_RE = /^\[("(\d)+")*\]$/;
-const ZIP_RE = /^\d{5}$/; // simple 5-digit US zip
-
-function validateCommon(opts: {
-  prefixText?: string;
-  groupID?: string;
-  count?: string;
-  gsn?: string;
-  ndc?: string;
-  ncpdp?: string;
-  quantity?: string;
-  ndcOverride?: string;
-  numResults?: string;
-  zipCode?: string;
-}) {
-  const numericGroupID = Number(opts.groupID);
-  const numericCount = Number(opts.count);
-  const numericQuantity = Number(opts.quantity);
-  const numericNumResults = Number(opts.numResults);
-
-  if (opts.prefixText !== undefined && opts.prefixText === '')
-    return 'Invalid prefixText (must be non-empty)';
-  if (opts.groupID !== undefined && !Number.isFinite(numericGroupID))
-    return 'Invalid groupID (must be >0)';
-  if (opts.count !== undefined && !(Number.isFinite(numericCount) && numericCount > 0))
-    return 'Invalid count (must be >0)';
-  if (opts.gsn !== undefined && !GSN_RE.test(opts.gsn)) return 'Invalid gsn (expect 6 digits)';
-  if (opts.ndc !== undefined && !NDC_RE.test(opts.ndc)) return 'Invalid ndc (expect 11 digits)';
-  if (opts.ncpdp !== undefined && !NCPDP_RE.test(opts.ncpdp))
-    return 'Invalid ncpdp (expect numerical list)';
-  if (opts.quantity !== undefined && !(Number.isFinite(numericQuantity) && numericQuantity > 0))
-    return 'Invalid quantity (must be >0)';
-  if (
-    opts.ndcOverride !== undefined &&
-    !(opts.ndcOverride === 'true' || opts.ndcOverride === 'false')
-  ) {
-    return 'Invalid ndcOverride (must be boolean)';
-  }
-  if (
-    opts.numResults !== undefined &&
-    !(Number.isFinite(numericNumResults) && numericNumResults > 0)
-  )
-    return 'Invalid numResults (must be >0)';
-  if (opts.zipCode !== undefined && opts.zipCode !== '' && !ZIP_RE.test(opts.zipCode))
-    return 'Invalid zipCode (expect 5 digits)';
-  return null;
-}
-
 type httpMethod = 'GET' | 'POST';
 
 async function performRequest(method: httpMethod, path: string, params: Record<string, any>) {
@@ -82,7 +31,7 @@ async function performRequest(method: httpMethod, path: string, params: Record<s
     if (method === 'GET') {
       res = await c.get(path, { params });
     } else if (method === 'POST') {
-      res = await c.post(path, { params });
+      res = await c.post(path, params);
     } else {
       throw new Error(`Invalid HTTP method`);
     }
@@ -103,9 +52,82 @@ async function performRequest(method: httpMethod, path: string, params: Record<s
   throw err;
 }
 
+// ----------------------------- Validation helpers -------------------------
+const GSN_RE = /^\d{6}$/; // 6-digit GSN
+const NCPDP_RE = /^(\[("\d", )*\d\])|(\[\])$/; // numerical list
+const NDC_RE = /^\d{11}$/; // 11 digit ndc (no dashes)
+const ZIP_RE = /^\d{5}$/; // simple 5-digit US zip
+
+function validate(opts: {
+  count?: string;
+  groupID?: string;
+  gsn?: string;
+  includeDrugInfo?: string;
+  includeDrugImage?: string;
+  ncpdp?: string;
+  ndc?: string;
+  ndcOverride?: string;
+  numPharm?: string;
+  numResults?: string;
+  prefixText?: string;
+  quantity?: string;
+  useUC?: string;
+  zipCode?: string;
+}) {
+  const numericCount = Number(opts.count);
+  const numericGroupID = Number(opts.groupID);
+  const numericNumPharm = Number(opts.numPharm);
+  const numericNumResults = Number(opts.numResults);
+  const numericQuantity = Number(opts.quantity);
+
+  if (opts.count !== undefined && !(Number.isFinite(numericCount) && numericCount > 0))
+    return 'Invalid count (must be >0)';
+  if (opts.groupID !== undefined && !Number.isFinite(numericGroupID))
+    return 'Invalid groupID (must be a number)';
+  if (opts.gsn !== undefined && !GSN_RE.test(opts.gsn)) return 'Invalid gsn (expect 6 digits)';
+  if (
+    opts.includeDrugInfo !== undefined &&
+    !(opts.includeDrugInfo === 'true' || opts.includeDrugInfo === 'false')
+  ) {
+    return 'Invalid includeDrugInfo (must be boolean)';
+  }
+  if (
+    opts.includeDrugImage !== undefined &&
+    !(opts.includeDrugImage === 'true' || opts.includeDrugImage === 'false')
+  ) {
+    return 'Invalid includeDrugImage (must be boolean)';
+  }
+  if (opts.ncpdp !== undefined && !NCPDP_RE.test(opts.ncpdp))
+    return 'Invalid ncpdp (expect numerical list)';
+  if (opts.ndc !== undefined && !NDC_RE.test(opts.ndc)) return 'Invalid ndc (expect 11 digits)';
+  if (
+    opts.ndcOverride !== undefined &&
+    !(opts.ndcOverride === 'true' || opts.ndcOverride === 'false')
+  ) {
+    return 'Invalid ndcOverride (must be boolean)';
+  }
+  if (opts.numPharm !== undefined && !(Number.isFinite(numericNumPharm) && numericNumPharm > 0))
+    return 'Invalid numPharm (must be >0)';
+  if (
+    opts.numResults !== undefined &&
+    !(Number.isFinite(numericNumResults) && numericNumResults > 0)
+  )
+    return 'Invalid numResults (must be >0)';
+  if (opts.prefixText !== undefined && opts.prefixText === '')
+    return 'Invalid prefixText (must be non-empty)';
+  if (opts.quantity !== undefined && !(Number.isFinite(numericQuantity) && numericQuantity > 0))
+    return 'Invalid quantity (must be >0)';
+  if (opts.useUC !== undefined && !(opts.useUC === 'true' || opts.useUC === 'false')) {
+    return 'Invalid useUC (must be boolean)';
+  }
+  if (opts.zipCode !== undefined && opts.zipCode !== '' && !ZIP_RE.test(opts.zipCode))
+    return 'Invalid zipCode (expect 5 digits)';
+  return null;
+}
+
 // 001 AutoComplete
 export async function autoComplete(opts: { prefixText: string; groupID: string; count?: string }) {
-  const validationError = validateCommon({
+  const validationError = validate({
     prefixText: opts.prefixText,
     groupID: opts.groupID,
     count: opts.count,
@@ -126,21 +148,25 @@ export async function autoComplete(opts: { prefixText: string; groupID: string; 
 // 002a FindDrugs - Using NDC11
 export async function findDrugsUsingNDC11(opts: {
   groupID: string;
-  brandIndicator: string;
+  brandIndicator?: string;
   ndc: string;
-  includeDrugInfo: string;
-  includeDrugImage: string;
-  quantity: string;
-  numPharm: string;
-  zipCode: string;
-  useUC: string;
-  ndcOverride: string;
+  includeDrugInfo?: string;
+  includeDrugImage?: string;
+  quantity?: string;
+  numPharm?: string;
+  zipCode?: string;
+  useUC?: string;
+  ndcOverride?: string;
 }) {
-  const validationError = validateCommon({
+  const validationError = validate({
     groupID: opts.groupID,
     ndc: opts.ndc,
+    includeDrugInfo: opts.includeDrugInfo,
+    includeDrugImage: opts.includeDrugImage,
     quantity: opts.quantity,
+    numPharm: opts.numPharm,
     zipCode: opts.zipCode,
+    useUC: opts.useUC,
     ndcOverride: opts.ndcOverride,
   });
   if (validationError) {
@@ -166,19 +192,23 @@ export async function findDrugsUsingNDC11(opts: {
 // 002b FindDrugs - Using DrugName
 export async function findDrugsUsingDrugName(opts: {
   groupID: string;
-  brandIndicator: string;
+  brandIndicator?: string;
   drugName: string;
-  includeDrugInfo: string;
-  includeDrugImage: string;
-  quantity: string;
-  numPharm: string;
-  zipCode: string;
-  useUC: string;
+  includeDrugInfo?: string;
+  includeDrugImage?: string;
+  quantity?: string;
+  numPharm?: string;
+  zipCode?: string;
+  useUC?: string;
 }) {
-  const validationError = validateCommon({
+  const validationError = validate({
     groupID: opts.groupID,
+    includeDrugInfo: opts.includeDrugInfo,
+    includeDrugImage: opts.includeDrugImage,
     quantity: opts.quantity,
+    numPharm: opts.numPharm,
     zipCode: opts.zipCode,
+    useUC: opts.useUC,
   });
   if (validationError) {
     const err: any = new Error(validationError);
@@ -202,20 +232,24 @@ export async function findDrugsUsingDrugName(opts: {
 // 002c FindDrugs - Using GSN and ReferencedBN
 export async function findDrugsUsingGSNAndReferencedBN(opts: {
   groupID: string;
-  brandIndicator: string;
+  brandIndicator?: string;
   gsn: string;
-  referencedBN: string;
-  includeDrugInfo: string;
-  includeDrugImage: string;
-  quantity: string;
-  numPharm: string;
-  zipCode: string;
-  useUC: string;
+  referencedBN?: string;
+  includeDrugInfo?: string;
+  includeDrugImage?: string;
+  quantity?: string;
+  numPharm?: string;
+  zipCode?: string;
+  useUC?: string;
 }) {
-  const validationError = validateCommon({
+  const validationError = validate({
     groupID: opts.groupID,
+    gsn: opts.gsn,
+    includeDrugInfo: opts.includeDrugInfo,
+    includeDrugImage: opts.includeDrugImage,
     quantity: opts.quantity,
     zipCode: opts.zipCode,
+    useUC: opts.useUC,
   });
   if (validationError) {
     const err: any = new Error(validationError);
@@ -239,7 +273,7 @@ export async function findDrugsUsingGSNAndReferencedBN(opts: {
 
 // 003 GetDrugFormStrength
 export async function getDrugFormStrength(opts: { groupID: string; gsn: string }) {
-  const validationError = validateCommon({
+  const validationError = validate({
     groupID: opts.groupID,
     gsn: opts.gsn,
   });
@@ -261,9 +295,9 @@ export async function priceDrug(opts: {
   ncpdp: string;
   groupID: string;
   quantity: string;
-  ndcOverride: string;
+  ndcOverride?: string;
 }) {
-  const validationError = validateCommon({
+  const validationError = validate({
     ndc: opts.ndc,
     ncpdp: opts.ncpdp,
     groupID: opts.groupID,
@@ -292,9 +326,9 @@ export async function priceDrugs(opts: {
   quantity: string;
   numResults: string;
   zipCode: string;
-  ndcOverride: string;
+  ndcOverride?: string;
 }) {
-  const validationError = validateCommon({
+  const validationError = validate({
     ndc: opts.ndc,
     groupID: opts.groupID,
     quantity: opts.quantity,
@@ -324,9 +358,9 @@ export async function priceDrugsByNCPDP(opts: {
   ncpdp: string;
   groupID: string;
   quantity: string;
-  ndcOverride: string;
+  ndcOverride?: string;
 }) {
-  const validationError = validateCommon({
+  const validationError = validate({
     ndc: opts.ndc,
     ncpdp: opts.ncpdp,
     groupID: opts.groupID,
@@ -350,7 +384,7 @@ export async function priceDrugsByNCPDP(opts: {
 
 // 007 GenerateCardholder
 export async function generateCardholder(opts: { groupID: string }) {
-  const validationError = validateCommon({
+  const validationError = validate({
     groupID: opts.groupID,
   });
   if (validationError) {
