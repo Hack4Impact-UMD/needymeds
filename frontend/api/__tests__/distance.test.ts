@@ -1,7 +1,7 @@
-import { zipToCoords, haversine } from '../(tabs)/distance';
+import { zipToCoords, distanceBetweenCoordinates } from '../distance';
 
 describe('converting to coordinates and calculating distances', () => {
-  // mock fetching before the tests that returns a json with just lat and lon
+  // mock fetching that returns a json with just lat and lon
   beforeEach(() => {
     global.fetch = jest.fn(() =>
       Promise.resolve({
@@ -25,11 +25,9 @@ describe('converting to coordinates and calculating distances', () => {
   test('haversine formula on coordinates', () => {
     const cp = { lat: '38.988836', lon: '-76.941576', error: '' };
     const la = { lat: '34.053691', lon: '-118.242766', error: '' };
-    const distance = haversine(cp, la) / 1000; // meters to kilometers
-    expect(distance).toBeCloseTo(3699.352);
-    expect(distance).toBeGreaterThan(3600);
-    expect(distance).toBeLessThan(3800);
+    const distance = distanceBetweenCoordinates(cp, la);
+    expect(distance).toBeCloseTo(2301.13);
+    expect(distance).toBeGreaterThan(2200);
+    expect(distance).toBeLessThan(2400);
   });
 });
-
-// test errors too?

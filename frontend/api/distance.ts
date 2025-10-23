@@ -16,7 +16,12 @@ export async function zipToCoords(zipcode: string): Promise<Coordinates> {
   const format = 'jsonv2';
   const url = `https://nominatim.openstreetmap.org/search?postalcode=${zipcode}&format=${format}`;
 
-  const response = await fetch(url);
+  // API request to Nominatim
+  const response = await fetch(url, {
+    headers: {
+      'User-Agent': 'NeedyMeds-App/1.0 (info@needymeds.org)',
+    },
+  });
   if (!response.ok) {
     coords.error = 'Request to Nominatim failed.';
     return coords;
@@ -34,10 +39,10 @@ export async function zipToCoords(zipcode: string): Promise<Coordinates> {
   return coords;
 }
 
-// calculate distance between two coordinates with the Haversin formula
-export function haversine(coords1: Coordinates, coords2: Coordinates): number {
-  // radius of earth in meters
-  const R = 6371000;
+// calculate distance between two coordinates with the Haversine formula
+export function distanceBetweenCoordinates(coords1: Coordinates, coords2: Coordinates): number {
+  // radius of earth in miles
+  const R = 3963;
 
   // convert from string to float
   const lat1 = parseFloat(coords1.lat);
@@ -57,7 +62,7 @@ export function haversine(coords1: Coordinates, coords2: Coordinates): number {
   // c
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-  // output in meters
+  // output in miles
   const distance = R * c;
   return distance;
 }
