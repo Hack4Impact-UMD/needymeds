@@ -1,19 +1,21 @@
 import nock from 'nock';
 import request from 'supertest';
 import app from '../app';
+import { getDsntSecret } from '../secrets/secrets';
 import { getPriceByNdc, priceByNdcAndNpiList } from '../services/dsnt.service';
 
-// mock the secrets module so we don't hit AWS locally
-jest.mock('../secrets/secrets', () => ({
-  getDSNTSecret: async () => ({
-    username: 'u',
-    password: 'p',
-    baseUrl: 'https://argusprod.dstsystems.com/pharmacy-drug-pricing/1.0/service',
-  }),
-}));
-
 describe('GET /api/dsnt/price', () => {
-  const host = 'https://argusprod.dstsystems.com';
+  let host: string;
+  let username: string;
+  let password: string;
+
+  beforeAll(async () => {
+    const secrets = await getDsntSecret();
+    host = secrets.baseUrl;
+    username = secrets.username;
+    password = secrets.password;
+  });
+
   afterEach(() => nock.cleanAll());
 
   it('200 happy path', async () => {
@@ -37,7 +39,12 @@ describe('GET /api/dsnt/price', () => {
 });
 
 describe('getPriceByNdc', () => {
-  const host = 'https://argusprod.dstsystems.com';
+  let host: string;
+
+  beforeAll(async () => {
+    const secrets = await getDsntSecret();
+    host = secrets.baseUrl;
+  });
 
   afterEach(() => nock.cleanAll());
 
@@ -110,7 +117,17 @@ describe('getPriceByNdc', () => {
 });
 
 describe('priceByNdcAndNpiList', () => {
-  const host = 'https://argusprod.dstsystems.com';
+  let host: string;
+  let username: string;
+  let password: string;
+
+  beforeAll(async () => {
+    const secrets = await getDsntSecret();
+    host = secrets.baseUrl;
+    username = secrets.username;
+    password = secrets.password;
+  });
+
   afterEach(() => nock.cleanAll());
 
   it('returns pricing for npilist single', async () => {

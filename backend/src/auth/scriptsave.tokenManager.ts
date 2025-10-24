@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getScriptSaveSecret } from '../secrets/secrets'; // placeholder
+import { getScriptSaveSecret } from '../secrets/secrets';
 
 class ScriptSaveTokenManager {
   token: string;
@@ -18,18 +18,23 @@ class ScriptSaveTokenManager {
 
   private async refreshToken() {
     const path = '/AuthorizationCore/api/Authentication/AcquireToken';
-    const { baseUrl, subscriptionKey } = await getScriptSaveSecret();
+    const { baseUrl, subscriptionKey, TenantId, ClientId, ClientSecret } =
+      await getScriptSaveSecret();
     const client = axios.create({
       baseURL: baseUrl,
       timeout: 12000,
       headers: {
-        Accept: 'application/json',
-        'Ocp-Apim-Subscription-Key': subscriptionKey,
+        'Content-Type': 'application/json',
+        'OCP-APIM-Subscription-Key': subscriptionKey,
       },
       validateStatus: () => true,
     });
 
-    const res = await client.get(path);
+    const res = await client.post(path, {
+      TenantId,
+      ClientId,
+      ClientSecret,
+    });
 
     if (res.status >= 200 && res.status < 300) {
       const data = res.data;

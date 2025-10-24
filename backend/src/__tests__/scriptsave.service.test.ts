@@ -165,7 +165,7 @@ describe('scriptsave.service', () => {
         .query({
           groupID: '3',
           BrandIndicator: 'B',
-          GSN: '12345',
+          GSN: '123456',
           referencedBN: 'BN123',
           IncludeDrugInfo: 'true',
           IncludeDrugImage: 'true',
@@ -179,7 +179,7 @@ describe('scriptsave.service', () => {
       const data = await findDrugsUsingGSNAndReferencedBN({
         groupID: '3',
         brandIndicator: 'B',
-        gsn: '12345',
+        gsn: '123456',
         referencedBN: 'BN123',
         includeDrugInfo: 'true',
         includeDrugImage: 'true',
@@ -196,7 +196,7 @@ describe('scriptsave.service', () => {
         findDrugsUsingGSNAndReferencedBN({
           groupID: '3',
           brandIndicator: 'B',
-          gsn: '12345',
+          gsn: '123456',
           referencedBN: 'BN123',
           includeDrugInfo: 'true',
           includeDrugImage: 'true',
@@ -214,10 +214,10 @@ describe('scriptsave.service', () => {
     it('returns data on 200', async () => {
       nock(host)
         .get('/pricingapi/api/PricingEngineExternal/DrugFormStrength')
-        .query({ groupID: '1', gsn: '12345' })
+        .query({ groupID: '1', gsn: '123456' })
         .reply(200, { strength: '10mg' });
 
-      const data = await getDrugFormStrength({ groupID: '1', gsn: '12345' });
+      const data = await getDrugFormStrength({ groupID: '1', gsn: '123456' });
       expect(data).toEqual({ strength: '10mg' });
     });
 
@@ -232,7 +232,7 @@ describe('scriptsave.service', () => {
         .get(/DrugFormStrength/)
         .reply(400, { message: 'bad req' });
 
-      await expect(getDrugFormStrength({ groupID: '1', gsn: '12345' })).rejects.toMatchObject({
+      await expect(getDrugFormStrength({ groupID: '1', gsn: '123456' })).rejects.toMatchObject({
         message: expect.stringContaining('ScriptSave returned 400'),
         status: 400,
       });
@@ -246,7 +246,7 @@ describe('scriptsave.service', () => {
         .get(/DrugFormStrength/)
         .reply(200, { ok: true });
 
-      const data = await getDrugFormStrength({ groupID: '1', gsn: '12345' });
+      const data = await getDrugFormStrength({ groupID: '1', gsn: '123456' });
       expect(data).toEqual({ ok: true });
       expect(scope.isDone()).toBe(true);
     });
@@ -257,7 +257,7 @@ describe('scriptsave.service', () => {
         .times(3)
         .reply(503, {});
 
-      await expect(getDrugFormStrength({ groupID: '1', gsn: '12345' })).rejects.toMatchObject({
+      await expect(getDrugFormStrength({ groupID: '1', gsn: '123456' })).rejects.toMatchObject({
         status: 503,
       });
       expect(scope.isDone()).toBe(true);
@@ -350,7 +350,7 @@ describe('scriptsave.service', () => {
         .post('/pricingenginecore/api/Pricing/PriceDrugsByNCPDP', (body) => {
           return (
             body.params.NDC === '12345678901' &&
-            body.params.NCPDP === '12345' &&
+            body.params.NCPDP === '["12345"]' &&
             body.params.groupID === '1'
           );
         })

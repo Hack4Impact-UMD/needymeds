@@ -9,9 +9,12 @@ type DsntSecret = {
 type ScriptSaveSecret = {
   baseUrl: string;
   subscriptionKey: string;
+  TenantId: string;
+  ClientId: string;
+  ClientSecret: string;
 };
 
-const region = 'us-east-1';
+const region = 'us-east-2';
 
 const client = new SecretsManagerClient({ region });
 
@@ -64,6 +67,9 @@ export async function getScriptSaveSecret(): Promise<ScriptSaveSecret> {
   const secret: ScriptSaveSecret = {
     baseUrl: parsed.baseUrl,
     subscriptionKey: parsed.subscriptionKey,
+    TenantId: parsed.TenantId,
+    ClientId: parsed.ClientId,
+    ClientSecret: parsed.ClientSecret,
   };
 
   cache = { dsntSecret: cache.dsntSecret, scriptSaveSecret: secret, exp: now + TTL_MS };
