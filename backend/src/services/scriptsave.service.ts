@@ -55,7 +55,7 @@ async function performRequest(method: httpMethod, path: string, params: Record<s
 // ----------------------------- Validation helpers -------------------------
 const GSN_RE = /^\d{6}$/; // 6-digit GSN
 const NCPDP_RE = /^(\[("\d", )*\d\])|(\[\])$/; // numerical list
-const NDC_RE = /^\d{11}$/; // 11 digit ndc (no dashes)
+const NDC_RE = /^\d{10}$/; // 10 digit ndc (no dashes)
 const ZIP_RE = /^\d{5}$/; // simple 5-digit US zip
 
 function validate(opts: {

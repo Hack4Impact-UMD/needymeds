@@ -30,7 +30,7 @@ async function client() {
 }
 
 // ----------------------------- Validation helpers -------------------------
-const NDC_RE = /^\d{11}$/; // 11 digit ndc (no dashes)
+const NDC_RE = /^\d{10}$/; // 10 digit ndc (no dashes)
 const ZIP_RE = /^\d{5}$/; // simple 5-digit US zip
 const NPI_RE = /^\d{10}$/; // 10 digit NPI
 
