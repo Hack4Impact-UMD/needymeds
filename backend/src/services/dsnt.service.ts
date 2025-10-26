@@ -40,7 +40,7 @@ function validateCommon(opts: {
   radius?: number;
   zipCode?: string;
 }) {
-  if (!NDC_RE.test(opts.ndc)) return 'Invalid ndc (expect 11 digits)';
+  if (!NDC_RE.test(opts.ndc)) return 'Invalid ndc (expect 10 digits)';
   if (!(Number.isFinite(opts.quantity) && opts.quantity > 0))
     return 'Invalid quantity (must be >0)';
   if (opts.radius !== undefined && !(Number.isFinite(opts.radius) && opts.radius > 0))

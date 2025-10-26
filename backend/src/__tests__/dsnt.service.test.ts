@@ -24,7 +24,7 @@ describe('GET /api/dsnt/price', () => {
       .reply(200, { foo: 'bar' });
     const res = await request(app)
       .get('/api/dsnt/price')
-      .query({ ndc: '59148000713', quantity: 100, radius: 100, zipCode: '10003' });
+      .query({ ndc: '5914800071', quantity: 100, radius: 100, zipCode: '10003' });
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ ok: true, data: { foo: 'bar' } });
   });
@@ -51,11 +51,11 @@ describe('getPriceByNdc', () => {
   it('returns data on 200', async () => {
     nock(host)
       .get('/pharmacy-drug-pricing/1.0/service/PharmacyPricing')
-      .query({ quantity: '100', ndc: '59148000713', radius: '100', zipCode: '10003' })
+      .query({ quantity: '100', ndc: '5914800071', radius: '100', zipCode: '10003' })
       .reply(200, { prices: [{ pharmacyId: 'X', price: 12.34 }] });
 
     const data = await getPriceByNdc({
-      ndc: '59148000713',
+      ndc: '5914800071',
       quantity: 100,
       radius: 100,
       zipCode: '10003',
@@ -66,12 +66,12 @@ describe('getPriceByNdc', () => {
   it('bubbles 4xx with safe message', async () => {
     nock(host)
       .get('/pharmacy-drug-pricing/1.0/service/PharmacyPricing')
-      .query({ quantity: '100', ndc: '59148000713', radius: '100', zipCode: '10003' })
+      .query({ quantity: '100', ndc: '5914800071', radius: '100', zipCode: '10003' })
       .reply(400, { message: 'bad request' });
 
     await expect(
       getPriceByNdc({
-        ndc: '59148000713',
+        ndc: '5914800071',
         quantity: 100,
         radius: 100,
         zipCode: '10003',
@@ -83,12 +83,12 @@ describe('getPriceByNdc', () => {
     const scope = nock(host)
       .get('/pharmacy-drug-pricing/1.0/service/PharmacyPricing')
       .times(3)
-      .query({ quantity: '100', ndc: '59148000713', radius: '100', zipCode: '10003' })
+      .query({ quantity: '100', ndc: '5914800071', radius: '100', zipCode: '10003' })
       .reply(503, {});
 
     await expect(
       getPriceByNdc({
-        ndc: '59148000713',
+        ndc: '5914800071',
         quantity: 100,
         radius: 100,
         zipCode: '10003',
@@ -106,7 +106,7 @@ describe('getPriceByNdc', () => {
       .reply(200, { ok: true });
 
     const data = await getPriceByNdc({
-      ndc: '59148000713',
+      ndc: '5914800071',
       quantity: 100,
       radius: 5,
       zipCode: '10003',
@@ -133,16 +133,16 @@ describe('priceByNdcAndNpiList', () => {
   it('returns pricing for npilist single', async () => {
     nock(host)
       .get('/pharmacy-drug-pricing/1.0/service/PharmacyPricing')
-      .query({ quantity: '100', ndc: '59148000713', npilist: '1326064445' })
-      .reply(200, { DrugPricing: [{ npi: '1326064445', ndc: '59148000713', price: '2087.39' }] });
+      .query({ quantity: '100', ndc: '5914800071', npilist: '1326064445' })
+      .reply(200, { DrugPricing: [{ npi: '1326064445', ndc: '5914800071', price: '2087.39' }] });
 
     const data = await priceByNdcAndNpiList({
-      ndc: '59148000713',
+      ndc: '5914800071',
       quantity: 100,
       npilist: '1326064445',
     });
     expect(data).toEqual({
-      DrugPricing: [{ npi: '1326064445', ndc: '59148000713', price: '2087.39' }],
+      DrugPricing: [{ npi: '1326064445', ndc: '5914800071', price: '2087.39' }],
     });
   });
 

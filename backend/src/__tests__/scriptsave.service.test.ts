@@ -64,7 +64,7 @@ describe('scriptsave.service', () => {
         .query({
           groupID: '1',
           BrandIndicator: 'B',
-          NDC: '12345678901',
+          NDC: '1234567890',
           IncludeDrugInfo: 'true',
           IncludeDrugImage: 'false',
           qty: '30',
@@ -78,7 +78,7 @@ describe('scriptsave.service', () => {
       const data = await findDrugsUsingNDC11({
         groupID: '1',
         brandIndicator: 'B',
-        ndc: '12345678901',
+        ndc: '1234567890',
         includeDrugInfo: 'true',
         includeDrugImage: 'false',
         quantity: '30',
@@ -270,7 +270,7 @@ describe('scriptsave.service', () => {
       nock(host)
         .get('/pricingenginecore/api/pricing/pricedrug')
         .query({
-          ndc: '12345678901',
+          ndc: '1234567890',
           ncpdp: '98765',
           groupID: '9',
           quantity: '30',
@@ -279,7 +279,7 @@ describe('scriptsave.service', () => {
         .reply(200, { price: 12.34 });
 
       const data = await priceDrug({
-        ndc: '12345678901',
+        ndc: '1234567890',
         ncpdp: '98765',
         groupID: '9',
         quantity: '30',
@@ -308,7 +308,7 @@ describe('scriptsave.service', () => {
       nock(host)
         .get('/pricingenginecore/api/pricing/pricedrug')
         .query({
-          ndc: '12345678901',
+          ndc: '1234567890',
           groupID: '1',
           quantity: '30',
           numResults: '10',
@@ -318,7 +318,7 @@ describe('scriptsave.service', () => {
         .reply(200, { results: [1, 2, 3] });
 
       const data = await priceDrugs({
-        ndc: '12345678901',
+        ndc: '1234567890',
         groupID: '1',
         quantity: '30',
         numResults: '10',
@@ -332,7 +332,7 @@ describe('scriptsave.service', () => {
     it('fails validation on bad zipCode', async () => {
       await expect(
         priceDrugs({
-          ndc: '12345678901',
+          ndc: '1234567890',
           groupID: '1',
           quantity: '30',
           numResults: '10',
@@ -349,7 +349,7 @@ describe('scriptsave.service', () => {
       nock(host)
         .post('/pricingenginecore/api/Pricing/PriceDrugsByNCPDP', (body) => {
           return (
-            body.params.NDC === '12345678901' &&
+            body.params.NDC === '1234567890' &&
             body.params.NCPDP === '["12345"]' &&
             body.params.groupID === '1'
           );
@@ -357,7 +357,7 @@ describe('scriptsave.service', () => {
         .reply(200, { ok: true });
 
       const data = await priceDrugsByNCPDP({
-        ndc: '12345678901',
+        ndc: '1234567890',
         ncpdp: '12345',
         groupID: '1',
         quantity: '90',

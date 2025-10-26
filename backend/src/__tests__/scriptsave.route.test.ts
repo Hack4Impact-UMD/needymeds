@@ -44,7 +44,7 @@ describe('scriptsave.route', () => {
     const res = await request(app).get('/scriptsave/findDrugsUsingNDC11').query({
       groupID: '1',
       brandIndicator: 'B',
-      ndc: '12345678901',
+      ndc: '1234567890',
       includeDrugInfo: 'true',
       includeDrugImage: 'false',
       quantity: '30',
@@ -59,7 +59,7 @@ describe('scriptsave.route', () => {
     expect(service.findDrugsUsingNDC11).toHaveBeenCalledWith({
       groupID: '1',
       brandIndicator: 'B',
-      ndc: '12345678901',
+      ndc: '1234567890',
       includeDrugInfo: 'true',
       includeDrugImage: 'false',
       quantity: '30',
@@ -188,7 +188,7 @@ describe('scriptsave.route', () => {
     (service.priceDrug as jest.Mock).mockResolvedValue({ price: 9.99 });
 
     const res = await request(app).get('/scriptsave/priceDrug').query({
-      ndc: '12345678901',
+      ndc: '1234567890',
       ncpdp: '12345',
       groupID: '1',
       quantity: '30',
@@ -198,7 +198,7 @@ describe('scriptsave.route', () => {
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ ok: true, data: { price: 9.99 } });
     expect(service.priceDrug).toHaveBeenCalledWith({
-      ndc: '12345678901',
+      ndc: '1234567890',
       ncpdp: '12345',
       groupID: '1',
       quantity: '30',
@@ -208,7 +208,7 @@ describe('scriptsave.route', () => {
 
   it('GET /scriptsave/priceDrug returns 400 when missing params', async () => {
     const res = await request(app).get('/scriptsave/priceDrug').query({
-      ndc: '12345678901',
+      ndc: '1234567890',
       ncpdp: '12345',
       groupID: '1',
     });
@@ -248,7 +248,7 @@ describe('scriptsave.route', () => {
     (service.priceDrugsByNCPDP as jest.Mock).mockResolvedValue({ price: 5.55 });
 
     const res = await request(app).post('/scriptsave/priceDrugsByNCPDP').send({
-      ndc: '12345678901',
+      ndc: '1234567890',
       ncpdp: '54321',
       groupID: '9',
       quantity: '45',
@@ -258,7 +258,7 @@ describe('scriptsave.route', () => {
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ ok: true, data: { price: 5.55 } });
     expect(service.priceDrugsByNCPDP).toHaveBeenCalledWith({
-      ndc: '12345678901',
+      ndc: '1234567890',
       ncpdp: '54321',
       groupID: '9',
       quantity: '45',

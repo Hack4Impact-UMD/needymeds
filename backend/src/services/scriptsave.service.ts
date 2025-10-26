@@ -99,7 +99,7 @@ function validate(opts: {
   }
   if (opts.ncpdp !== undefined && !NCPDP_RE.test(opts.ncpdp))
     return 'Invalid ncpdp (expect numerical list)';
-  if (opts.ndc !== undefined && !NDC_RE.test(opts.ndc)) return 'Invalid ndc (expect 11 digits)';
+  if (opts.ndc !== undefined && !NDC_RE.test(opts.ndc)) return 'Invalid ndc (expect 10 digits)';
   if (
     opts.ndcOverride !== undefined &&
     !(opts.ndcOverride === 'true' || opts.ndcOverride === 'false')
