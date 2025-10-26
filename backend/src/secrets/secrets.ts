@@ -14,6 +14,11 @@ type ScriptSaveSecret = {
   ClientSecret: string;
 };
 
+type UrlApiSecret = {
+  baseUrl: string;
+  xApiKey: string;
+};
+
 const region = 'us-east-2';
 
 const client = new SecretsManagerClient({ region });
@@ -21,9 +26,10 @@ const client = new SecretsManagerClient({ region });
 let cache: {
   dsntSecret: DsntSecret | null;
   scriptSaveSecret: ScriptSaveSecret | null;
+  urlApiSecret: UrlApiSecret | null;
   exp: number;
 };
-cache = { dsntSecret: null, scriptSaveSecret: null, exp: 0 };
+cache = { dsntSecret: null, scriptSaveSecret: null, urlApiSecret: null, exp: 0 };
 const TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 export async function getDsntSecret(): Promise<DsntSecret> {
@@ -44,7 +50,12 @@ export async function getDsntSecret(): Promise<DsntSecret> {
     password: parsed.password,
   };
 
-  cache = { dsntSecret: secret, scriptSaveSecret: cache.scriptSaveSecret, exp: now + TTL_MS };
+  cache = {
+    dsntSecret: secret,
+    scriptSaveSecret: cache.scriptSaveSecret,
+    urlApiSecret: cache.urlApiSecret,
+    exp: now + TTL_MS,
+  };
   return secret;
 }
 
@@ -72,6 +83,37 @@ export async function getScriptSaveSecret(): Promise<ScriptSaveSecret> {
     ClientSecret: parsed.ClientSecret,
   };
 
-  cache = { dsntSecret: cache.dsntSecret, scriptSaveSecret: secret, exp: now + TTL_MS };
+  cache = {
+    dsntSecret: cache.dsntSecret,
+    scriptSaveSecret: secret,
+    urlApiSecret: cache.urlApiSecret,
+    exp: now + TTL_MS,
+  };
+  return secret;
+}
+
+export async function getUrlApiSecret(): Promise<UrlApiSecret> {
+  const now = Date.now();
+  if (cache.urlApiSecret && cache.exp > now) return cache.urlApiSecret;
+
+  const cmd = new GetSecretValueCommand({ SecretId: 'needy-meds/urlapi' });
+  const res = await client.send(cmd);
+
+  const raw =
+    res.SecretString ?? (res.SecretBinary ? Buffer.from(res.SecretBinary).toString('utf-8') : '');
+  if (!raw) throw new Error('Empty UrlApi secret');
+
+  const parsed = JSON.parse(raw);
+  const secret: UrlApiSecret = {
+    baseUrl: parsed.baseUrl,
+    xApiKey: parsed.xApiKey,
+  };
+
+  cache = {
+    dsntSecret: cache.dsntSecret,
+    scriptSaveSecret: cache.scriptSaveSecret,
+    urlApiSecret: secret,
+    exp: now + TTL_MS,
+  };
   return secret;
 }
