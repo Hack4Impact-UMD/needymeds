@@ -3,6 +3,7 @@ import express from 'express';
 import helmet from 'helmet';
 import dsntRouter from './routes/dsnt.route';
 import scriptSaveRouter from './routes/scriptsave.route';
+import urlRouter from './routes/url.route';
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.get('/', (_req, res) => res.status(200).json({ ok: true, route: 'root' }));
 // New preferred base path
 app.use('/api/dsnt', dsntRouter);
 app.use('/api/scriptsave', scriptSaveRouter);
+app.use('/api/url', urlRouter);
 
 app.use((err: any, _req: any, res: any, _next: any) => {
   const status = err?.status ?? err?.response?.status ?? 500;

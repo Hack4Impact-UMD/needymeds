@@ -189,7 +189,7 @@ describe('scriptsave.route', () => {
 
     const res = await request(app).get('/scriptsave/priceDrug').query({
       ndc: '1234567890',
-      ncpdp: '12345',
+      ncpdp: '["12345"]',
       groupID: '1',
       quantity: '30',
       ndcOverride: 'false',
@@ -199,7 +199,7 @@ describe('scriptsave.route', () => {
     expect(res.body).toEqual({ ok: true, data: { price: 9.99 } });
     expect(service.priceDrug).toHaveBeenCalledWith({
       ndc: '1234567890',
-      ncpdp: '12345',
+      ncpdp: '["12345"]',
       groupID: '1',
       quantity: '30',
       ndcOverride: 'false',
@@ -209,7 +209,7 @@ describe('scriptsave.route', () => {
   it('GET /scriptsave/priceDrug returns 400 when missing params', async () => {
     const res = await request(app).get('/scriptsave/priceDrug').query({
       ndc: '1234567890',
-      ncpdp: '12345',
+      ncpdp: '["12345"]',
       groupID: '1',
     });
 

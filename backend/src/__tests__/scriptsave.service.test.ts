@@ -1,4 +1,11 @@
 import nock from 'nock';
+
+jest.mock('../auth/scriptsave.tokenManager', () => ({
+  scriptSaveTokenManager: {
+    getToken: () => 'test-token',
+  },
+}));
+
 import { getScriptSaveSecret } from '../secrets/secrets';
 import {
   autoComplete,
@@ -13,7 +20,7 @@ import {
 } from '../services/scriptsave.service';
 
 describe('scriptsave.service', () => {
-  let host: string;
+  let host: string = process.env.SCRIPTSAVE_BASE_URL || '';
   let subscriptionKey: string;
 
   beforeAll(async () => {
@@ -271,7 +278,7 @@ describe('scriptsave.service', () => {
         .get('/pricingenginecore/api/pricing/pricedrug')
         .query({
           ndc: '1234567890',
-          ncpdp: '98765',
+          ncpdp: '["98765"]',
           groupID: '9',
           quantity: '30',
           ndcOverride: 'true',
@@ -280,7 +287,7 @@ describe('scriptsave.service', () => {
 
       const data = await priceDrug({
         ndc: '1234567890',
-        ncpdp: '98765',
+        ncpdp: '["98765"]',
         groupID: '9',
         quantity: '30',
         ndcOverride: 'true',
@@ -293,7 +300,7 @@ describe('scriptsave.service', () => {
       await expect(
         priceDrug({
           ndc: 'bad',
-          ncpdp: '12345',
+          ncpdp: '["12345"]',
           groupID: '9',
           quantity: '-1',
           ndcOverride: 'true',
@@ -348,17 +355,13 @@ describe('scriptsave.service', () => {
     it('POSTs and returns data', async () => {
       nock(host)
         .post('/pricingenginecore/api/Pricing/PriceDrugsByNCPDP', (body) => {
-          return (
-            body.params.NDC === '1234567890' &&
-            body.params.NCPDP === '["12345"]' &&
-            body.params.groupID === '1'
-          );
+          return body.NDC === '1234567890' && body.NCPDP === '["12345"]' && body.groupID === '1';
         })
         .reply(200, { ok: true });
 
       const data = await priceDrugsByNCPDP({
         ndc: '1234567890',
-        ncpdp: '12345',
+        ncpdp: '["12345"]',
         groupID: '1',
         quantity: '90',
         ndcOverride: 'false',

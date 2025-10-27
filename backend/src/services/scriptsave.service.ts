@@ -5,7 +5,7 @@ import { getScriptSaveSecret } from '../secrets/secrets';
 async function client() {
   const { baseUrl, subscriptionKey } = await getScriptSaveSecret();
 
-  const JWToken = scriptSaveTokenManager.getToken();
+  const JWToken = await scriptSaveTokenManager.getToken();
 
   return axios.create({
     baseURL: baseUrl,
@@ -54,7 +54,7 @@ async function performRequest(method: httpMethod, path: string, params: Record<s
 
 // ----------------------------- Validation helpers -------------------------
 const GSN_RE = /^\d{6}$/; // 6-digit GSN
-const NCPDP_RE = /^(\[("\d", )*\d\])|(\[\])$/; // numerical list
+const NCPDP_RE = /^(?:\d+|\[(?:"\d+"(?:,\s*"\d+")*)?\])$/;
 const NDC_RE = /^\d{10}$/; // 10 digit ndc (no dashes)
 const ZIP_RE = /^\d{5}$/; // simple 5-digit US zip
 

@@ -11,12 +11,17 @@ class ScriptSaveTokenManager {
 
   public async getToken() {
     if (Date.now() >= this.expiresAt || !this.token) {
-      this.refreshToken();
+      await this.refreshToken();
     }
     return this.token;
   }
 
   private async refreshToken() {
+    if (process.env.NODE_ENV === 'test') {
+      this.token = 'test-access-token';
+      this.expiresAt = Date.now() + 60_000;
+      return this.token;
+    }
     const path = '/AuthorizationCore/api/Authentication/AcquireToken';
     const { baseUrl, subscriptionKey, TenantId, ClientId, ClientSecret } =
       await getScriptSaveSecret();
