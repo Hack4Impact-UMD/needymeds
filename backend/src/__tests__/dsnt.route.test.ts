@@ -1,28 +1,19 @@
 import nock from 'nock';
 import { getPriceByNdc } from '../services/dsnt.service';
 
-// mock the secrets module so we don't hit AWS locally
-jest.mock('../secrets/secrets', () => ({
-  getDSNTSecret: async () => ({
-    username: 'u',
-    password: 'p',
-    baseUrl: 'https://argusprod.dstsystems.com/pharmacy-drug-pricing/1.0/service',
-  }),
-}));
+const host = process.env.DSNT_BASE_URL || '';
 
 describe('getPriceByNdc (service)', () => {
-  const host = 'https://argusprod.dstsystems.com';
-
   afterEach(() => nock.cleanAll());
 
   it('returns data on 200', async () => {
     nock(host)
-      .get('/pharmacy-drug-pricing/1.0/service/PharmacyPricing')
-      .query({ quantity: '100', ndc: '5914800071', radius: '100', zipCode: '10003' })
+      .get('/PharmacyPricing')
+      .query({ quantity: '100', ndc: '59148000713', radius: '100', zipCode: '10003' })
       .reply(200, { prices: [{ pharmacyId: 'X', price: 12.34 }] });
 
     const data = await getPriceByNdc({
-      ndc: '5914800071',
+      ndc: '59148000713',
       quantity: 100,
       radius: 100,
       zipCode: '10003',
@@ -32,13 +23,13 @@ describe('getPriceByNdc (service)', () => {
 
   it('bubbles 4xx with safe message', async () => {
     nock(host)
-      .get('/pharmacy-drug-pricing/1.0/service/PharmacyPricing')
-      .query({ quantity: '100', ndc: '5914800071', radius: '100', zipCode: '10003' })
+      .get('/PharmacyPricing')
+      .query({ quantity: '100', ndc: '59148000713', radius: '100', zipCode: '10003' })
       .reply(400, { message: 'bad request' });
 
     await expect(
       getPriceByNdc({
-        ndc: '5914800071',
+        ndc: '59148000713',
         quantity: 100,
         radius: 100,
         zipCode: '10003',
@@ -55,7 +46,7 @@ describe('getPriceByNdc (service)', () => {
       .reply(200, { ok: true });
 
     const data = await getPriceByNdc({
-      ndc: '5914800071',
+      ndc: '59148000713',
       quantity: 100,
       radius: 5,
       zipCode: '10003',

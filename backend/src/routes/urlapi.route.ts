@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { getUrlResponse } from '../services/urlLookupService';
+import { getUrlResponse } from '../services/urlapi.service';
+
 const router = Router();
 
 router.get('/url-lookup', async (req: any, res: any, next: any) => {
@@ -8,12 +9,9 @@ router.get('/url-lookup', async (req: any, res: any, next: any) => {
     if (!ndc) {
       return res.status(400).json({ ok: false, error: 'ndc is required' });
     }
-    const ndcStr = String(ndc);
-    if (!/^\d{10}$/.test(ndcStr)) {
-      return res.status(400).json({ ok: false, error: 'ndc must be a 10-digit numeric string' });
-    }
 
-    const data = await getUrlResponse({ ndc: ndcStr });
+    const data = await getUrlResponse({ ndc: String(ndc) });
+
     res.json({ ok: true, data });
   } catch (err) {
     next(err);

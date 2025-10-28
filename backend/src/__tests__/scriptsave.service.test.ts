@@ -1,12 +1,4 @@
 import nock from 'nock';
-
-jest.mock('../auth/scriptsave.tokenManager', () => ({
-  scriptSaveTokenManager: {
-    getToken: () => 'test-token',
-  },
-}));
-
-import { getScriptSaveSecret } from '../secrets/secrets';
 import {
   autoComplete,
   findDrugsUsingDrugName,
@@ -19,16 +11,9 @@ import {
   priceDrugsByNCPDP,
 } from '../services/scriptsave.service';
 
+const host: string = process.env.SCRIPTSAVE_BASE_URL || '';
+
 describe('scriptsave.service', () => {
-  let host: string = process.env.SCRIPTSAVE_BASE_URL || '';
-  let subscriptionKey: string;
-
-  beforeAll(async () => {
-    const secrets = await getScriptSaveSecret();
-    host = secrets.baseUrl;
-    subscriptionKey = secrets.subscriptionKey;
-  });
-
   afterEach(() => nock.cleanAll());
 
   // -------------------- autoComplete --------------------
@@ -71,7 +56,7 @@ describe('scriptsave.service', () => {
         .query({
           groupID: '1',
           BrandIndicator: 'B',
-          NDC: '1234567890',
+          NDC: '12345678901',
           IncludeDrugInfo: 'true',
           IncludeDrugImage: 'false',
           qty: '30',
@@ -85,7 +70,7 @@ describe('scriptsave.service', () => {
       const data = await findDrugsUsingNDC11({
         groupID: '1',
         brandIndicator: 'B',
-        ndc: '1234567890',
+        ndc: '12345678901',
         includeDrugInfo: 'true',
         includeDrugImage: 'false',
         quantity: '30',
@@ -277,8 +262,8 @@ describe('scriptsave.service', () => {
       nock(host)
         .get('/pricingenginecore/api/pricing/pricedrug')
         .query({
-          ndc: '1234567890',
-          ncpdp: '["98765"]',
+          NDC: '12345678901',
+          NCPDP: '["98765"]',
           groupID: '9',
           quantity: '30',
           ndcOverride: 'true',
@@ -286,7 +271,7 @@ describe('scriptsave.service', () => {
         .reply(200, { price: 12.34 });
 
       const data = await priceDrug({
-        ndc: '1234567890',
+        ndc: '12345678901',
         ncpdp: '["98765"]',
         groupID: '9',
         quantity: '30',
@@ -315,7 +300,7 @@ describe('scriptsave.service', () => {
       nock(host)
         .get('/pricingenginecore/api/pricing/pricedrug')
         .query({
-          ndc: '1234567890',
+          NDC: '12345678901',
           groupID: '1',
           quantity: '30',
           numResults: '10',
@@ -325,7 +310,7 @@ describe('scriptsave.service', () => {
         .reply(200, { results: [1, 2, 3] });
 
       const data = await priceDrugs({
-        ndc: '1234567890',
+        ndc: '12345678901',
         groupID: '1',
         quantity: '30',
         numResults: '10',
@@ -339,7 +324,7 @@ describe('scriptsave.service', () => {
     it('fails validation on bad zipCode', async () => {
       await expect(
         priceDrugs({
-          ndc: '1234567890',
+          ndc: '12345678901',
           groupID: '1',
           quantity: '30',
           numResults: '10',
@@ -355,12 +340,12 @@ describe('scriptsave.service', () => {
     it('POSTs and returns data', async () => {
       nock(host)
         .post('/pricingenginecore/api/Pricing/PriceDrugsByNCPDP', (body) => {
-          return body.NDC === '1234567890' && body.NCPDP === '["12345"]' && body.groupID === '1';
+          return body.NDC === '12345678901' && body.NCPDP === '["12345"]' && body.groupID === '1';
         })
         .reply(200, { ok: true });
 
       const data = await priceDrugsByNCPDP({
-        ndc: '1234567890',
+        ndc: '12345678901',
         ncpdp: '["12345"]',
         groupID: '1',
         quantity: '90',

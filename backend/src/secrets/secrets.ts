@@ -33,13 +33,6 @@ cache = { dsntSecret: null, scriptSaveSecret: null, urlApiSecret: null, exp: 0 }
 const TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 export async function getDsntSecret(): Promise<DsntSecret> {
-  if (process.env.NODE_ENV === 'test') {
-    return {
-      baseUrl: process.env.DSNT_HOST || '',
-      username: 'test-user',
-      password: 'test-pass',
-    };
-  }
   const now = Date.now();
   if (cache.dsntSecret && cache.exp > now) return cache.dsntSecret;
 
@@ -71,15 +64,6 @@ export async function getDsntSecret(): Promise<DsntSecret> {
 export const getDSNTSecret = getDsntSecret; // legacy name expected by older tests
 
 export async function getScriptSaveSecret(): Promise<ScriptSaveSecret> {
-  if (process.env.NODE_ENV === 'test') {
-    return {
-      baseUrl: 'https://example-scriptsave.com',
-      subscriptionKey: 'test-sub-key',
-      TenantId: '',
-      ClientId: '',
-      ClientSecret: '',
-    };
-  }
   const now = Date.now();
   if (cache.scriptSaveSecret && cache.exp > now) return cache.scriptSaveSecret;
 

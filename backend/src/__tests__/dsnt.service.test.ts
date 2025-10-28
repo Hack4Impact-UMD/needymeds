@@ -1,44 +1,20 @@
 import nock from 'nock';
 import request from 'supertest';
 import app from '../app';
-import { getDsntSecret } from '../secrets/secrets';
 import { getPriceByNdc, priceByNdcAndNpiList } from '../services/dsnt.service';
 
-jest.mock('../secrets/secrets', () => ({
-  getDsntSecret: async () => ({
-    username: 'u',
-    password: 'p',
-    baseUrl: process.env.DSNT_HOST || '',
-  }),
-
-  getDSNTSecret: async () => ({
-    username: 'u',
-    password: 'p',
-    baseUrl: 'https://argusprod.dstsystems.com',
-  }),
-}));
+const host = process.env.DSNT_BASE_URL || '';
 
 describe('GET /api/dsnt/price', () => {
-  let host: string;
-  let username: string;
-  let password: string;
-
-  beforeAll(async () => {
-    const secrets = await getDsntSecret();
-    host = secrets.baseUrl;
-    username = secrets.username;
-    password = secrets.password;
-  });
-
   afterEach(() => nock.cleanAll());
 
   it('200 happy path', async () => {
-    nock(/https?:\/\/argusprod\.dstsystems\.com/)
+    nock(host)
       .get(/PharmacyPricing/)
       .reply(200, { foo: 'bar' });
     const res = await request(app)
       .get('/api/dsnt/price')
-      .query({ ndc: '5914800071', quantity: 100, radius: 100, zipCode: '10003' });
+      .query({ ndc: '59148000713', quantity: 100, radius: 100, zipCode: '10003' });
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ ok: true, data: { foo: 'bar' } });
   });
@@ -53,23 +29,16 @@ describe('GET /api/dsnt/price', () => {
 });
 
 describe('getPriceByNdc', () => {
-  let host: string;
-
-  beforeAll(async () => {
-    const secrets = await getDsntSecret();
-    host = secrets.baseUrl;
-  });
-
   afterEach(() => nock.cleanAll());
 
   it('returns data on 200', async () => {
-    nock(/https?:\/\/argusprod\.dstsystems\.com/)
+    nock(host)
       .get(/PharmacyPricing/)
-      .query({ quantity: '100', ndc: '5914800071', radius: '100', zipCode: '10003' })
+      .query({ quantity: '100', ndc: '59148000713', radius: '100', zipCode: '10003' })
       .reply(200, { prices: [{ pharmacyId: 'X', price: 12.34 }] });
 
     const data = await getPriceByNdc({
-      ndc: '5914800071',
+      ndc: '59148000713',
       quantity: 100,
       radius: 100,
       zipCode: '10003',
@@ -78,14 +47,14 @@ describe('getPriceByNdc', () => {
   });
 
   it('bubbles 4xx with safe message', async () => {
-    nock(/https?:\/\/argusprod\.dstsystems\.com/)
+    nock(host)
       .get(/PharmacyPricing/)
-      .query({ quantity: '100', ndc: '5914800071', radius: '100', zipCode: '10003' })
+      .query({ quantity: '100', ndc: '59148000713', radius: '100', zipCode: '10003' })
       .reply(400, { message: 'bad request' });
 
     await expect(
       getPriceByNdc({
-        ndc: '5914800071',
+        ndc: '59148000713',
         quantity: 100,
         radius: 100,
         zipCode: '10003',
@@ -94,15 +63,15 @@ describe('getPriceByNdc', () => {
   });
 
   it('fails after exhausting retries with 5xx', async () => {
-    const scope = nock(/https?:\/\/argusprod\.dstsystems\.com/)
+    const scope = nock(host)
       .get(/PharmacyPricing/)
       .times(3)
-      .query({ quantity: '100', ndc: '5914800071', radius: '100', zipCode: '10003' })
+      .query({ quantity: '100', ndc: '59148000713', radius: '100', zipCode: '10003' })
       .reply(503, {});
 
     await expect(
       getPriceByNdc({
-        ndc: '5914800071',
+        ndc: '59148000713',
         quantity: 100,
         radius: 100,
         zipCode: '10003',
@@ -112,7 +81,7 @@ describe('getPriceByNdc', () => {
   });
 
   it('retries on 502 then succeeds', async () => {
-    const scope = nock(/https?:\/\/argusprod\.dstsystems\.com/)
+    const scope = nock(host)
       .get(/PharmacyPricing/)
       .twice()
       .reply(502, {})
@@ -120,7 +89,7 @@ describe('getPriceByNdc', () => {
       .reply(200, { ok: true });
 
     const data = await getPriceByNdc({
-      ndc: '5914800071',
+      ndc: '59148000713',
       quantity: 100,
       radius: 5,
       zipCode: '10003',
@@ -131,43 +100,32 @@ describe('getPriceByNdc', () => {
 });
 
 describe('priceByNdcAndNpiList', () => {
-  let host: string;
-  let username: string;
-  let password: string;
-
-  beforeAll(async () => {
-    const secrets = await getDsntSecret();
-    host = secrets.baseUrl;
-    username = secrets.username;
-    password = secrets.password;
-  });
-
   afterEach(() => nock.cleanAll());
 
   it('returns pricing for npilist single', async () => {
-    nock(/https?:\/\/argusprod\.dstsystems\.com/)
+    nock(host)
       .get(/PharmacyPricing/)
-      .query({ quantity: '100', ndc: '5914800071', npilist: '1326064445' })
-      .reply(200, { DrugPricing: [{ npi: '1326064445', ndc: '5914800071', price: '2087.39' }] });
+      .query({ quantity: '100', ndc: '59148000713', npilist: '1326064445' })
+      .reply(200, { DrugPricing: [{ npi: '1326064445', ndc: '59148000713', price: '2087.39' }] });
 
     const data = await priceByNdcAndNpiList({
-      ndc: '5914800071',
+      ndc: '59148000713',
       quantity: 100,
       npilist: '1326064445',
     });
     expect(data).toEqual({
-      DrugPricing: [{ npi: '1326064445', ndc: '5914800071', price: '2087.39' }],
+      DrugPricing: [{ npi: '1326064445', ndc: '59148000713', price: '2087.39' }],
     });
   });
 
   it('returns pricing for multiple npis', async () => {
-    nock(/https?:\/\/argusprod\.dstsystems\.com/)
+    nock(host)
       .get(/PharmacyPricing/)
-      .query({ quantity: '45', ndc: '0059140528', npilist: '1013431949,1326064445' })
+      .query({ quantity: '45', ndc: '00591405281', npilist: '1013431949,1326064445' })
       .reply(200, { DrugPricing: [] });
 
     const data = await priceByNdcAndNpiList({
-      ndc: '0059140528',
+      ndc: '00591405281',
       quantity: 45,
       npilist: '1013431949,1326064445',
     });
@@ -176,7 +134,7 @@ describe('priceByNdcAndNpiList', () => {
 
   it('validates bad npi', async () => {
     await expect(
-      priceByNdcAndNpiList({ ndc: '00591405289', quantity: 45, npilist: 'abc' })
+      priceByNdcAndNpiList({ ndc: '005914052819', quantity: 45, npilist: 'abc' })
     ).rejects.toMatchObject({ status: 400 });
   });
 });

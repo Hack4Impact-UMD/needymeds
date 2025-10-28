@@ -30,7 +30,7 @@ async function client() {
 }
 
 // ----------------------------- Validation helpers -------------------------
-const NDC_RE = /^\d{10}$/; // 10 digit ndc (no dashes)
+const NDC_RE = /^\d{11}$/; // 11 digit ndc (no dashes)
 const ZIP_RE = /^\d{5}$/; // simple 5-digit US zip
 const NPI_RE = /^\d{10}$/; // 10 digit NPI
 
@@ -40,7 +40,7 @@ function validateCommon(opts: {
   radius?: number;
   zipCode?: string;
 }) {
-  if (!NDC_RE.test(opts.ndc)) return 'Invalid ndc (expect 10 digits)';
+  if (!NDC_RE.test(opts.ndc)) return 'Invalid ndc (expect 11 digits)';
   if (!(Number.isFinite(opts.quantity) && opts.quantity > 0))
     return 'Invalid quantity (must be >0)';
   if (opts.radius !== undefined && !(Number.isFinite(opts.radius) && opts.radius > 0))

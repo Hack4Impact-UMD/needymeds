@@ -55,7 +55,7 @@ async function performRequest(method: httpMethod, path: string, params: Record<s
 // ----------------------------- Validation helpers -------------------------
 const GSN_RE = /^\d{6}$/; // 6-digit GSN
 const NCPDP_RE = /^(?:\d+|\[(?:"\d+"(?:,\s*"\d+")*)?\])$/;
-const NDC_RE = /^\d{10}$/; // 10 digit ndc (no dashes)
+const NDC_RE = /^\d{11}$/; // 11 digit ndc (no dashes)
 const ZIP_RE = /^\d{5}$/; // simple 5-digit US zip
 
 function validate(opts: {
@@ -99,7 +99,7 @@ function validate(opts: {
   }
   if (opts.ncpdp !== undefined && !NCPDP_RE.test(opts.ncpdp))
     return 'Invalid ncpdp (expect numerical list)';
-  if (opts.ndc !== undefined && !NDC_RE.test(opts.ndc)) return 'Invalid ndc (expect 10 digits)';
+  if (opts.ndc !== undefined && !NDC_RE.test(opts.ndc)) return 'Invalid ndc (expect 11 digits)';
   if (
     opts.ndcOverride !== undefined &&
     !(opts.ndcOverride === 'true' || opts.ndcOverride === 'false')
@@ -311,8 +311,8 @@ export async function priceDrug(opts: {
   }
 
   return performRequest('GET', '/pricingenginecore/api/pricing/pricedrug', {
-    ndc: opts.ndc,
-    ncpdp: opts.ncpdp,
+    NDC: opts.ndc,
+    NCPDP: opts.ncpdp,
     groupID: opts.groupID,
     quantity: opts.quantity,
     ndcOverride: opts.ndcOverride,
@@ -343,7 +343,7 @@ export async function priceDrugs(opts: {
   }
 
   return performRequest('GET', '/pricingenginecore/api/pricing/pricedrug', {
-    ndc: opts.ndc,
+    NDC: opts.ndc,
     groupID: opts.groupID,
     quantity: opts.quantity,
     numResults: opts.numResults,
