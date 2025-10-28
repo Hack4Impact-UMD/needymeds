@@ -13,6 +13,14 @@ import {
 
 const host: string = process.env.SCRIPTSAVE_BASE_URL || '';
 
+jest.mock('../secrets/secrets', () => ({
+  getScriptSaveSecret: async () => ({
+    baseUrl: process.env.SCRIPTSAVE_BASE_URL || '',
+    username: 'placeholder',
+    password: 'placeholder',
+  }),
+}));
+
 describe('scriptsave.service', () => {
   afterEach(() => nock.cleanAll());
 

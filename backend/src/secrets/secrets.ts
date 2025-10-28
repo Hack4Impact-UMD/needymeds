@@ -59,10 +59,6 @@ export async function getDsntSecret(): Promise<DsntSecret> {
   return secret;
 }
 
-// Backward-compatible alias (tests or older code may mock/get `getDSNTSecret`)
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export const getDSNTSecret = getDsntSecret; // legacy name expected by older tests
-
 export async function getScriptSaveSecret(): Promise<ScriptSaveSecret> {
   const now = Date.now();
   if (cache.scriptSaveSecret && cache.exp > now) return cache.scriptSaveSecret;

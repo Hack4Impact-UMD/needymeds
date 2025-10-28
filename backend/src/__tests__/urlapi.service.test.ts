@@ -1,7 +1,15 @@
 import nock from 'nock';
 import { getUrlResponse } from '../services/urlapi.service';
 
-const host: string = process.env.URLAPI_BASE_URL || 'https://fake-urlapi.test';
+const host: string = process.env.URLAPI_BASE_URL || '';
+
+jest.mock('../secrets/secrets', () => ({
+  getUrlApiSecret: async () => ({
+    baseUrl: process.env.URLAPI_BASE_URL || '',
+    username: 'placeholder',
+    password: 'placeholder',
+  }),
+}));
 
 describe('urlapi.service', () => {
   afterEach(() => nock.cleanAll());

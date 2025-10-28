@@ -1,7 +1,15 @@
 import nock from 'nock';
 import { autoComplete, findDrugsUsingNDC11, priceDrug } from '../services/scriptsave.service';
 
-const host = process.env.SCRIPTSAVE_BASE_URL || '';
+const host: string = process.env.SCRIPTSAVE_BASE_URL || '';
+
+jest.mock('../secrets/secrets', () => ({
+  getScriptSaveSecret: async () => ({
+    baseUrl: process.env.SCRIPTSAVE_BASE_URL || '',
+    username: 'placeholder',
+    password: 'placeholder',
+  }),
+}));
 
 describe('ScriptSave service endpoints', () => {
   afterEach(() => nock.cleanAll());

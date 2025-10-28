@@ -1,7 +1,15 @@
 import nock from 'nock';
 import { getPriceByNdc } from '../services/dsnt.service';
 
-const host = process.env.DSNT_BASE_URL || '';
+const host: string = process.env.DSNT_BASE_URL || '';
+
+jest.mock('../secrets/secrets', () => ({
+  getDsntSecret: async () => ({
+    baseUrl: process.env.DSNT_BASE_URL || '',
+    username: 'placeholder',
+    password: 'placeholder',
+  }),
+}));
 
 describe('getPriceByNdc (service)', () => {
   afterEach(() => nock.cleanAll());

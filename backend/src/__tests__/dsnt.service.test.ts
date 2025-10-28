@@ -3,7 +3,15 @@ import request from 'supertest';
 import app from '../app';
 import { getPriceByNdc, priceByNdcAndNpiList } from '../services/dsnt.service';
 
-const host = process.env.DSNT_BASE_URL || '';
+const host: string = process.env.DSNT_BASE_URL || '';
+
+jest.mock('../secrets/secrets', () => ({
+  getDsntSecret: async () => ({
+    baseUrl: process.env.DSNT_BASE_URL || '',
+    username: 'placeholder',
+    password: 'placeholder',
+  }),
+}));
 
 describe('GET /api/dsnt/price', () => {
   afterEach(() => nock.cleanAll());

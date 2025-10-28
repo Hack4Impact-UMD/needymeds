@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getDSNTSecret } from '../secrets/secrets';
+import { getDsntSecret } from '../secrets/secrets';
 
 function basicHeader(user: string, pass: string) {
   const b64 = Buffer.from(`${user}:${pass}`).toString('base64');
@@ -7,7 +7,7 @@ function basicHeader(user: string, pass: string) {
 }
 
 async function client() {
-  const { baseUrl, username, password } = await getDSNTSecret();
+  const { baseUrl, username, password } = await getDsntSecret();
 
   return axios.create({
     baseURL: baseUrl,
