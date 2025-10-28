@@ -3,7 +3,7 @@ import { getUrlResponse } from '../services/urlapi.service';
 
 const router = Router();
 
-router.get('/url-lookup', async (req: any, res: any, next: any) => {
+router.get('/lookup', async (req: any, res: any, next: any) => {
   try {
     const { ndc } = req.query;
     if (!ndc) {

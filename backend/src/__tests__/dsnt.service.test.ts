@@ -39,8 +39,8 @@ describe('getPriceByNdc', () => {
 
     const data = await getPriceByNdc({
       ndc: '59148000713',
-      quantity: 100,
-      radius: 100,
+      quantity: '100',
+      radius: '100',
       zipCode: '10003',
     });
     expect(data).toEqual({ prices: [{ pharmacyId: 'X', price: 12.34 }] });
@@ -55,8 +55,8 @@ describe('getPriceByNdc', () => {
     await expect(
       getPriceByNdc({
         ndc: '59148000713',
-        quantity: 100,
-        radius: 100,
+        quantity: '100',
+        radius: '100',
         zipCode: '10003',
       })
     ).rejects.toMatchObject({ message: 'DS&T returned 400', status: 400 });
@@ -72,8 +72,8 @@ describe('getPriceByNdc', () => {
     await expect(
       getPriceByNdc({
         ndc: '59148000713',
-        quantity: 100,
-        radius: 100,
+        quantity: '100',
+        radius: '100',
         zipCode: '10003',
       })
     ).rejects.toMatchObject({ status: 503 });
@@ -90,8 +90,8 @@ describe('getPriceByNdc', () => {
 
     const data = await getPriceByNdc({
       ndc: '59148000713',
-      quantity: 100,
-      radius: 5,
+      quantity: '100',
+      radius: '5',
       zipCode: '10003',
     });
     expect(data).toEqual({ ok: true });
@@ -110,7 +110,7 @@ describe('priceByNdcAndNpiList', () => {
 
     const data = await priceByNdcAndNpiList({
       ndc: '59148000713',
-      quantity: 100,
+      quantity: '100',
       npilist: '1326064445',
     });
     expect(data).toEqual({
@@ -126,7 +126,7 @@ describe('priceByNdcAndNpiList', () => {
 
     const data = await priceByNdcAndNpiList({
       ndc: '00591405281',
-      quantity: 45,
+      quantity: '45',
       npilist: '1013431949,1326064445',
     });
     expect(data).toEqual({ DrugPricing: [] });
@@ -134,7 +134,7 @@ describe('priceByNdcAndNpiList', () => {
 
   it('validates bad npi', async () => {
     await expect(
-      priceByNdcAndNpiList({ ndc: '005914052819', quantity: 45, npilist: 'abc' })
+      priceByNdcAndNpiList({ ndc: '005914052819', quantity: '45', npilist: 'abc' })
     ).rejects.toMatchObject({ status: 400 });
   });
 });

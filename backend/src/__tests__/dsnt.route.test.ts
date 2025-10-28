@@ -14,8 +14,8 @@ describe('getPriceByNdc (service)', () => {
 
     const data = await getPriceByNdc({
       ndc: '59148000713',
-      quantity: 100,
-      radius: 100,
+      quantity: '100',
+      radius: '100',
       zipCode: '10003',
     });
     expect(data).toEqual({ prices: [{ pharmacyId: 'X', price: 12.34 }] });
@@ -30,8 +30,8 @@ describe('getPriceByNdc (service)', () => {
     await expect(
       getPriceByNdc({
         ndc: '59148000713',
-        quantity: 100,
-        radius: 100,
+        quantity: '100',
+        radius: '100',
         zipCode: '10003',
       })
     ).rejects.toMatchObject({ message: 'DS&T returned 400', status: 400 });
@@ -47,8 +47,8 @@ describe('getPriceByNdc (service)', () => {
 
     const data = await getPriceByNdc({
       ndc: '59148000713',
-      quantity: 100,
-      radius: 5,
+      quantity: '100',
+      radius: '5',
       zipCode: '10003',
     });
     expect(data).toEqual({ ok: true });

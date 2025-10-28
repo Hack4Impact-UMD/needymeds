@@ -60,11 +60,11 @@ async function performRequest(method: httpMethod, path: string, params: Record<s
 }
 
 // ----------------------------- Validation Helpers -----------------------------
-const NDC_RE = /^\d{11}$/; // 11-digit NDC
+const NDC_RE = /^\d{10}$/; // 10-digit NDC
 
 function validate(opts: { ndc?: string }) {
   if (!opts.ndc) return 'ndc is required';
-  if (!NDC_RE.test(opts.ndc)) return 'ndc must be an 11-digit numeric string';
+  if (!NDC_RE.test(opts.ndc)) return 'ndc must be a 10-digit numeric string';
   return null;
 }
 
@@ -79,7 +79,7 @@ export async function getUrlResponse(opts: { ndc: string }) {
     throw err;
   }
 
-  return performRequest('GET', '/url-lookup', {
+  return performRequest('GET', '/lookup', {
     ndc: opts.ndc,
   });
 }

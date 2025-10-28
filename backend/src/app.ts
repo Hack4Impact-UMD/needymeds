@@ -16,7 +16,7 @@ app.get('/', (_req, res) => res.status(200).json({ ok: true, route: 'root' }));
 
 app.use('/api/dsnt', dsntRouter);
 app.use('/api/scriptsave', scriptSaveRouter);
-app.use('/api/url', urlRouter);
+app.use('/api/urlapi', urlRouter);
 
 app.use((err: any, _req: any, res: any, _next: any) => {
   const status = err?.status ?? err?.response?.status ?? 500;

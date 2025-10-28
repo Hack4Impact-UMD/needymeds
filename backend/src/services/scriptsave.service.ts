@@ -54,7 +54,7 @@ async function performRequest(method: httpMethod, path: string, params: Record<s
 
 // ----------------------------- Validation helpers -------------------------
 const GSN_RE = /^\d{6}$/; // 6-digit GSN
-const NCPDP_RE = /^(?:\d+|\[(?:"\d+"(?:,\s*"\d+")*)?\])$/;
+const NCPDP_RE = /^\[("\d*")+(,\s*("\d*")+)*\]$/; // numerical string list
 const NDC_RE = /^\d{11}$/; // 11 digit ndc (no dashes)
 const ZIP_RE = /^\d{5}$/; // simple 5-digit US zip
 
@@ -98,7 +98,7 @@ function validate(opts: {
     return 'Invalid includeDrugImage (must be boolean)';
   }
   if (opts.ncpdp !== undefined && !NCPDP_RE.test(opts.ncpdp))
-    return 'Invalid ncpdp (expect numerical list)';
+    return 'Invalid ncpdp (expect numerical string list)';
   if (opts.ndc !== undefined && !NDC_RE.test(opts.ndc)) return 'Invalid ndc (expect 11 digits)';
   if (
     opts.ndcOverride !== undefined &&
@@ -315,7 +315,7 @@ export async function priceDrug(opts: {
     NCPDP: opts.ncpdp,
     groupID: opts.groupID,
     quantity: opts.quantity,
-    ndcOverride: opts.ndcOverride,
+    NDCOverride: opts.ndcOverride,
   });
 }
 
@@ -342,13 +342,13 @@ export async function priceDrugs(opts: {
     throw err;
   }
 
-  return performRequest('GET', '/pricingenginecore/api/pricing/pricedrug', {
+  return performRequest('GET', '/pharmacypricing/api/pricing/pricedrugs', {
     NDC: opts.ndc,
     groupID: opts.groupID,
     quantity: opts.quantity,
     numResults: opts.numResults,
     zipCode: opts.zipCode,
-    ndcOverride: opts.ndcOverride,
+    NDCOverride: opts.ndcOverride,
   });
 }
 
@@ -373,12 +373,21 @@ export async function priceDrugsByNCPDP(opts: {
     throw err;
   }
 
+  const parsedNcpdp = (() => {
+    try {
+      const arr = JSON.parse(String(opts.ncpdp));
+      return Array.isArray(arr) ? arr : [String(opts.ncpdp)];
+    } catch {
+      return [String(opts.ncpdp)];
+    }
+  })();
+
   return performRequest('POST', '/pricingenginecore/api/Pricing/PriceDrugsByNCPDP', {
     NDC: opts.ndc,
-    NCPDP: opts.ncpdp,
+    NCPDP: parsedNcpdp,
     groupID: opts.groupID,
     quantity: opts.quantity,
-    ndcoverride: opts.ndcOverride,
+    NDCOverride: opts.ndcOverride,
   });
 }
 

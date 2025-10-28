@@ -219,9 +219,9 @@ router.get('/priceDrugs', async (req, res, next) => {
 });
 
 // ------------------- 006 PriceDrugsByNCPDP -------------------
-router.post('/priceDrugsByNCPDP', async (req, res, next) => {
+router.get('/priceDrugsByNCPDP', async (req, res, next) => {
   try {
-    const { ndc, ncpdp, groupID, quantity, ndcOverride } = req.body;
+    const { ndc, ncpdp, groupID, quantity, ndcOverride } = req.query;
     if (!ndc || !ncpdp || !groupID || !quantity) {
       return res.status(400).json({
         ok: false,

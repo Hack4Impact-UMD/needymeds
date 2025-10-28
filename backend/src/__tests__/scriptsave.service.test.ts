@@ -266,7 +266,7 @@ describe('scriptsave.service', () => {
           NCPDP: '["98765"]',
           groupID: '9',
           quantity: '30',
-          ndcOverride: 'true',
+          NDCOverride: 'true',
         })
         .reply(200, { price: 12.34 });
 
@@ -298,14 +298,14 @@ describe('scriptsave.service', () => {
   describe('priceDrugs', () => {
     it('returns list of prices', async () => {
       nock(host)
-        .get('/pricingenginecore/api/pricing/pricedrug')
+        .get('/pharmacypricing/api/pricing/pricedrugs')
         .query({
           NDC: '12345678901',
           groupID: '1',
           quantity: '30',
           numResults: '10',
           zipCode: '90210',
-          ndcOverride: 'false',
+          NDCOverride: 'false',
         })
         .reply(200, { results: [1, 2, 3] });
 
@@ -340,7 +340,13 @@ describe('scriptsave.service', () => {
     it('POSTs and returns data', async () => {
       nock(host)
         .post('/pricingenginecore/api/Pricing/PriceDrugsByNCPDP', (body) => {
-          return body.NDC === '12345678901' && body.NCPDP === '["12345"]' && body.groupID === '1';
+          return (
+            body.NDC === '12345678901' &&
+            body.NCPDP.includes('12345') &&
+            body.groupID === '1' &&
+            body.quantity === '90' &&
+            body.NDCOverride === 'false'
+          );
         })
         .reply(200, { ok: true });
 

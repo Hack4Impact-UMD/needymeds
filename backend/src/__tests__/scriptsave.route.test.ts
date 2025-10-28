@@ -49,7 +49,7 @@ describe('ScriptSave service endpoints', () => {
       .get('/pricingenginecore/api/pricing/pricedrug')
       .query({
         NDC: '12345678901',
-        NCPDP: '5555555',
+        NCPDP: '["5555555"]',
         groupID: '123',
         quantity: '30',
       })
@@ -57,7 +57,7 @@ describe('ScriptSave service endpoints', () => {
 
     const data = await priceDrug({
       ndc: '12345678901',
-      ncpdp: '5555555',
+      ncpdp: '["5555555"]',
       groupID: '123',
       quantity: '30',
     });
