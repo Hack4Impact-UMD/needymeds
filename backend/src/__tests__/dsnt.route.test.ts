@@ -1,30 +1,29 @@
 import nock from 'nock';
 import { getPriceByNdc } from '../services/dsnt.service';
 
-// mock the secrets module so we don't hit AWS locally
+const host: string = process.env.DSNT_BASE_URL || '';
+
 jest.mock('../secrets/secrets', () => ({
-  getDSNTSecret: async () => ({
-    username: 'u',
-    password: 'p',
-    baseUrl: 'https://argusprod.dstsystems.com/pharmacy-drug-pricing/1.0/service',
+  getDsntSecret: async () => ({
+    baseUrl: process.env.DSNT_BASE_URL || '',
+    username: 'placeholder',
+    password: 'placeholder',
   }),
 }));
 
 describe('getPriceByNdc (service)', () => {
-  const host = 'https://argusprod.dstsystems.com';
-
   afterEach(() => nock.cleanAll());
 
   it('returns data on 200', async () => {
     nock(host)
-      .get('/pharmacy-drug-pricing/1.0/service/PharmacyPricing')
+      .get('/PharmacyPricing')
       .query({ quantity: '100', ndc: '59148000713', radius: '100', zipCode: '10003' })
       .reply(200, { prices: [{ pharmacyId: 'X', price: 12.34 }] });
 
     const data = await getPriceByNdc({
       ndc: '59148000713',
-      quantity: 100,
-      radius: 100,
+      quantity: '100',
+      radius: '100',
       zipCode: '10003',
     });
     expect(data).toEqual({ prices: [{ pharmacyId: 'X', price: 12.34 }] });
@@ -32,15 +31,15 @@ describe('getPriceByNdc (service)', () => {
 
   it('bubbles 4xx with safe message', async () => {
     nock(host)
-      .get('/pharmacy-drug-pricing/1.0/service/PharmacyPricing')
+      .get('/PharmacyPricing')
       .query({ quantity: '100', ndc: '59148000713', radius: '100', zipCode: '10003' })
       .reply(400, { message: 'bad request' });
 
     await expect(
       getPriceByNdc({
         ndc: '59148000713',
-        quantity: 100,
-        radius: 100,
+        quantity: '100',
+        radius: '100',
         zipCode: '10003',
       })
     ).rejects.toMatchObject({ message: 'DS&T returned 400', status: 400 });
@@ -56,8 +55,8 @@ describe('getPriceByNdc (service)', () => {
 
     const data = await getPriceByNdc({
       ndc: '59148000713',
-      quantity: 100,
-      radius: 5,
+      quantity: '100',
+      radius: '5',
       zipCode: '10003',
     });
     expect(data).toEqual({ ok: true });

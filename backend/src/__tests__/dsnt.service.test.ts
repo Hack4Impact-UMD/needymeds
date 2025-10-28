@@ -3,17 +3,17 @@ import request from 'supertest';
 import app from '../app';
 import { getPriceByNdc, priceByNdcAndNpiList } from '../services/dsnt.service';
 
-// mock the secrets module so we don't hit AWS locally
+const host: string = process.env.DSNT_BASE_URL || '';
+
 jest.mock('../secrets/secrets', () => ({
-  getDSNTSecret: async () => ({
-    username: 'u',
-    password: 'p',
-    baseUrl: 'https://argusprod.dstsystems.com/pharmacy-drug-pricing/1.0/service',
+  getDsntSecret: async () => ({
+    baseUrl: process.env.DSNT_BASE_URL || '',
+    username: 'placeholder',
+    password: 'placeholder',
   }),
 }));
 
 describe('GET /api/dsnt/price', () => {
-  const host = 'https://argusprod.dstsystems.com';
   afterEach(() => nock.cleanAll());
 
   it('200 happy path', async () => {
@@ -37,20 +37,18 @@ describe('GET /api/dsnt/price', () => {
 });
 
 describe('getPriceByNdc', () => {
-  const host = 'https://argusprod.dstsystems.com';
-
   afterEach(() => nock.cleanAll());
 
   it('returns data on 200', async () => {
     nock(host)
-      .get('/pharmacy-drug-pricing/1.0/service/PharmacyPricing')
+      .get(/PharmacyPricing/)
       .query({ quantity: '100', ndc: '59148000713', radius: '100', zipCode: '10003' })
       .reply(200, { prices: [{ pharmacyId: 'X', price: 12.34 }] });
 
     const data = await getPriceByNdc({
       ndc: '59148000713',
-      quantity: 100,
-      radius: 100,
+      quantity: '100',
+      radius: '100',
       zipCode: '10003',
     });
     expect(data).toEqual({ prices: [{ pharmacyId: 'X', price: 12.34 }] });
@@ -58,15 +56,15 @@ describe('getPriceByNdc', () => {
 
   it('bubbles 4xx with safe message', async () => {
     nock(host)
-      .get('/pharmacy-drug-pricing/1.0/service/PharmacyPricing')
+      .get(/PharmacyPricing/)
       .query({ quantity: '100', ndc: '59148000713', radius: '100', zipCode: '10003' })
       .reply(400, { message: 'bad request' });
 
     await expect(
       getPriceByNdc({
         ndc: '59148000713',
-        quantity: 100,
-        radius: 100,
+        quantity: '100',
+        radius: '100',
         zipCode: '10003',
       })
     ).rejects.toMatchObject({ message: 'DS&T returned 400', status: 400 });
@@ -74,7 +72,7 @@ describe('getPriceByNdc', () => {
 
   it('fails after exhausting retries with 5xx', async () => {
     const scope = nock(host)
-      .get('/pharmacy-drug-pricing/1.0/service/PharmacyPricing')
+      .get(/PharmacyPricing/)
       .times(3)
       .query({ quantity: '100', ndc: '59148000713', radius: '100', zipCode: '10003' })
       .reply(503, {});
@@ -82,8 +80,8 @@ describe('getPriceByNdc', () => {
     await expect(
       getPriceByNdc({
         ndc: '59148000713',
-        quantity: 100,
-        radius: 100,
+        quantity: '100',
+        radius: '100',
         zipCode: '10003',
       })
     ).rejects.toMatchObject({ status: 503 });
@@ -100,8 +98,8 @@ describe('getPriceByNdc', () => {
 
     const data = await getPriceByNdc({
       ndc: '59148000713',
-      quantity: 100,
-      radius: 5,
+      quantity: '100',
+      radius: '5',
       zipCode: '10003',
     });
     expect(data).toEqual({ ok: true });
@@ -110,18 +108,17 @@ describe('getPriceByNdc', () => {
 });
 
 describe('priceByNdcAndNpiList', () => {
-  const host = 'https://argusprod.dstsystems.com';
   afterEach(() => nock.cleanAll());
 
   it('returns pricing for npilist single', async () => {
     nock(host)
-      .get('/pharmacy-drug-pricing/1.0/service/PharmacyPricing')
+      .get(/PharmacyPricing/)
       .query({ quantity: '100', ndc: '59148000713', npilist: '1326064445' })
       .reply(200, { DrugPricing: [{ npi: '1326064445', ndc: '59148000713', price: '2087.39' }] });
 
     const data = await priceByNdcAndNpiList({
       ndc: '59148000713',
-      quantity: 100,
+      quantity: '100',
       npilist: '1326064445',
     });
     expect(data).toEqual({
@@ -131,13 +128,13 @@ describe('priceByNdcAndNpiList', () => {
 
   it('returns pricing for multiple npis', async () => {
     nock(host)
-      .get('/pharmacy-drug-pricing/1.0/service/PharmacyPricing')
-      .query({ quantity: '45', ndc: '00591405289', npilist: '1013431949,1326064445' })
+      .get(/PharmacyPricing/)
+      .query({ quantity: '45', ndc: '00591405281', npilist: '1013431949,1326064445' })
       .reply(200, { DrugPricing: [] });
 
     const data = await priceByNdcAndNpiList({
-      ndc: '00591405289',
-      quantity: 45,
+      ndc: '00591405281',
+      quantity: '45',
       npilist: '1013431949,1326064445',
     });
     expect(data).toEqual({ DrugPricing: [] });
@@ -145,7 +142,7 @@ describe('priceByNdcAndNpiList', () => {
 
   it('validates bad npi', async () => {
     await expect(
-      priceByNdcAndNpiList({ ndc: '00591405289', quantity: 45, npilist: 'abc' })
+      priceByNdcAndNpiList({ ndc: '005914052819', quantity: '45', npilist: 'abc' })
     ).rejects.toMatchObject({ status: 400 });
   });
 });
