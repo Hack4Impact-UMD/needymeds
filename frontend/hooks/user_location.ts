@@ -1,6 +1,6 @@
 import * as Location from 'expo-location';
-import { setAddress, setZipCode } from '../app/redux/locationSlice';
-import { store } from '../app/redux/store';
+import { setAddress, setZipCode } from '../redux/locationSlice';
+import { store } from '../redux/store';
 
 export interface UserLocationResult {
   zipcode?: string;
