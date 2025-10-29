@@ -8,9 +8,9 @@ const Stack = createNativeStackNavigator();
 
 export default function HomeScreen() {
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="Join" component={WelcomeScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="Search" component={SearchScreen} options={{ title: 'Search Page' }} />
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Join" component={WelcomeScreen} />
+      <Stack.Screen name="Search" component={SearchScreen} />
     </Stack.Navigator>
   );
 }

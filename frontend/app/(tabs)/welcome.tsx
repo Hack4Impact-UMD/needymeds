@@ -6,7 +6,7 @@ const WelcomeScreen = ({ navigation }: any) => {
       contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
     >
       <Text>Welcome!</Text>
-      <Button title="Go to Search" onPress={() => navigation.navigate('Next')} />
+      <Button title="Go to Search" onPress={() => navigation.navigate('Search')} />
     </ScrollView>
   );
 };
