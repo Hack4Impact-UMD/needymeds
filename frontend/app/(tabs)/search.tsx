@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Text, Surface } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 //  medication dataset used as  search stub.
 const MOCK_MEDS = [
@@ -20,7 +21,7 @@ const MOCK_MEDS = [
   { id: '5', name: 'Amlodipine', strength: '5 mg', price: '$7' },
 ];
 
-const SearchScreen = ({ navigation }: any) => {
+const SearchScreen = () => {
   const [query, setQuery] = useState('');
 
   // very small client-side search logic. Matches query against medication name.
@@ -33,7 +34,7 @@ const SearchScreen = ({ navigation }: any) => {
   const onSubmit = () => {
     // if there is an exact-ish match, navigate to the selected medication screen for the first match.
     if (results.length > 0) {
-      navigation.navigate('SelectedMedication', { medication: results[0] });
+      router.navigate('/selected');
     } else {
       // no results, do nothing for now — could show a message or perform a fallback search.
     }
@@ -52,14 +53,19 @@ const SearchScreen = ({ navigation }: any) => {
 
         {/* promo area */}
         <View style={styles.promoWrap}>
-          <Text style={styles.promoTitle}>Upto 80% off</Text>
+          <Text style={styles.promoTitle}>Up to 80% off</Text>
           <Text style={styles.promoSubtitle}>on your prescription</Text>
         </View>
 
         {/* searc bar */}
         <View style={styles.searchRow}>
           <View style={styles.inputWrap}>
-            <MaterialCommunityIcons name="arrow-left" size={20} color="#111" style={{ marginRight: 8 }} />
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={20}
+              color="#111"
+              style={{ marginRight: 8 }}
+            />
             <TextInput
               placeholder="Search for a drug"
               placeholderTextColor="#9aa0a6"
@@ -69,12 +75,15 @@ const SearchScreen = ({ navigation }: any) => {
               style={styles.input}
               returnKeyType="search"
             />
-            <TouchableOpacity onPress={onSubmit} accessibilityRole="button" style={styles.inputIcon}>
+            <TouchableOpacity
+              onPress={onSubmit}
+              accessibilityRole="button"
+              style={styles.inputIcon}
+            >
               <MaterialCommunityIcons name="magnify" size={20} color="#111" />
             </TouchableOpacity>
           </View>
         </View>
-
 
         {/* results list */}
         <View style={styles.resultsWrap}>
@@ -93,7 +102,7 @@ const SearchScreen = ({ navigation }: any) => {
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={styles.resultCard}
-                  onPress={() => navigation.navigate('SelectedMedication', { medication: item })}
+                  onPress={() => router.navigate('/selected')}
                 >
                   <View>
                     <Text style={styles.resultTitle}>{item.name}</Text>
@@ -110,15 +119,21 @@ const SearchScreen = ({ navigation }: any) => {
       <Surface style={styles.bottomNav} elevation={0}>
         <TouchableOpacity style={styles.navItem}>
           <MaterialCommunityIcons name="magnify" size={24} color="#111827" />
-          <Text variant="labelMedium" style={styles.navLabel}>Search</Text>
+          <Text variant="labelMedium" style={styles.navLabel}>
+            Search
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem}>
           <MaterialCommunityIcons name="credit-card" size={24} color="#6B7280" />
-          <Text variant="labelMedium" style={styles.navLabel}>My Cards</Text>
+          <Text variant="labelMedium" style={styles.navLabel}>
+            My Cards
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem}>
           <MaterialCommunityIcons name="web" size={24} color="#6B7280" />
-          <Text variant="labelMedium" style={styles.navLabel}>Resources</Text>
+          <Text variant="labelMedium" style={styles.navLabel}>
+            Resources
+          </Text>
         </TouchableOpacity>
       </Surface>
     </SafeAreaView>
@@ -133,7 +148,7 @@ const styles = StyleSheet.create({
   promoWrap: { alignItems: 'center', marginTop: 16, marginBottom: 24 },
   promoTitle: { fontSize: 32, fontWeight: '200', color: '#111827' },
   promoSubtitle: { fontSize: 16, color: '#6B7280', marginTop: 4 },
-  searchRow: { flexDirection: 'row', alignItems: 'center', marginTop: 8},
+  searchRow: { flexDirection: 'row', alignItems: 'center', marginTop: 8 },
   inputWrap: {
     flex: 1,
     flexDirection: 'row',
@@ -164,7 +179,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#111827',
     paddingVertical: 0,
-    backgroundColor: '#E5E8ED'
+    backgroundColor: '#E5E8ED',
   },
   resultsWrap: { flex: 1, marginTop: 8 },
   hintWrap: { alignItems: 'center', marginTop: 24 },
@@ -197,20 +212,30 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#F3F4F6',
   },
-  navItem: { 
-    alignItems: 'center', 
+  navItem: {
+    alignItems: 'center',
     justifyContent: 'center',
     minWidth: 88,
     paddingVertical: 8,
   },
-  navLabel: { 
+  navLabel: {
     marginTop: 6,
     fontSize: 12,
     color: '#6B7280',
     fontWeight: '500',
   },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 44 },
-  langPill: { paddingVertical: 6, paddingHorizontal: 10, borderRadius: 16, backgroundColor: '#fff' },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: 44,
+  },
+  langPill: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 16,
+    backgroundColor: '#fff',
+  },
   langText: { color: '#111827', fontSize: 12 },
 });
 
