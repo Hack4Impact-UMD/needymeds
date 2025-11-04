@@ -56,7 +56,7 @@ const SearchScreen = ({ navigation }: any) => {
           <Text style={styles.promoSubtitle}>on your prescription</Text>
         </View>
 
-        {/* searc bar */}
+        {/* search bar */}
         <View style={styles.searchRow}>
           <View style={styles.inputWrap}>
             <MaterialCommunityIcons name="arrow-left" size={20} color="#111" style={{ marginRight: 8 }} />
