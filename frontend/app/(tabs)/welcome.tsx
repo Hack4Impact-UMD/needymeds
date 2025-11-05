@@ -5,8 +5,6 @@ import { router } from 'expo-router';
 
 import { Colors } from '@/constants/theme';
 
-// where to move assets?
-
 const WelcomeScreen = () => {
   const theme = useTheme();
 
