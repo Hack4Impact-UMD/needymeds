@@ -5,11 +5,14 @@ type Adjudicator = 'DSNT' | 'ScriptSave';
 export interface DrugSearchResult {
   adjudicator: Adjudicator;
   pharmacyName: string; // primary field for de-duplication
+  pharmacyAddress: string;
+  pharmacyPhone: string;
   ndc: string;
   labelName: string;
   price: string;
-  latitude: number;
-  longitude: number;
+  latitude: string | number;
+  longitude: string | number;
+  distance: string | number;
 }
 
 /* Requests */
