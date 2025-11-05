@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   View,
   TextInput,
@@ -8,14 +8,14 @@ import {
   Platform,
   Image,
 } from 'react-native';
-import { Text, Surface, TouchableRipple } from 'react-native-paper';
+import { Text, TouchableRipple } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Dropdown } from 'react-native-element-dropdown';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import HomeBackgroundShape from '../components/HomeBackgroundShape';
+import BottomNavBar from '../components/BottomNavBar';
 //import ResourcesIcon from '../assets/resource.svg';
-const resourcesIcon = require('../assets/Icon.png');
 const logo = require('../assets/horizontal_logo.png');
 
 const MOCK_MEDS = [
@@ -153,29 +153,7 @@ const SearchScreen = () => {
           )}
         </View>
       </View>
-      {/* paper bottom navigation bar */}
-      <Surface style={styles.bottomNav} elevation={0}>
-        <TouchableOpacity style={styles.navItem} activeOpacity={0.85} onPress={() => {}}>
-          <View style={styles.navActiveContainer}>
-            <MaterialCommunityIcons name="magnify" size={20} color="#7C3AED" />
-          </View>
-          <Text variant="labelMedium" style={[styles.navLabel]}>
-            Search
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <MaterialCommunityIcons name="credit-card" size={24} color="#6B7280" />
-          <Text variant="labelMedium" style={styles.navLabel}>
-            My Cards
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Image source={resourcesIcon} style={{ width: 26, height: 26 }} resizeMode="contain" />
-          <Text variant="labelMedium" style={styles.navLabel}>
-            Resources
-          </Text>
-        </TouchableOpacity>
-      </Surface>
+      <BottomNavBar />
     </SafeAreaView>
   );
 };
@@ -266,39 +244,7 @@ const styles = StyleSheet.create({
   resultTitle: { fontSize: 16, fontWeight: '600' },
   resultSubtitle: { color: '#666', fontSize: 12 },
   resultPrice: { color: '#0b69ff', fontWeight: '600' },
-  bottomNav: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: '#FAF5FF',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingTop: 4,
-    borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
-  },
-  navItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 88,
-    paddingVertical: 8,
-  },
-  navLabel: {
-    marginTop: 6,
-    fontSize: 12,
-    color: '#625B71',
-    fontWeight: '500',
-  },
-  navActiveContainer: {
-    width: 60,
-    height: 30,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#E8DEF8',
-  },
+
   logoImage: {
     width: 80,
     height: 40,

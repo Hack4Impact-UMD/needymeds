@@ -2,7 +2,6 @@ import React from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import { Text, Divider } from 'react-native-paper';
 import { IconButton } from 'react-native-paper';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 const card = require('../assets/confirmation_number.png');
 const arrow = require('../assets/arrow_right.png');
 

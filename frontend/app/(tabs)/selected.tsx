@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import {
   Button,
-  Divider,
   Searchbar,
   TextInput,
   Provider as PaperProvider,
@@ -10,10 +9,10 @@ import {
 import { Dropdown } from 'react-native-element-dropdown';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PharmacyRow from '../components/PharmacyRow'; // adjust alias if needed
+import BottomNavBar from '../components/BottomNavBar';
 
 
 const SelectedScreen = () => {
-  const time = '9:30';
   const langOptions = [
     { label: 'EN', value: 'EN' },
     { label: 'SP', value: 'SP' },
@@ -63,6 +62,7 @@ const SelectedScreen = () => {
     <PaperProvider>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.container}>
+          <BottomNavBar />
           <View style={styles.searchRow}>
             {/* SEARCH BAR */}
             <Searchbar
@@ -177,21 +177,7 @@ const SelectedScreen = () => {
               Include generic (docosanal)
             </Button>
           </View>
-
-          <View style={{ backgroundColor: '#F6FAFE', marginTop: 12, padding: 10, width: '100%' }}>
-            <View style={{ flexDirection: 'row' }}>
-              {/* ICON */}
-              <Text style={{ alignSelf: 'center' }}></Text>
-              <View style={{ flexDirection: 'column', flex: 2 }}>
-                <Text>Pharmacy Name</Text>
-                <Text>$2.00</Text>
-              </View>
-              <Text style={{ alignSelf: 'center' }}>0.6mi</Text>
-              {/* ICON */}
-              <Text style={{ alignSelf: 'center' }}></Text>
-            </View>
-            <Divider style={{ marginTop: 8 }} />
-          </View>
+          {/* example pharmacy cards from figma, implement search results here */}
           <View style={{ width: '100%', marginTop: 12 }}>
             <PharmacyRow
               name="Walgreens"
