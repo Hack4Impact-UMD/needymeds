@@ -71,10 +71,10 @@ async function searchDrug(drugName: string, zipCode: number, radius: number) {
 
   const pharmacyResultMap: Map<string, DrugSearchResult[]> = new Map();
 
-  const coords = await zipToCoords(effectiveZip);
-
   // Process DSNT results
   for (const dsntResult of dsntDrugResults.DrugPricing ?? []) {
+    const coords = await zipToCoords(dsntResult.zipCode);
+
     const distance = distanceBetweenCoordinates(
       { lat: coords.lat, lon: coords.lon },
       { lat: userLat, lon: userLon }
@@ -103,13 +103,13 @@ async function searchDrug(drugName: string, zipCode: number, radius: number) {
 
   // Process ScriptSave results
   for (const scriptSaveResult of scriptSaveDrugResults.drugs ?? []) {
-    const resultLat = Number(scriptSaveResult.latitude);
-    const resultLon = Number(scriptSaveResult.longitude);
-
     const distance = distanceBetweenCoordinates(
-      { lat: coords.lat, lon: coords.lon },
+      { lat: scriptSaveResult.latitude, lon: scriptSaveResult.longitude },
       { lat: userLat, lon: userLon }
     );
+
+    const resultLat = Number(scriptSaveResult.latitude);
+    const resultLon = Number(scriptSaveResult.longitude);
 
     const convertedResult: DrugSearchResult = {
       adjudicator: 'ScriptSave',
