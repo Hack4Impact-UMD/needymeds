@@ -24,15 +24,20 @@ const MAX_SCRIPTSAVE_NUMRESULTS = 999999999;
  * @param zipCode to search for pharmacy drugs in.
  * @param radius to search within, relative to 'zipCode'.
  */
-async function searchDrug(drugName: string, zipCode: number, radius: number) {
+async function searchDrug(
+  drugName: string,
+  radius: number,
+  includeGeneric: boolean,
+  zipCode?: number
+) {
   // Get user's location (lat/lon/zip) from hook
   const { userLat, userLon, userZipCode, userLocationError } = await useUserLocation();
 
   if (userLocationError) {
-    console.warn('Failed to retrieve user location:', userLocationError);
+    throw new Error(userLocationError);
   }
 
-  const effectiveZip = userZipCode || String(zipCode);
+  const effectiveZip = String(zipCode) || userZipCode;
 
   // Find the drug’s NDC
   const drugsByName: ScriptSaveFindDrugsResponse = await scriptSaveClient.getDrugsByName({
@@ -73,12 +78,20 @@ async function searchDrug(drugName: string, zipCode: number, radius: number) {
 
   // Process DSNT results
   for (const dsntResult of dsntDrugResults.DrugPricing ?? []) {
+    if (!includeGeneric && !dsntResult.labelName.includes(drugName)) {
+      continue;
+    }
+
     const coords = await zipToCoords(dsntResult.zipCode);
 
     const distance = distanceBetweenCoordinates(
       { lat: coords.lat, lon: coords.lon },
       { lat: userLat, lon: userLon }
     );
+
+    if (distance > radius) {
+      continue;
+    }
 
     const pharmacyAddress = dsntResult.street2
       ? `${dsntResult.street1}, ${dsntResult.street2}, ${dsntResult.city}, ${dsntResult.state} ${dsntResult.zipCode}`
@@ -103,10 +116,18 @@ async function searchDrug(drugName: string, zipCode: number, radius: number) {
 
   // Process ScriptSave results
   for (const scriptSaveResult of scriptSaveDrugResults.drugs ?? []) {
+    if (!includeGeneric && !scriptSaveResult.ln.includes(drugName)) {
+      continue;
+    }
+
     const distance = distanceBetweenCoordinates(
       { lat: scriptSaveResult.latitude, lon: scriptSaveResult.longitude },
       { lat: userLat, lon: userLon }
     );
+
+    if (distance > radius) {
+      continue;
+    }
 
     const resultLat = Number(scriptSaveResult.latitude);
     const resultLon = Number(scriptSaveResult.longitude);
@@ -143,8 +164,9 @@ async function searchDrug(drugName: string, zipCode: number, radius: number) {
 // -----------------------------------------------------------------------------
 export async function searchDrugByPrice(
   drugName: string,
-  zipCode: number,
-  radius: number
+  radius: number,
+  includeGeneric: boolean,
+  zipCode?: number
 ): Promise<DrugSearchResult[]> {
   try {
     const key = `by-price-${drugName.toLowerCase()}-${zipCode}-${radius}`;
@@ -162,7 +184,7 @@ export async function searchDrugByPrice(
     }
 
     // Fresh query
-    const searchResults = await searchDrug(drugName, zipCode, radius);
+    const searchResults = await searchDrug(drugName, radius, includeGeneric, zipCode);
     const sorted = [...searchResults].sort((a, b) => +a.price - +b.price);
     store.dispatch(setCacheEntry({ key, results: sorted, by: 'price' }));
     return sorted;
@@ -177,8 +199,9 @@ export async function searchDrugByPrice(
 // -----------------------------------------------------------------------------
 export async function searchDrugByDistance(
   drugName: string,
-  zipCode: number,
-  radius: number
+  radius: number,
+  includeGeneric: boolean,
+  zipCode?: number
 ): Promise<DrugSearchResult[]> {
   try {
     const key = `by-distance-${drugName.toLowerCase()}-${zipCode}-${radius}`;
@@ -196,7 +219,7 @@ export async function searchDrugByDistance(
     }
 
     // Fresh query
-    const searchResults = await searchDrug(drugName, zipCode, radius);
+    const searchResults = await searchDrug(drugName, radius, includeGeneric, zipCode);
     const sorted = [...searchResults].sort((a, b) => +a.distance - +b.distance);
     store.dispatch(setCacheEntry({ key, results: sorted, by: 'distance' }));
     return sorted;
