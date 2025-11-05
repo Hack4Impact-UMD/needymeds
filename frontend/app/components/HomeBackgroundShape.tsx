@@ -1,4 +1,3 @@
-import React from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
@@ -16,8 +15,8 @@ export default function HomeBackgroundShape({
   color = '#226488',
   translateY = 0,
 }: Props) {
-  const circleWidth = width * 1.35;      // a bit wider than the screen
-  const radius = circleWidth;            //  radius for a smooth arc
+  const circleWidth = width * 1.35;      
+  const radius = circleWidth;           
 
   return (
     <View
