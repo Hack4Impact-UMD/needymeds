@@ -105,7 +105,6 @@ const SearchScreen = () => {
             <TouchableOpacity
               onPress={onSubmit}
               accessibilityRole="button"
-              style={styles.inputIcon}
             >
               <MaterialCommunityIcons name="magnify" size={20} color="#111" />
             </TouchableOpacity>
@@ -221,13 +220,8 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     backgroundColor: '#E5E8ED',
   },
-  inputIcon: {
-    marginLeft: 8,
-    padding: 3,
-    borderRadius: 20,
-  },
   input: {
-    flex: 1,
+    flex: 0.95,
     fontSize: 16,
     color: '#111827',
     padding: 12,

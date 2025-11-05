@@ -9,6 +9,8 @@ import {
 } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import PharmacyRow from '../components/PharmacyRow'; // adjust alias if needed
+
 
 const SelectedScreen = () => {
   const time = '9:30';
@@ -61,12 +63,10 @@ const SelectedScreen = () => {
     <PaperProvider>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.container}>
-          <View
-            style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}
-          >
+          <View style={styles.searchRow}>
             {/* SEARCH BAR */}
             <Searchbar
-              placeholder=""
+              placeholder="Abreva cream 2%"
               style={styles.search}
               inputStyle={{ color: '#41484D' }}
               iconColor="#41484D"
@@ -76,46 +76,28 @@ const SelectedScreen = () => {
             {/* LANGUAGE DROPDOWN */}
             <Dropdown
               placeholder="EN"
+              value={lang}
               labelField="label"
               valueField="value"
               data={langOptions}
               onChange={handleLang}
-              style={{
-                width: 60,
-                borderColor: '#C1C7CE',
-                borderWidth: 1,
-                padding: 5,
-                paddingLeft: 10,
-                borderRadius: 10,
-              }}
+              style={styles.langDropdown}
               dropdownPosition="bottom"
               placeholderStyle={{ color: '#41484D' }}
               itemTextStyle={{ color: '#41484D' }}
             />
           </View>
 
-          <View
-            style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}
-          >
+          <View style={styles.formRow}>
             {/* FORM DROPDOWN */}
-            {/* use render label option */}
             <Dropdown
               placeholder="Form"
-              value="Tube"
+              value="tube"
               data={formOptions}
-              labelField="form"
+              labelField="label"
               valueField="value"
               onChange={handleForm}
-              style={{
-                borderColor: '#41484D',
-                borderWidth: 1,
-                margin: 5,
-                padding: 5,
-                paddingLeft: 10,
-                borderRadius: 5,
-                height: 50,
-                width: 150,
-              }}
+              style={styles.formDropdown}
               dropdownPosition="bottom"
               placeholderStyle={{ color: '#41484D' }}
               itemTextStyle={{ color: '#41484D' }}
@@ -131,7 +113,7 @@ const SelectedScreen = () => {
             />
           </View>
 
-          <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+          <View style={styles.locationRow}>
             {/* LOCATION TEXT FIELD */}
             <TextInput
               placeholder="Where?"
@@ -147,7 +129,7 @@ const SelectedScreen = () => {
               placeholder="Radius"
               label="Radius"
               mode="outlined"
-              style={[styles.textInput, { marginRight: 20 }]}
+              style={styles.textInput}
               outlineStyle={{ borderColor: '#41484D', borderWidth: 1 }}
               textColor="#71787E"
               right={<TextInput.Affix text="miles" textStyle={{ color: '#41484D' }} />}
@@ -165,17 +147,16 @@ const SelectedScreen = () => {
             {/* PRICE DROPDOWN */}
             <Dropdown
               placeholder="By price"
-              value="Tube"
+              value={sort}
               data={sortOptions}
               labelField="label"
               valueField="value"
               onChange={handleSort}
               style={{
-                width: 100,
-                padding: 5,
-                paddingLeft: 10,
+                width: 110,
+                paddingHorizontal: 12,
                 borderWidth: 1,
-                borderRadius: 10,
+                borderRadius: 8,
                 borderColor: '#C1C7CE',
                 height: 36,
               }}
@@ -183,22 +164,13 @@ const SelectedScreen = () => {
               itemTextStyle={{ color: '#41484D' }}
             />
             <Button
-              mode="contained"
-              style={{
-                margin: 5,
-                padding: 0,
-                width: 160,
-                alignSelf: 'flex-end',
-                borderWidth: 1,
-                borderRadius: 10,
-                borderColor: '#C1C7CE',
-                height: 36,
+              mode="outlined"
+              style={styles.genericButton}
+              labelStyle={{ 
+                color: buttonText,
+                fontSize: 14,
               }}
-              labelStyle={{
-                alignSelf: 'center',
-                margin: 8,
-              }}
-              contentStyle={{ padding: 0, margin: 0 }}
+              contentStyle={{ height: 36 }}
               onPress={handleButton}
               buttonColor={buttonBKG}
             >
@@ -220,6 +192,29 @@ const SelectedScreen = () => {
             </View>
             <Divider style={{ marginTop: 8 }} />
           </View>
+          <View style={{ width: '100%', marginTop: 12 }}>
+            <PharmacyRow
+              name="Walgreens"
+              price="$35.93"
+              distance="0.3mi"
+              onPress={() => console.log('Walgreens pressed')}
+              onCouponPress={() => console.log('Coupon for Walgreens')}
+            />
+            <PharmacyRow
+              name="Walgreens Specialty Pharmacy"
+              price="$35.93"
+              distance="0.3mi"
+              onPress={() => console.log('Specialty pressed')}
+              onCouponPress={() => console.log('Coupon for Specialty')}
+            />
+            <PharmacyRow
+              name="Costco"
+              price="$36.85"
+              distance="1.2mi"
+              onPress={() => console.log('Costco pressed')}
+              onCouponPress={() => console.log('Coupon for Costco')}
+            />
+          </View>
         </View>
       </SafeAreaView>
     </PaperProvider>
@@ -235,26 +230,72 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    paddingHorizontal: 32,
-    paddingTop: 24,
+    paddingHorizontal: 16,
+    paddingTop: 15,
     paddingBottom: 32,
-    alignItems: 'center',
   },
-  textInput: {
-    margin: 5,
-    backgroundColor: 'white',
-    width: 150,
-    height: 50,
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 16,
   },
   search: {
-    margin: 10,
-    width: '70%',
-    alignSelf: 'flex-start',
+    flex: 1,
+    marginRight: 12,
     backgroundColor: '#E5E8ED',
+    borderRadius: 8,
+    height: 40,
   },
-  drop: {
-    alignSelf: 'center',
-    backgroundColor: '#B6EBFF',
+  langDropdown: {
+    width: 60,
+    borderColor: '#C1C7CE',
+    borderWidth: 1,
+    padding: 5,
+    paddingLeft: 10,
+    borderRadius: 10,
+    height: 40,
+  },
+  formRow: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    width: '100%',
+    gap: 16,
+  },
+  locationRow: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    width: '100%',
+    gap: 16,
+  },
+  sortRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    width: '100%',
+    gap: 16,
+  },
+  formDropdown: {
+    flex: 1,
+    borderColor: '#41484D',
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    height: 56,
+    backgroundColor: 'white',
+  },
+  textInput: {
+    flex: 1,
+    backgroundColor: 'white',
+    height: 56,
+  },
+  genericButton: {
+    flex: 1,
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: '#C1C7CE',
+    height: 36,
+    maxWidth: 200,
   },
 });
 
