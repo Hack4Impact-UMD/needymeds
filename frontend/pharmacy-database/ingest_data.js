@@ -4,7 +4,6 @@ const dotenv = require('dotenv');
 const { open } = require('sqlite');
 const sqlite3 = require('sqlite3');
 const path = require('path');
-
 const ENV_PATH = path.resolve(__dirname, '.env');
 dotenv.config({ path: ENV_PATH });
 
@@ -34,7 +33,7 @@ async function createEmptyDB(db) {
         address_line2 TEXT,
         city TEXT,
         state TEXT,
-        fax_no INTEGER,
+        fax_no TEXT,
         county TEXT,
         latitude REAL,
         longitude REAL
@@ -45,8 +44,14 @@ async function createEmptyDB(db) {
 
 async function extractData() {
   console.log('Extracting pharmacy data from spreadsheet');
+  if (!fs.existsSync(DATASHEET_PATH)) {
+    throw new Error(`CSV file not found: ${DATASHEET_PATH}`);
+  }
+
   const csv = fs.readFileSync(DATASHEET_PATH, 'utf8');
   const records = parse(csv, { columns: true, skip_empty_lines: true });
+  console.log(`Extracted ${records.length} records`);
+
   return records;
 }
 
@@ -56,19 +61,19 @@ function formatData(records) {
   const cleanString = (str) => str?.trim() || null;
 
   return records.map((row) => ({
-    pharm_id: parseInt(cleanString(row['Pharmacy ID'])) || null,
-    npi_id: parseInt(cleanString(row['Pharmacy NPI ID'])) || null,
-    name: cleanString(row['Pharmacy Name']) || '',
-    affiliation_id: parseInt(cleanString(row['Pharmacy Affiliation ID'])) || null,
-    affiliation_name: cleanString(row['Pharmacy Affiliation Name']) || '',
-    chain_id: parseInt(cleanString(row['Pharmacy Chain ID'])) || null,
-    chain_name: cleanString(row['Pharmacy Chain Name']) || '',
-    address_line1: cleanString(row['Pharmacy Address Line 1']) || '',
-    address_line2: cleanString(row['Pharmacy Address Line 2']) || '',
-    city: cleanString(row['Pharmacy City Name']) || '',
-    state: cleanString(row['Pharmacy State CD']) || '',
-    fax_no: parseInt(cleanString(row['Pharmacy Fax No'])) || null,
-    county: cleanString(row['Pharmacy County Name']) || '',
+    pharm_id: parseInt(cleanString(row['Pharmacy ID'])),
+    npi_id: parseInt(cleanString(row['Pharmacy NPI ID'])),
+    name: cleanString(row['Pharmacy Name']),
+    affiliation_id: parseInt(cleanString(row['Pharmacy Affiliation ID'])),
+    affiliation_name: cleanString(row['Pharmacy Affiliation Name']),
+    chain_id: parseInt(cleanString(row['Pharmacy Chain ID'])),
+    chain_name: cleanString(row['Pharmacy Chain Name']),
+    address_line1: cleanString(row['Pharmacy Address Line 1']),
+    address_line2: cleanString(row['Pharmacy Address Line 2']),
+    city: cleanString(row['Pharmacy City Name']),
+    state: cleanString(row['Pharmacy State CD']),
+    fax_no: cleanString(row['Pharmacy Fax No']),
+    county: cleanString(row['Pharmacy County Name']),
     latitude: parseFloat(cleanString(row['Pharmacy Latitude'])) || null,
     longitude: parseFloat(cleanString(row['Pharmacy Longitude'])) || null,
   }));
@@ -118,18 +123,31 @@ async function previewData(db, limit = 5) {
 }
 
 async function main() {
-  const db = await connectDB();
+  let db;
+  try {
+    if (!fs.existsSync(DATABASE_URL)) {
+      throw new Error(`Database file not found: ${DATABASE_URL}`);
+    }
 
-  await createEmptyDB(db);
+    db = await connectDB();
 
-  const data = await extractData();
-  const clean_data = formatData(data);
-  await loadData(db, clean_data);
+    await createEmptyDB(db);
 
-  await previewData(db);
+    const data = await extractData();
+    const clean_data = formatData(data);
+    await loadData(db, clean_data);
 
-  await db.close();
-  console.log('Data ingestion complete!');
+    await previewData(db);
+
+    console.log('Data ingestion complete!');
+  } catch (error) {
+    console.error("Error occurred: ", error.message)
+  } finally {
+    if (db) {
+      await db.close();
+      console.log('Database connection closed.');
+    }
+  }
 }
 
 main().catch((err) => console.error('Data Ingestion Error:', err));
