@@ -5,13 +5,18 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
-  SafeAreaView,
   Platform,
+  Image,
 } from 'react-native';
-import { Text, Surface } from 'react-native-paper';
+import { Text, Surface, TouchableRipple } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import { Dropdown } from 'react-native-element-dropdown';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import HomeBackgroundShape from '../components/HomeBackgroundShape';
+//import ResourcesIcon from '../assets/resource.svg';
+const logo = require('../assets/horizontal_logo.png');
 
-//  medication dataset used as  search stub.
 const MOCK_MEDS = [
   { id: '1', name: 'Atorvastatin', strength: '10 mg', price: '$4' },
   { id: '2', name: 'Lisinopril', strength: '20 mg', price: '$6' },
@@ -20,7 +25,12 @@ const MOCK_MEDS = [
   { id: '5', name: 'Amlodipine', strength: '5 mg', price: '$7' },
 ];
 
-const SearchScreen = ({ navigation }: any) => {
+const langOptions = [
+    { label: 'EN', value: 'EN' },
+    { label: 'SP', value: 'SP' },
+  ];
+
+const SearchScreen = () => {
   const [query, setQuery] = useState('');
 
   // very small client-side search logic. Matches query against medication name.
@@ -31,35 +41,57 @@ const SearchScreen = ({ navigation }: any) => {
   }, [query]);
 
   const onSubmit = () => {
-    // if there is an exact-ish match, navigate to the selected medication screen for the first match.
     if (results.length > 0) {
-      navigation.navigate('SelectedMedication', { medication: results[0] });
+      router.navigate('/selected');
     } else {
-      // no results, do nothing for now — could show a message or perform a fallback search.
+      // no results, do nothing for now could show a message or perform a fallback search.
     }
   };
+
+  const [lang, setLang] = useState('EN');
+  function handleButton(item: any): void {
+    if (item && item.value) setLang(item.value);
+  }
 
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
+      <HomeBackgroundShape top={200} height={800} color="#226488" />
+
         {/* header area */}
         <View style={styles.headerRow}>
-          <Text style={styles.logo}>NeedyMeds</Text>
-          <TouchableOpacity style={styles.langPill} accessibilityRole="button">
-            <Text style={styles.langText}>EN ▾</Text>
-          </TouchableOpacity>
+          <View>
+            <Image source={logo} style={styles.logoImage} resizeMode="contain" />
+          </View>
+          <Dropdown
+            placeholder="EN"
+            value={lang}
+            labelField="label"
+            valueField="value"
+            data={langOptions}
+            onChange={handleButton}
+            style={{
+              width: 60,
+              borderColor: '#C1C7CE',
+              borderWidth: 1,
+              padding: 5,
+              paddingLeft: 10,
+              borderRadius: 10,
+            }}
+            placeholderStyle={{ color: '#41484D' }}
+            itemTextStyle={{ color: '#41484D' }}
+          />
         </View>
 
         {/* promo area */}
         <View style={styles.promoWrap}>
-          <Text style={styles.promoTitle}>Upto 80% off</Text>
+          <Text style={styles.promoTitle}>Up to 80% off</Text>
           <Text style={styles.promoSubtitle}>on your prescription</Text>
         </View>
 
-        {/* search bar */}
+        {/* searc bar */}
         <View style={styles.searchRow}>
           <View style={styles.inputWrap}>
-            <MaterialCommunityIcons name="arrow-left" size={20} color="#111" style={{ marginRight: 8 }} />
             <TextInput
               placeholder="Search for a drug"
               placeholderTextColor="#9aa0a6"
@@ -69,31 +101,46 @@ const SearchScreen = ({ navigation }: any) => {
               style={styles.input}
               returnKeyType="search"
             />
-            <TouchableOpacity onPress={onSubmit} accessibilityRole="button" style={styles.inputIcon}>
+            <TouchableOpacity
+              onPress={onSubmit}
+              accessibilityRole="button"
+              style={styles.inputIcon}
+            >
               <MaterialCommunityIcons name="magnify" size={20} color="#111" />
             </TouchableOpacity>
           </View>
         </View>
-
+          <TouchableRipple
+            onPress={() => {/* TODO: Navigate to eligibility info */}}
+            style={styles.eligibleWrap}
+            borderless
+            accessibilityRole="link"
+            accessibilityHint="Learn more about program eligibility"
+          >
+            <View style={styles.eligibleInner}>
+              <View style={styles.eligibleIconCircle}>
+                <MaterialCommunityIcons name="information-outline" size={14} color="white" />
+              </View>
+              <Text style={styles.eligibleText}>What is eligible?</Text>
+            </View>
+          </TouchableRipple>
 
         {/* results list */}
         <View style={styles.resultsWrap}>
           {query.length === 0 ? (
-            <View style={styles.hintWrap}>
-              <Text style={styles.hintText}>Search for a medication to see results.</Text>
-            </View>
-          ) : results.length === 0 ? (
-            <View style={styles.hintWrap}>
-              <Text style={styles.hintText}>No results found for {query}</Text>
-            </View>
-          ) : (
+              null
+            ) : results.length === 0 ? (
+              <View style={styles.hintWrap}>
+                <Text style={styles.hintText}>No results found for {query}</Text>
+              </View>
+            ) : (
             <FlatList
               data={results}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={styles.resultCard}
-                  onPress={() => navigation.navigate('SelectedMedication', { medication: item })}
+                  onPress={() => router.navigate('/selected')}
                 >
                   <View>
                     <Text style={styles.resultTitle}>{item.name}</Text>
@@ -108,17 +155,25 @@ const SearchScreen = ({ navigation }: any) => {
       </View>
       {/* paper bottom navigation bar */}
       <Surface style={styles.bottomNav} elevation={0}>
-        <TouchableOpacity style={styles.navItem}>
-          <MaterialCommunityIcons name="magnify" size={24} color="#111827" />
-          <Text variant="labelMedium" style={styles.navLabel}>Search</Text>
+        <TouchableOpacity style={styles.navItem} activeOpacity={0.85} onPress={() => {}}>
+          <View style={styles.navActiveContainer}>
+            <MaterialCommunityIcons name="magnify" size={20} color="#7C3AED" />
+          </View>
+          <Text variant="labelMedium" style={[styles.navLabel]}>
+            Search
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem}>
           <MaterialCommunityIcons name="credit-card" size={24} color="#6B7280" />
-          <Text variant="labelMedium" style={styles.navLabel}>My Cards</Text>
+          <Text variant="labelMedium" style={styles.navLabel}>
+            My Cards
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem}>
-          <MaterialCommunityIcons name="web" size={24} color="#6B7280" />
-          <Text variant="labelMedium" style={styles.navLabel}>Resources</Text>
+          {/* <ResourcesIcon width={24} height={24} /> */}
+          <Text variant="labelMedium" style={styles.navLabel}>
+            Resources
+          </Text>
         </TouchableOpacity>
       </Surface>
     </SafeAreaView>
@@ -126,45 +181,79 @@ const SearchScreen = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#fff' },
-  container: { flex: 1, padding: 20, paddingBottom: Platform.OS === 'ios' ? 84 : 68 },
-  header: { height: 44, justifyContent: 'center' },
-  logo: { fontSize: 20, fontWeight: '600', color: '#2563EB' },
-  promoWrap: { alignItems: 'center', marginTop: 16, marginBottom: 24 },
-  promoTitle: { fontSize: 32, fontWeight: '200', color: '#111827' },
-  promoSubtitle: { fontSize: 16, color: '#6B7280', marginTop: 4 },
-  searchRow: { flexDirection: 'row', alignItems: 'center', marginTop: 8},
+  safe: { 
+    flex: 1, 
+    backgroundColor: '#fff' 
+  },
+  container: { 
+    flex: 1, 
+    padding: 20, 
+    paddingBottom: Platform.OS === 'ios' ? 84 : 68, 
+    fontFamily: 'Nunito Sans'
+  },
+  promoWrap: { 
+    alignItems: 'center', 
+    marginTop: 70, 
+    marginBottom: 24 
+  },
+  promoTitle: { 
+    fontSize: 32, 
+    fontWeight: '300', 
+    color: '#41484D' 
+  },
+  promoSubtitle: { 
+    fontSize: 16, 
+    color: '#41484D', 
+    marginTop: 4
+  },
+  searchRow: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginTop: 25 
+  },
   inputWrap: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: 7,
+    paddingHorizontal: 7,
     borderRadius: 28,
     backgroundColor: '#E5E8ED',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 2,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
   },
   inputIcon: {
     marginLeft: 8,
-    padding: 4,
+    padding: 3,
     borderRadius: 20,
   },
   input: {
     flex: 1,
     fontSize: 16,
     color: '#111827',
-    paddingVertical: 0,
-    backgroundColor: '#E5E8ED'
+    padding: 12,
+    borderRadius: 28,
+    backgroundColor: '#E5E8ED',
+  },
+  /* eligible link */
+  eligibleWrap: { 
+    alignSelf: "center", 
+    marginTop: 20,
+    },
+  eligibleInner: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    gap: 4 
+  },
+  eligibleIconCircle: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  eligibleText: { 
+    color: "white", 
+    textDecorationLine: "underline", 
+    fontSize: 14 
   },
   resultsWrap: { flex: 1, marginTop: 8 },
   hintWrap: { alignItems: 'center', marginTop: 24 },
@@ -191,27 +280,40 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingBottom: Platform.OS === 'ios' ? 24 : 16,
-    paddingTop: 12,
-    height: Platform.OS === 'ios' ? 90 : 76,
+    paddingTop: 4,
     borderTopWidth: 1,
     borderTopColor: '#F3F4F6',
   },
-  navItem: { 
-    alignItems: 'center', 
+  navItem: {
+    alignItems: 'center',
     justifyContent: 'center',
     minWidth: 88,
     paddingVertical: 8,
   },
-  navLabel: { 
+  navLabel: {
     marginTop: 6,
     fontSize: 12,
-    color: '#6B7280',
+    color: '#625B71',
     fontWeight: '500',
   },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 44 },
-  langPill: { paddingVertical: 6, paddingHorizontal: 10, borderRadius: 16, backgroundColor: '#fff' },
-  langText: { color: '#111827', fontSize: 12 },
+  navActiveContainer: {
+    width: 60,
+    height: 30,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#E8DEF8',
+  },
+  logoImage: {
+    width: 80,
+    height: 40,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: 44,
+  },
 });
 
 export default SearchScreen;

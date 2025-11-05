@@ -5,8 +5,10 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: { display: 'none' }
+        tabBarStyle: { display: 'none' },
       }}
     />
   );
 }
+
+// <Tabs></Tabs> to show bottom tabs

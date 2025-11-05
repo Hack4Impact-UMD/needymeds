@@ -1,16 +1,18 @@
-// import { Text, ScrollView } from 'react-native';
-// import { Stack } from 'expo-router';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import WelcomeScreen from './welcome';
-import SearchScreen from './search';
-
-const Stack = createNativeStackNavigator();
+import { Button, Text, ScrollView } from 'react-native';
+import { router, Stack } from 'expo-router';
 
 export default function HomeScreen() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Join" component={WelcomeScreen} />
-      <Stack.Screen name="Search" component={SearchScreen} />
-    </Stack.Navigator>
+    <>
+      <Stack.Screen options={{ title: 'Home' }} />
+      <ScrollView>
+        <Text>Index beginning page</Text>
+        <Button title="Go to Search" onPress={() => router.navigate('/search')} />
+      </ScrollView>
+    </>
   );
 }
+
+// router.push('/search')
+// router.back()
+// router.replace('')
