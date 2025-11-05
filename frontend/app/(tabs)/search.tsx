@@ -15,6 +15,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import HomeBackgroundShape from '../components/HomeBackgroundShape';
 //import ResourcesIcon from '../assets/resource.svg';
+const resourcesIcon = require('../assets/Icon.png');
 const logo = require('../assets/horizontal_logo.png');
 
 const MOCK_MEDS = [
@@ -170,7 +171,7 @@ const SearchScreen = () => {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem}>
-          {/* <ResourcesIcon width={24} height={24} /> */}
+          <Image source={resourcesIcon} style={{ width: 26, height: 26 }} resizeMode="contain" />
           <Text variant="labelMedium" style={styles.navLabel}>
             Resources
           </Text>
