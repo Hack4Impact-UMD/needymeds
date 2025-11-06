@@ -61,12 +61,12 @@ function formatData(records) {
   const cleanString = (str) => str?.trim() || null;
 
   return records.map((row) => ({
-    pharm_id: parseInt(cleanString(row['Pharmacy ID'])),
-    npi_id: parseInt(cleanString(row['Pharmacy NPI ID'])),
+    pharm_id: parseInt(cleanString(row['Pharmacy ID']), 10) || null,
+    npi_id: parseInt(cleanString(row['Pharmacy NPI ID']), 10) || null,
     name: cleanString(row['Pharmacy Name']),
-    affiliation_id: parseInt(cleanString(row['Pharmacy Affiliation ID'])),
+    affiliation_id: parseInt(cleanString(row['Pharmacy Affiliation ID']), 10) || null,
     affiliation_name: cleanString(row['Pharmacy Affiliation Name']),
-    chain_id: parseInt(cleanString(row['Pharmacy Chain ID'])),
+    chain_id: parseInt(cleanString(row['Pharmacy Chain ID']), 10) || null,
     chain_name: cleanString(row['Pharmacy Chain Name']),
     address_line1: cleanString(row['Pharmacy Address Line 1']),
     address_line2: cleanString(row['Pharmacy Address Line 2']),
