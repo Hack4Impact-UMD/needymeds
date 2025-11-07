@@ -31,13 +31,9 @@ async function searchDrug(
   zipCode?: number
 ) {
   // Get user's location (lat/lon/zip) from hook
-  const { userLat, userLon, userZipCode, userLocationError } = await useUserLocation();
+  const { userLat, userLon, userZipCode } = await useUserLocation();
 
-  if (userLocationError) {
-    throw new Error(userLocationError);
-  }
-
-  const effectiveZip = String(zipCode) || userZipCode;
+  const effectiveZip = zipCode !== undefined && zipCode !== null ? String(zipCode) : userZipCode;
 
   // Find the drug’s NDC
   const drugsByName: ScriptSaveFindDrugsResponse = await scriptSaveClient.getDrugsByName({

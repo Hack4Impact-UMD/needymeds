@@ -1,11 +1,5 @@
 import * as Location from 'expo-location';
-import {
-  cacheLocation,
-  setAddress,
-  setError,
-  setLoading,
-  setZipCode,
-} from '../../redux/locationSlice';
+import { cacheLocation, setAddress, setLoading, setZipCode } from '../../redux/locationSlice';
 import { store } from '../../redux/store';
 import getUserLocation from '../userLocation';
 
@@ -30,29 +24,6 @@ beforeEach(() => {
 });
 
 describe('getUserLocation', () => {
-  it('should return error if location permission is denied', async () => {
-    (Location.requestForegroundPermissionsAsync as jest.Mock).mockResolvedValueOnce({
-      status: 'denied',
-    });
-
-    const result = await getUserLocation();
-
-    expect(result.userLocationError).toContain('Permission');
-    expect(mockDispatch).toHaveBeenCalledWith(setLoading(true));
-    expect(mockDispatch).toHaveBeenCalledWith(setError(expect.anything()));
-  });
-
-  it('should return error if location retrieval fails', async () => {
-    (Location.requestForegroundPermissionsAsync as jest.Mock).mockResolvedValueOnce({
-      status: 'granted',
-    });
-    (Location.getCurrentPositionAsync as jest.Mock).mockResolvedValueOnce(null);
-
-    const result = await getUserLocation();
-    expect(result.userLocationError).toContain('Error fetching current location');
-    expect(mockDispatch).toHaveBeenCalledWith(setError(expect.anything()));
-  });
-
   it('should use cached result if available', async () => {
     (Location.requestForegroundPermissionsAsync as jest.Mock).mockResolvedValueOnce({
       status: 'granted',
@@ -108,51 +79,59 @@ describe('getUserLocation', () => {
     );
   });
 
-  it('should retry API calls and fail after retries', async () => {
+  it('should throw if permission is denied', async () => {
     (Location.requestForegroundPermissionsAsync as jest.Mock).mockResolvedValueOnce({
-      status: 'granted',
-    });
-    (Location.getCurrentPositionAsync as jest.Mock).mockResolvedValueOnce({
-      coords: { latitude: 50, longitude: 60 },
+      status: 'denied',
     });
 
-    mockFetch
-      .mockResolvedValueOnce({ ok: false })
-      .mockResolvedValueOnce({ ok: false })
-      .mockResolvedValueOnce({ ok: false });
+    await expect(getUserLocation()).rejects.toThrow('Permission to access location was denied.');
 
-    const result = await getUserLocation();
-
-    expect(result.userLocationError).toContain('Nominatim API request failed after retries');
-    expect(mockDispatch).toHaveBeenCalledWith(setError(expect.any(String)));
+    expect(mockDispatch).toHaveBeenCalledWith(setLoading(false));
   });
 
-  it('should throw error if zip code missing in response', async () => {
+  it('should throw if location cannot be fetched', async () => {
+    (Location.requestForegroundPermissionsAsync as jest.Mock).mockResolvedValueOnce({
+      status: 'granted',
+    });
+    (Location.getCurrentPositionAsync as jest.Mock).mockResolvedValueOnce(null);
+
+    await expect(getUserLocation()).rejects.toThrow('Error fetching current location.');
+
+    expect(mockDispatch).toHaveBeenCalledWith(setLoading(false));
+  });
+
+  it('should throw if API request fails after retries', async () => {
     (Location.requestForegroundPermissionsAsync as jest.Mock).mockResolvedValueOnce({
       status: 'granted',
     });
     (Location.getCurrentPositionAsync as jest.Mock).mockResolvedValueOnce({
-      coords: { latitude: 30, longitude: 40 },
+      coords: { latitude: 10, longitude: 20 },
+    });
+
+    mockFetch.mockResolvedValue({ ok: false });
+
+    await expect(getUserLocation()).rejects.toThrow('Nominatim API request failed after retries.');
+
+    expect(mockDispatch).toHaveBeenCalledWith(setLoading(false));
+  });
+
+  it('should throw if zip code not found in response', async () => {
+    (Location.requestForegroundPermissionsAsync as jest.Mock).mockResolvedValueOnce({
+      status: 'granted',
+    });
+    (Location.getCurrentPositionAsync as jest.Mock).mockResolvedValueOnce({
+      coords: { latitude: 10, longitude: 20 },
     });
 
     const mockJson = jest.fn().mockResolvedValueOnce({
       address: {},
-      display_name: 'Unknown Area',
+      display_name: 'Some Address',
     });
 
     mockFetch.mockResolvedValueOnce({ ok: true, json: mockJson });
 
-    const result = await getUserLocation();
-    expect(result.userLocationError).toContain('Zip code not found');
-  });
+    await expect(getUserLocation()).rejects.toThrow('Zip code not found in address result.');
 
-  it('should handle unexpected exceptions gracefully', async () => {
-    (Location.requestForegroundPermissionsAsync as jest.Mock).mockRejectedValueOnce(
-      new Error('Unexpected error')
-    );
-
-    const result = await getUserLocation();
-    expect(result.userLocationError).toContain('Unexpected error');
-    expect(mockDispatch).toHaveBeenCalledWith(setError(expect.any(String)));
+    expect(mockDispatch).toHaveBeenCalledWith(setLoading(false));
   });
 });

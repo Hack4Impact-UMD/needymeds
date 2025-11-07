@@ -131,16 +131,6 @@ describe('searchDrugByPrice', () => {
     expect(results).toEqual([{ pharmacyName: 'Cached Pharmacy', price: 5 }]);
     expect(setCacheEntry).not.toHaveBeenCalled();
   });
-
-  it('handles user location errors gracefully', async () => {
-    (useUserLocation as jest.Mock).mockResolvedValueOnce({
-      ...mockUserLocation,
-      userLocationError: 'Location error',
-    });
-
-    const results = await searchDrugByPrice('TestDrug', 50, true, 10001);
-    expect(results).toEqual([]);
-  });
 });
 
 describe('searchDrugByDistance', () => {
