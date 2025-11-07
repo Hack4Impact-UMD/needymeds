@@ -72,6 +72,9 @@ export default async function getUserLocation(): Promise<UserLocationResult> {
 
     dispatch(
       cacheLocation({
+        lat: userLat,
+        lon: userLon,
+        address,
         zipCode: userZipCode,
         timestamp: Date.now(),
       })
