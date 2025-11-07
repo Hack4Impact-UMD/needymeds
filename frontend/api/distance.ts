@@ -23,14 +23,12 @@ export async function zipToCoords(zipcode: string): Promise<Coordinates> {
     },
   });
   if (!response.ok) {
-    coords.error = 'Request to Nominatim failed.';
-    return coords;
+    throw new Error('Request to Nominatim failed.');
   }
 
   const data = await response.json();
   if (!data || data.length === 0) {
-    coords.error = 'No location results.';
-    return coords;
+    throw new Error('No location results.');
   }
 
   coords.lat = data[0].lat;
