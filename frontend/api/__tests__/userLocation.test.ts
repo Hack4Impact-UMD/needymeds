@@ -35,7 +35,7 @@ describe('getUserLocation', () => {
     mockGetState.mockReturnValueOnce({
       location: {
         cache: {
-          '10,20': { zipCode: '12345', lat: '10', lon: '20', timestamp: Date.now() },
+          '10,20': { zipCode: '12345', timestamp: Date.now() },
         },
       },
     });
@@ -71,8 +71,6 @@ describe('getUserLocation', () => {
       expect.objectContaining({
         type: cacheLocation.type,
         payload: expect.objectContaining({
-          lat: '10',
-          lon: '20',
           zipCode: '67890',
         }),
       })

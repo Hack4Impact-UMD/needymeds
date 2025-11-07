@@ -1,4 +1,4 @@
-import useUserLocation from '@/api/userLocation';
+import getUserLocation from '@/api/userLocation';
 import { setCacheEntry } from '../redux/drugSearchSlice';
 import { store } from '../redux/store';
 import { distanceBetweenCoordinates, zipToCoords } from './distance';
@@ -28,12 +28,9 @@ async function searchDrug(
   drugName: string,
   radius: number,
   includeGeneric: boolean,
-  zipCode?: number
+  effectiveZip: string
 ) {
-  // Get user's location (lat/lon/zip) from hook
-  const { userLat, userLon, userZipCode } = await useUserLocation();
-
-  const effectiveZip = zipCode !== undefined && zipCode !== null ? String(zipCode) : userZipCode;
+  const userCoords = await zipToCoords(effectiveZip);
 
   // Find the drug’s NDC
   const drugsByName: ScriptSaveFindDrugsResponse = await scriptSaveClient.getDrugsByName({
@@ -82,7 +79,7 @@ async function searchDrug(
 
     const distance = distanceBetweenCoordinates(
       { lat: pharmacyCoords.lat, lon: pharmacyCoords.lon },
-      { lat: userLat, lon: userLon }
+      { lat: userCoords.lat, lon: userCoords.lon }
     );
 
     if (distance > radius) {
@@ -118,7 +115,7 @@ async function searchDrug(
 
     const distance = distanceBetweenCoordinates(
       { lat: scriptSaveResult.latitude, lon: scriptSaveResult.longitude },
-      { lat: userLat, lon: userLon }
+      { lat: userCoords.lat, lon: userCoords.lon }
     );
 
     if (distance > radius) {
@@ -162,13 +159,17 @@ export async function searchDrugByPrice(
   zipCode?: number
 ): Promise<DrugSearchResult[]> {
   try {
-    const key = `by-price-${drugName.toLowerCase()}-${zipCode}-${radius}`;
+    const { userZipCode } = await getUserLocation();
+
+    const effectiveZip = zipCode !== undefined && zipCode !== null ? String(zipCode) : userZipCode;
+
+    const key = `by-price-${drugName.toLowerCase()}-${effectiveZip}-${radius}-${includeGeneric}`;
     const state = store.getState() as any;
     const cachedEntry = state.drugSearch.cache[key];
     if (cachedEntry) return cachedEntry.results;
 
     // Reutilize distance-sorted cache if available
-    const byDistanceKey = `by-distance-${drugName.toLowerCase()}-${zipCode}-${radius}`;
+    const byDistanceKey = `by-distance-${drugName.toLowerCase()}-${effectiveZip}-${radius}-${includeGeneric}`;
     const cachedDistanceEntry = state.drugSearch.cache[byDistanceKey];
     if (cachedDistanceEntry) {
       const sorted = [...cachedDistanceEntry.results].sort((a, b) => +a.price - +b.price);
@@ -177,7 +178,7 @@ export async function searchDrugByPrice(
     }
 
     // Fresh query
-    const searchResults = await searchDrug(drugName, radius, includeGeneric, zipCode);
+    const searchResults = await searchDrug(drugName, radius, includeGeneric, effectiveZip);
     const sorted = [...searchResults].sort((a, b) => +a.price - +b.price);
     store.dispatch(setCacheEntry({ key, results: sorted, by: 'price' }));
     return sorted;
@@ -197,13 +198,17 @@ export async function searchDrugByDistance(
   zipCode?: number
 ): Promise<DrugSearchResult[]> {
   try {
-    const key = `by-distance-${drugName.toLowerCase()}-${zipCode}-${radius}`;
+    const { userZipCode } = await getUserLocation();
+
+    const effectiveZip = zipCode !== undefined && zipCode !== null ? String(zipCode) : userZipCode;
+
+    const key = `by-distance-${drugName.toLowerCase()}-${effectiveZip}-${radius}-${includeGeneric}`;
     const state = store.getState() as any;
     const cachedEntry = state.drugSearch.cache[key];
     if (cachedEntry) return cachedEntry.results;
 
     // Reutilize price-sorted cache if available
-    const byPriceKey = `by-price-${drugName.toLowerCase()}-${zipCode}-${radius}`;
+    const byPriceKey = `by-price-${drugName.toLowerCase()}-${effectiveZip}-${radius}-${includeGeneric}`;
     const cachedByPriceEntry = state.drugSearch.cache[byPriceKey];
     if (cachedByPriceEntry) {
       const sorted = [...cachedByPriceEntry.results].sort((a, b) => +a.distance - +b.distance);
@@ -212,7 +217,7 @@ export async function searchDrugByDistance(
     }
 
     // Fresh query
-    const searchResults = await searchDrug(drugName, radius, includeGeneric, zipCode);
+    const searchResults = await searchDrug(drugName, radius, includeGeneric, effectiveZip);
     const sorted = [...searchResults].sort((a, b) => +a.distance - +b.distance);
     store.dispatch(setCacheEntry({ key, results: sorted, by: 'distance' }));
     return sorted;

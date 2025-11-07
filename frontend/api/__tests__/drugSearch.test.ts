@@ -120,7 +120,7 @@ describe('searchDrugByPrice', () => {
     (store.getState as jest.Mock).mockReturnValueOnce({
       drugSearch: {
         cache: {
-          'by-price-testdrug-10001-50': {
+          'by-price-testdrug-10001-50-true': {
             results: [{ pharmacyName: 'Cached Pharmacy', price: 5 }],
           },
         },

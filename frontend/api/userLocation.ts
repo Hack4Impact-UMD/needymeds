@@ -3,8 +3,6 @@ import { cacheLocation, setAddress, setLoading, setZipCode } from '../redux/loca
 import { store } from '../redux/store';
 
 export interface UserLocationResult {
-  userLat: string;
-  userLon: string;
   userZipCode: string;
 }
 
@@ -16,7 +14,7 @@ async function fetchWithRetry(
 ): Promise<Response> {
   for (let attempt = 0; attempt < retries; attempt++) {
     const response = await fetch(url, options);
-    if (response.ok) return response;
+    if (response && response.ok) return response;
     if (attempt < retries - 1) {
       await new Promise((resolve) => setTimeout(resolve, delay * (attempt + 1)));
     }
@@ -51,7 +49,7 @@ export default async function getUserLocation(): Promise<UserLocationResult> {
       // Use cached result
       const userZipCode = cached.zipCode;
       dispatch(setZipCode(userZipCode));
-      return { userLat, userLon, userZipCode };
+      return { userZipCode };
     }
 
     const url = `https://nominatim.openstreetmap.org/reverse?lat=${userLat}&lon=${userLon}&format=json`;
@@ -74,14 +72,12 @@ export default async function getUserLocation(): Promise<UserLocationResult> {
 
     dispatch(
       cacheLocation({
-        lat: userLat,
-        lon: userLon,
         zipCode: userZipCode,
         timestamp: Date.now(),
       })
     );
 
-    return { userLat, userLon, userZipCode };
+    return { userZipCode };
   } catch (error) {
     console.error('Error in getUserLocation:', error);
     throw error;

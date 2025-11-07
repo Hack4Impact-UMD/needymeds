@@ -1,8 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface CachedLocation {
-  lat: string;
-  lon: string;
   zipCode: string;
   timestamp: number;
 }
@@ -40,7 +38,7 @@ const locationSlice = createSlice({
       state.loading = action.payload;
     },
     cacheLocation: (state, action: PayloadAction<CachedLocation>) => {
-      const key = `${action.payload.lat},${action.payload.lon}`;
+      const key = `${action.payload.zipCode}`;
       state.cache[key] = action.payload;
     },
   },
