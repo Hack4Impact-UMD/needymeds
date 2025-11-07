@@ -1,5 +1,4 @@
 import * as Location from 'expo-location';
-import useUserLocation from '../../hooks/use-user-location';
 import {
   cacheLocation,
   setAddress,
@@ -8,6 +7,7 @@ import {
   setZipCode,
 } from '../../redux/locationSlice';
 import { store } from '../../redux/store';
+import getUserLocation from '../userLocation';
 
 jest.mock('expo-location');
 jest.mock('../../redux/store', () => ({
@@ -29,13 +29,13 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe('useUserLocation', () => {
+describe('getUserLocation', () => {
   it('should return error if location permission is denied', async () => {
     (Location.requestForegroundPermissionsAsync as jest.Mock).mockResolvedValueOnce({
       status: 'denied',
     });
 
-    const result = await useUserLocation();
+    const result = await getUserLocation();
 
     expect(result.userLocationError).toContain('Permission');
     expect(mockDispatch).toHaveBeenCalledWith(setLoading(true));
@@ -48,7 +48,7 @@ describe('useUserLocation', () => {
     });
     (Location.getCurrentPositionAsync as jest.Mock).mockResolvedValueOnce(null);
 
-    const result = await useUserLocation();
+    const result = await getUserLocation();
     expect(result.userLocationError).toContain('Error fetching current location');
     expect(mockDispatch).toHaveBeenCalledWith(setError(expect.anything()));
   });
@@ -69,7 +69,7 @@ describe('useUserLocation', () => {
       },
     });
 
-    const result = await useUserLocation();
+    const result = await getUserLocation();
 
     expect(result.userZipCode).toBe('12345');
     expect(mockDispatch).toHaveBeenCalledWith(setZipCode('12345'));
@@ -91,7 +91,7 @@ describe('useUserLocation', () => {
 
     mockFetch.mockResolvedValueOnce({ ok: true, json: mockJson });
 
-    const result = await useUserLocation();
+    const result = await getUserLocation();
 
     expect(result.userZipCode).toBe('67890');
     expect(mockDispatch).toHaveBeenCalledWith(setZipCode('67890'));
@@ -121,7 +121,7 @@ describe('useUserLocation', () => {
       .mockResolvedValueOnce({ ok: false })
       .mockResolvedValueOnce({ ok: false });
 
-    const result = await useUserLocation();
+    const result = await getUserLocation();
 
     expect(result.userLocationError).toContain('Nominatim API request failed after retries');
     expect(mockDispatch).toHaveBeenCalledWith(setError(expect.any(String)));
@@ -142,7 +142,7 @@ describe('useUserLocation', () => {
 
     mockFetch.mockResolvedValueOnce({ ok: true, json: mockJson });
 
-    const result = await useUserLocation();
+    const result = await getUserLocation();
     expect(result.userLocationError).toContain('Zip code not found');
   });
 
@@ -151,7 +151,7 @@ describe('useUserLocation', () => {
       new Error('Unexpected error')
     );
 
-    const result = await useUserLocation();
+    const result = await getUserLocation();
     expect(result.userLocationError).toContain('Unexpected error');
     expect(mockDispatch).toHaveBeenCalledWith(setError(expect.any(String)));
   });

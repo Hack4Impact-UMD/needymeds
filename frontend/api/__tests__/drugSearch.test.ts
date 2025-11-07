@@ -1,4 +1,4 @@
-import useUserLocation from '@/hooks/use-user-location';
+import useUserLocation from '@/api/userLocation';
 import { setCacheEntry } from '../../redux/drugSearchSlice';
 import { store } from '../../redux/store';
 import { distanceBetweenCoordinates, zipToCoords } from '../distance';
@@ -9,7 +9,7 @@ import { scriptSaveClient } from '../scriptSaveClient';
 // -------------------------------
 // Mocks
 // -------------------------------
-jest.mock('@/hooks/use-user-location');
+jest.mock('../userLocation');
 jest.mock('../../redux/drugSearchSlice', () => ({
   setCacheEntry: jest.fn((payload) => ({ type: 'setCacheEntry', payload })),
 }));

@@ -1,4 +1,4 @@
-import useUserLocation from '@/hooks/use-user-location';
+import useUserLocation from '@/api/userLocation';
 import { setCacheEntry } from '../redux/drugSearchSlice';
 import { store } from '../redux/store';
 import { distanceBetweenCoordinates, zipToCoords } from './distance';
@@ -82,10 +82,10 @@ async function searchDrug(
       continue;
     }
 
-    const coords = await zipToCoords(dsntResult.zipCode);
+    const pharmacyCoords = await zipToCoords(dsntResult.zipCode);
 
     const distance = distanceBetweenCoordinates(
-      { lat: coords.lat, lon: coords.lon },
+      { lat: pharmacyCoords.lat, lon: pharmacyCoords.lon },
       { lat: userLat, lon: userLon }
     );
 
@@ -105,8 +105,8 @@ async function searchDrug(
       ndc: dsntResult.ndc,
       labelName: dsntResult.labelName,
       price: dsntResult.price,
-      latitude: coords.lat,
-      longitude: coords.lon,
+      latitude: pharmacyCoords.lat,
+      longitude: pharmacyCoords.lon,
       distance,
     };
 

@@ -31,7 +31,7 @@ async function fetchWithRetry(
   throw new Error('Nominatim API request failed after retries.');
 }
 
-export default async function useUserLocation(): Promise<UserLocationResult> {
+export default async function getUserLocation(): Promise<UserLocationResult> {
   let userLat = '';
   let userLon = '';
   let userZipCode = '';
