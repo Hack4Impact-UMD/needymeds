@@ -10,47 +10,47 @@ export interface DrugSearchResult {
   ndc: string;
   labelName: string;
   price: string;
-  latitude: string | number;
-  longitude: string | number;
-  distance: string | number;
+  latitude: string;
+  longitude: string;
+  distance: string;
 }
 
 /* Requests */
 
 export interface DsntPriceRequest {
-  quantity: string | number;
+  quantity: string;
   ndc: string;
-  radius: string | number;
+  radius: string;
   zipCode: string;
 }
 
 export interface DsntPriceNpiRequest {
   npilist: string;
-  quantity: string | number;
+  quantity: string;
   ndc: string;
-  radius?: string | number;
+  radius?: string;
   zipCode?: string;
 }
 
 export interface ScriptSaveFindDrugsRequest {
-  groupID: string | number;
+  groupID: string;
   brandIndicator?: string;
   drugName: string;
-  includeDrugInfo?: string | boolean;
-  includeDrugImage?: string | boolean;
-  quantity?: string | number;
-  numPharm?: string | number;
-  zipCode?: string | number;
-  useUC?: string | boolean;
+  includeDrugInfo?: string;
+  includeDrugImage?: string;
+  quantity?: string;
+  numPharm?: string;
+  zipCode?: string;
+  useUC?: string;
 }
 
 export interface ScriptSavePriceRequest {
-  ndc: string | number;
-  groupID: string | number;
-  quantity: string | number;
-  numResults: string | number;
-  zipCode: string | number;
-  ndcOverride?: string | boolean;
+  ndc: string;
+  groupID: string;
+  quantity: string;
+  numResults: string;
+  zipCode: string;
+  ndcOverride?: string;
 }
 
 /* Responses */

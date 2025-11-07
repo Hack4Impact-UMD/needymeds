@@ -42,7 +42,7 @@ async function searchDrug(
   // Find the drug’s NDC
   const drugsByName: ScriptSaveFindDrugsResponse = await scriptSaveClient.getDrugsByName({
     drugName,
-    groupID,
+    groupID: String(groupID),
   });
 
   if (!drugsByName?.Drugs?.length) {
@@ -54,18 +54,18 @@ async function searchDrug(
   // Prepare adjudicator queries
   const dsntSearchQuery: DsntPriceRequest = {
     ndc: String(ndc),
-    quantity: 1,
+    quantity: '1',
     zipCode: effectiveZip,
-    radius: Math.min(radius, MAX_DSNT_RADIUS),
+    radius: String(Math.min(radius, MAX_DSNT_RADIUS)),
   };
 
   const scriptSaveSearchQuery: ScriptSavePriceRequest = {
     ndc: String(ndc),
-    groupID,
-    quantity: 1,
-    numResults: MAX_SCRIPTSAVE_NUMRESULTS,
+    groupID: String(groupID),
+    quantity: '1',
+    numResults: String(MAX_SCRIPTSAVE_NUMRESULTS),
     zipCode: effectiveZip,
-    ndcOverride,
+    ndcOverride: String(ndcOverride),
   };
 
   // Query both DSNT and ScriptSave in parallel
@@ -107,7 +107,7 @@ async function searchDrug(
       price: dsntResult.price,
       latitude: pharmacyCoords.lat,
       longitude: pharmacyCoords.lon,
-      distance,
+      distance: String(distance),
     };
 
     const existing = pharmacyResultMap.get(convertedResult.pharmacyName) ?? [];
@@ -129,9 +129,6 @@ async function searchDrug(
       continue;
     }
 
-    const resultLat = Number(scriptSaveResult.latitude);
-    const resultLon = Number(scriptSaveResult.longitude);
-
     const convertedResult: DrugSearchResult = {
       adjudicator: 'ScriptSave',
       pharmacyName: scriptSaveResult.pharmacyName,
@@ -140,9 +137,9 @@ async function searchDrug(
       ndc: scriptSaveResult.ndc,
       labelName: scriptSaveResult.ln,
       price: scriptSaveResult.price,
-      latitude: resultLat,
-      longitude: resultLon,
-      distance,
+      latitude: scriptSaveResult.latitude,
+      longitude: scriptSaveResult.longitude,
+      distance: String(distance),
     };
 
     const existing = pharmacyResultMap.get(convertedResult.pharmacyName) ?? [];
