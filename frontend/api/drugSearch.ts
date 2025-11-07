@@ -12,7 +12,7 @@ import {
 } from './types';
 
 const MAX_DSNT_RADIUS = 125.99;
-const MAX_SCRIPTSAVE_NUMRESULTS = 999999999;
+const MAX_SCRIPTSAVE_NUMRESULTS = 100;
 
 /**
  * This function queries both adjudicator APIs to find pharmacy drugs with
