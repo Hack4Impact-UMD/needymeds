@@ -15,6 +15,18 @@ export interface DrugSearchResult {
   distance: string;
 }
 
+export interface Pharmacy {
+  pharmacyName: string;
+  pharmacyStreet1: string;
+  pharmacyStreet2: string;
+  pharmacyCity: string;
+  pharmacyState: string;
+  pharmacyZipCode: string;
+  latitude?: number;
+  longitude?: number;
+  distance?: number;
+}
+
 /* Requests */
 
 export interface DsntPriceRequest {
