@@ -125,10 +125,6 @@ async function previewData(db, limit = 5) {
 async function main() {
   let db;
   try {
-    if (!fs.existsSync(DATABASE_URL)) {
-      throw new Error(`Database file not found: ${DATABASE_URL}`);
-    }
-
     db = await connectDB();
 
     await createEmptyDB(db);
