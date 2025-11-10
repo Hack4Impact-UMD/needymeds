@@ -1,0 +1,149 @@
+const fs = require('fs');
+const { parse } = require('csv-parse/sync');
+const dotenv = require('dotenv');
+const { open } = require('sqlite');
+const sqlite3 = require('sqlite3');
+const path = require('path');
+const ENV_PATH = path.resolve(__dirname, '.env');
+dotenv.config({ path: ENV_PATH });
+
+const DATASHEET_PATH = path.resolve(__dirname, process.env.DATASHEET_PATH);
+const DATABASE_URL = path.resolve(__dirname, process.env.DATABASE_URL);
+
+async function connectDB() {
+  return open({
+    filename: DATABASE_URL,
+    driver: sqlite3.Database,
+  });
+}
+
+async function createEmptyDB(db) {
+  await db.exec('DROP TABLE IF EXISTS Pharmacy;');
+  await db.exec(`
+    CREATE TABLE Pharmacy (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        pharm_id INTEGER,
+        npi_id INTEGER,
+        name TEXT,
+        affiliation_id INTEGER,
+        affiliation_name TEXT,
+        chain_id INTEGER,
+        chain_name TEXT,
+        address_line1 TEXT,
+        address_line2 TEXT,
+        city TEXT,
+        state TEXT,
+        fax_no TEXT,
+        county TEXT,
+        latitude REAL,
+        longitude REAL
+    );
+  `);
+  console.log('Pharmacy table created.');
+}
+
+async function extractData() {
+  console.log('Extracting pharmacy data from spreadsheet');
+  if (!fs.existsSync(DATASHEET_PATH)) {
+    throw new Error(`CSV file not found: ${DATASHEET_PATH}`);
+  }
+
+  const csv = fs.readFileSync(DATASHEET_PATH, 'utf8');
+  const records = parse(csv, { columns: true, skip_empty_lines: true });
+  console.log(`Extracted ${records.length} records`);
+
+  return records;
+}
+
+function formatData(records) {
+  console.log('Processing data');
+
+  const cleanString = (str) => str?.trim() || null;
+
+  return records.map((row) => ({
+    pharm_id: parseInt(cleanString(row['Pharmacy ID']), 10) || null,
+    npi_id: parseInt(cleanString(row['Pharmacy NPI ID']), 10) || null,
+    name: cleanString(row['Pharmacy Name']),
+    affiliation_id: parseInt(cleanString(row['Pharmacy Affiliation ID']), 10) || null,
+    affiliation_name: cleanString(row['Pharmacy Affiliation Name']),
+    chain_id: parseInt(cleanString(row['Pharmacy Chain ID']), 10) || null,
+    chain_name: cleanString(row['Pharmacy Chain Name']),
+    address_line1: cleanString(row['Pharmacy Address Line 1']),
+    address_line2: cleanString(row['Pharmacy Address Line 2']),
+    city: cleanString(row['Pharmacy City Name']),
+    state: cleanString(row['Pharmacy State CD']),
+    fax_no: cleanString(row['Pharmacy Fax No']),
+    county: cleanString(row['Pharmacy County Name']),
+    latitude: parseFloat(cleanString(row['Pharmacy Latitude'])) || null,
+    longitude: parseFloat(cleanString(row['Pharmacy Longitude'])) || null,
+  }));
+}
+
+async function loadData(db, pharmacies) {
+  console.log('Loading data into SQLite DB');
+  const insertStmt = await db.prepare(`
+        INSERT INTO Pharmacy (
+            pharm_id, npi_id, name, affiliation_id, affiliation_name,
+            chain_id, chain_name, address_line1, address_line2,
+            city, state, fax_no, county, latitude, longitude
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+  await db.exec('BEGIN TRANSACTION;');
+  for (const row of pharmacies) {
+    await insertStmt.run([
+      row.pharm_id,
+      row.npi_id,
+      row.name,
+      row.affiliation_id,
+      row.affiliation_name,
+      row.chain_id,
+      row.chain_name,
+      row.address_line1,
+      row.address_line2,
+      row.city,
+      row.state,
+      row.fax_no,
+      row.county,
+      row.latitude,
+      row.longitude,
+    ]);
+  }
+  await db.exec('COMMIT;');
+  await insertStmt.finalize();
+
+  console.log(`${pharmacies.length} records inserted`);
+}
+
+async function previewData(db, limit = 5) {
+  console.log(`\nPPreview of top ${limit} rows:`);
+  const rows = await db.all(`SELECT * FROM Pharmacy LIMIT ?`, [limit]);
+  console.table(rows);
+}
+
+async function main() {
+  let db;
+  try {
+    db = await connectDB();
+
+    await createEmptyDB(db);
+
+    const data = await extractData();
+    const clean_data = formatData(data);
+    await loadData(db, clean_data);
+
+    await previewData(db);
+
+    console.log('Data ingestion complete!');
+  } catch (error) {
+    console.error("Error occurred: ", error.message)
+  } finally {
+    if (db) {
+      await db.close();
+      console.log('Database connection closed.');
+    }
+  }
+}
+
+main().catch((err) => console.error('Data Ingestion Error:', err));
