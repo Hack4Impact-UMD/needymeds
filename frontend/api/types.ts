@@ -5,49 +5,52 @@ type Adjudicator = 'DSNT' | 'ScriptSave';
 export interface DrugSearchResult {
   adjudicator: Adjudicator;
   pharmacyName: string; // primary field for de-duplication
+  pharmacyAddress: string;
+  pharmacyPhone: string;
   ndc: string;
   labelName: string;
   price: string;
-  latitude: number;
-  longitude: number;
+  latitude: string;
+  longitude: string;
+  distance: string;
 }
 
 /* Requests */
 
 export interface DsntPriceRequest {
-  quantity: string | number;
+  quantity: string;
   ndc: string;
-  radius: string | number;
+  radius: string;
   zipCode: string;
 }
 
 export interface DsntPriceNpiRequest {
   npilist: string;
-  quantity: string | number;
+  quantity: string;
   ndc: string;
-  radius?: string | number;
+  radius?: string;
   zipCode?: string;
 }
 
 export interface ScriptSaveFindDrugsRequest {
-  groupID: string | number;
+  groupID: string;
   brandIndicator?: string;
   drugName: string;
-  includeDrugInfo?: string | boolean;
-  includeDrugImage?: string | boolean;
-  quantity?: string | number;
-  numPharm?: string | number;
-  zipCode?: string | number;
-  useUC?: string | boolean;
+  includeDrugInfo?: string;
+  includeDrugImage?: string;
+  quantity?: string;
+  numPharm?: string;
+  zipCode?: string;
+  useUC?: string;
 }
 
 export interface ScriptSavePriceRequest {
-  ndc: string | number;
-  groupID: string | number;
-  quantity: string | number;
-  numResults: string | number;
-  zipCode: string | number;
-  ndcOverride?: string | boolean;
+  ndc: string;
+  groupID: string;
+  quantity: string;
+  numResults: string;
+  zipCode: string;
+  ndcOverride?: string;
 }
 
 /* Responses */
