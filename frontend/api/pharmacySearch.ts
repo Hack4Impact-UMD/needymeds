@@ -2,7 +2,6 @@ let SQLite: any;
 try {
   SQLite = require('expo-sqlite');
 } catch {
-  // For testing environments where expo-sqlite may not be available
   SQLite = { openDatabaseAsync: () => Promise.reject(new Error('expo-sqlite not available')) };
 }
 import { setCacheEntry } from '../redux/pharmacySearchSlice';
@@ -11,34 +10,85 @@ import { distanceBetweenCoordinates, zipToCoords } from './distance';
 import { Pharmacy } from './types';
 
 interface PharmacyRow {
-  pharmacyName: string;
-  pharmacyStreet1: string;
-  pharmacyStreet2: string | null;
-  pharmacyCity: string;
-  pharmacyState: string;
-  pharmacyZipCode: string;
+  name: string;
+  address_line1: string;
+  address_line2: string | null;
+  city: string;
+  state: string;
+  zip_code?: string | null;
   latitude: number | null;
   longitude: number | null;
 }
 async function openDatabase(): Promise<any> {
-  return await SQLite.openDatabaseAsync('pharmacies.db');
+  return await SQLite.openDatabaseAsync('pharmacy.db');
 }
 
 async function queryAllPharmacies(db: any): Promise<Pharmacy[]> {
   const result = (await db.getAllAsync(
-    'SELECT pharmacyName, pharmacyStreet1, pharmacyStreet2, pharmacyCity, pharmacyState, pharmacyZipCode, latitude, longitude FROM pharmacies'
+    'SELECT name, address_line1, address_line2, city, state, latitude, longitude FROM Pharmacy'
   )) as PharmacyRow[];
 
   return result.map((row: PharmacyRow) => ({
-    pharmacyName: row.pharmacyName,
-    pharmacyStreet1: row.pharmacyStreet1,
-    pharmacyStreet2: row.pharmacyStreet2 || '',
-    pharmacyCity: row.pharmacyCity,
-    pharmacyState: row.pharmacyState,
-    pharmacyZipCode: row.pharmacyZipCode,
+    pharmacyName: row.name || '',
+    pharmacyStreet1: row.address_line1 || '',
+    pharmacyStreet2: row.address_line2 || '',
+    pharmacyCity: row.city || '',
+    pharmacyState: row.state || '',
+    pharmacyZipCode: row.zip_code || '', // Will be empty string if zip_code column doesn't exist
     latitude: row.latitude ?? undefined,
     longitude: row.longitude ?? undefined,
   }));
+}
+
+export async function testDatabaseConnection(): Promise<{
+  success: boolean;
+  error?: string;
+  tableExists?: boolean;
+  rowCount?: number;
+}> {
+  try {
+    const db = await openDatabase();
+
+    // Test if we can query
+    try {
+      const result = await db.getAllAsync('SELECT COUNT(*) as count FROM Pharmacy');
+      const count = result?.[0]?.count ?? 0;
+
+      await db.closeAsync();
+
+      return {
+        success: true,
+        tableExists: true,
+        rowCount: count,
+      };
+    } catch (queryError: any) {
+      await db.closeAsync();
+
+      // Check if it's a "no such table" error
+      if (
+        queryError?.message?.includes('no such table') ||
+        queryError?.message?.includes('SQLITE_ERROR')
+      ) {
+        return {
+          success: false,
+          error: 'Table "Pharmacy" does not exist',
+          tableExists: false,
+        };
+      }
+
+      return {
+        success: false,
+        error: `Query error: ${queryError?.message || 'Unknown error'}`,
+        tableExists: false,
+      };
+    }
+  } catch (err: any) {
+    return {
+      success: false,
+      error: `Database connection failed: ${err?.message || 'Unknown error'}`,
+      tableExists: false,
+    };
+  }
 }
 
 export async function searchPharmacies(zipCode: number, radius: number): Promise<Pharmacy[]> {

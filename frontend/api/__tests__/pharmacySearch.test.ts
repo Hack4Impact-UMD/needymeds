@@ -1,31 +1,33 @@
-import { openDatabaseAsync } from 'expo-sqlite';
-import { setCacheEntry } from '../../redux/pharmacySearchSlice';
-import { store } from '../../redux/store';
-import { distanceBetweenCoordinates, zipToCoords } from '../distance';
-import { searchPharmacies } from '../pharmacySearch';
-import { Pharmacy } from '../types';
-
 // -------------------------------
 // Mocks
 // -------------------------------
-jest.mock('expo-sqlite');
-const mockOpenDatabaseAsync = openDatabaseAsync as jest.MockedFunction<typeof openDatabaseAsync>;
-
+const mockOpenDatabaseAsync = jest.fn();
+jest.mock(
+  'expo-sqlite',
+  () => ({
+    openDatabaseAsync: (...args: any[]) => mockOpenDatabaseAsync(...args),
+  }),
+  { virtual: true }
+);
 jest.mock('../../redux/pharmacySearchSlice', () => ({
   setCacheEntry: jest.fn((payload) => ({ type: 'setCacheEntry', payload })),
 }));
-
 jest.mock('../../redux/store', () => ({
   store: {
     getState: jest.fn(),
     dispatch: jest.fn(),
   },
 }));
-
 jest.mock('../distance', () => ({
   distanceBetweenCoordinates: jest.fn(),
   zipToCoords: jest.fn(),
 }));
+
+import { setCacheEntry } from '../../redux/pharmacySearchSlice';
+import { store } from '../../redux/store';
+import { distanceBetweenCoordinates, zipToCoords } from '../distance';
+import { searchPharmacies } from '../pharmacySearch';
+import { Pharmacy } from '../types';
 
 // -------------------------------
 // Test Data
@@ -83,34 +85,35 @@ beforeEach(() => {
   (distanceBetweenCoordinates as jest.Mock).mockReturnValue(1);
 
   (mockOpenDatabaseAsync as jest.Mock).mockResolvedValue(mockDatabase);
+  // Mock database returns data in the actual database schema format
   (mockDatabase.getAllAsync as jest.Mock).mockResolvedValue([
     {
-      pharmacyName: mockPharmacy1.pharmacyName,
-      pharmacyStreet1: mockPharmacy1.pharmacyStreet1,
-      pharmacyStreet2: null,
-      pharmacyCity: mockPharmacy1.pharmacyCity,
-      pharmacyState: mockPharmacy1.pharmacyState,
-      pharmacyZipCode: mockPharmacy1.pharmacyZipCode,
+      name: mockPharmacy1.pharmacyName,
+      address_line1: mockPharmacy1.pharmacyStreet1,
+      address_line2: null,
+      city: mockPharmacy1.pharmacyCity,
+      state: mockPharmacy1.pharmacyState,
+      zip_code: mockPharmacy1.pharmacyZipCode,
       latitude: mockPharmacy1.latitude,
       longitude: mockPharmacy1.longitude,
     },
     {
-      pharmacyName: mockPharmacy2.pharmacyName,
-      pharmacyStreet1: mockPharmacy2.pharmacyStreet1,
-      pharmacyStreet2: null,
-      pharmacyCity: mockPharmacy2.pharmacyCity,
-      pharmacyState: mockPharmacy2.pharmacyState,
-      pharmacyZipCode: mockPharmacy2.pharmacyZipCode,
+      name: mockPharmacy2.pharmacyName,
+      address_line1: mockPharmacy2.pharmacyStreet1,
+      address_line2: null,
+      city: mockPharmacy2.pharmacyCity,
+      state: mockPharmacy2.pharmacyState,
+      zip_code: mockPharmacy2.pharmacyZipCode,
       latitude: mockPharmacy2.latitude,
       longitude: mockPharmacy2.longitude,
     },
     {
-      pharmacyName: mockPharmacy3.pharmacyName,
-      pharmacyStreet1: mockPharmacy3.pharmacyStreet1,
-      pharmacyStreet2: null,
-      pharmacyCity: mockPharmacy3.pharmacyCity,
-      pharmacyState: mockPharmacy3.pharmacyState,
-      pharmacyZipCode: mockPharmacy3.pharmacyZipCode,
+      name: mockPharmacy3.pharmacyName,
+      address_line1: mockPharmacy3.pharmacyStreet1,
+      address_line2: null,
+      city: mockPharmacy3.pharmacyCity,
+      state: mockPharmacy3.pharmacyState,
+      zip_code: mockPharmacy3.pharmacyZipCode,
       latitude: mockPharmacy3.latitude,
       longitude: mockPharmacy3.longitude,
     },
@@ -191,12 +194,12 @@ describe('searchPharmacies', () => {
   it('handles pharmacies without stored coordinates by converting zip code', async () => {
     (mockDatabase.getAllAsync as jest.Mock).mockResolvedValueOnce([
       {
-        pharmacyName: mockPharmacy1.pharmacyName,
-        pharmacyStreet1: mockPharmacy1.pharmacyStreet1,
-        pharmacyStreet2: null,
-        pharmacyCity: mockPharmacy1.pharmacyCity,
-        pharmacyState: mockPharmacy1.pharmacyState,
-        pharmacyZipCode: mockPharmacy1.pharmacyZipCode,
+        name: mockPharmacy1.pharmacyName,
+        address_line1: mockPharmacy1.pharmacyStreet1,
+        address_line2: null,
+        city: mockPharmacy1.pharmacyCity,
+        state: mockPharmacy1.pharmacyState,
+        zip_code: mockPharmacy1.pharmacyZipCode,
         latitude: null,
         longitude: null,
       },
