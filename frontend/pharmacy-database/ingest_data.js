@@ -45,6 +45,8 @@ async function createEmptyDB(db) {
         address_line2 TEXT,
         city TEXT,
         state TEXT,
+        zipcode TEXT,
+        phone_no TEXT,
         fax_no TEXT,
         county TEXT,
         latitude REAL,
@@ -84,6 +86,8 @@ function formatData(records) {
     address_line2: cleanString(row['Pharmacy Address Line 2']),
     city: cleanString(row['Pharmacy City Name']),
     state: cleanString(row['Pharmacy State CD']),
+    zipcode: cleanString(row['Pharmacy Zip CD']),
+    phone_no: cleanString(row['Pharmacy Phone No']),
     fax_no: cleanString(row['Pharmacy Fax No']),
     county: cleanString(row['Pharmacy County Name']),
     latitude: parseFloat(cleanString(row['Pharmacy Latitude'])) || null,
@@ -97,9 +101,9 @@ async function loadData(db, pharmacies) {
         INSERT INTO Pharmacy (
             pharm_id, npi_id, name, affiliation_id, affiliation_name,
             chain_id, chain_name, address_line1, address_line2,
-            city, state, fax_no, county, latitude, longitude
+            city, state, zipcode, phone_no, fax_no, county, latitude, longitude
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
   await db.exec('BEGIN TRANSACTION;');
@@ -116,7 +120,9 @@ async function loadData(db, pharmacies) {
       row.address_line2,
       row.city,
       row.state,
+      row.zipcode,
       row.fax_no,
+      row.phone_no,
       row.county,
       row.latitude,
       row.longitude,
