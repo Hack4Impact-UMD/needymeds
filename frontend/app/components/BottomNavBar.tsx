@@ -1,37 +1,31 @@
-import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { Surface, Text } from 'react-native-paper';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { usePathname } from 'expo-router';
+// import React from 'react';
+import { TouchableOpacity, StyleSheet } from 'react-native'; // View, Image
+import { Icon, Surface, Text } from 'react-native-paper';
+// import { MaterialCommunityIcons } from '@expo/vector-icons';
+// import { usePathname } from 'expo-router';
 
-const resourcesIcon = require('../assets/Icon.png');
-const cardIcon = require('../assets/confirmation_number.png');
+// const resourcesIcon = require('../assets/Icon.png');
+// const cardIcon = require('../assets/confirmation_number.png');
 
 const BottomNavBar = () => {
-  const pathname = usePathname();
+  // const pathname = usePathname();
 
   return (
     <Surface style={styles.bottomNav} elevation={0}>
       <TouchableOpacity style={styles.navItem} activeOpacity={0.85}>
-        <View style={pathname.includes('search') ? styles.navActiveContainer : undefined}>
-          <MaterialCommunityIcons
-            name="magnify"
-            size={21}
-            color={pathname.includes('search') ? '#7C3AED' : '#6B7280'}
-          />
-        </View>
+        <Icon source="medication-outline" color="#004E60" size={30} />
         <Text variant="labelMedium" style={styles.navLabel}>
-          Search
+          Home
         </Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.navItem}>
-        <Image source={cardIcon} style={{ width: 26, height: 26 }} resizeMode="contain" />
+        <Icon source="store-plus-outline" color="#004E60" size={30} />
         <Text variant="labelMedium" style={styles.navLabel}>
-          My Cards
+          Pharmacies
         </Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.navItem}>
-        <Image source={resourcesIcon} style={{ width: 26, height: 26 }} resizeMode="contain" />
+        <Icon source="account" color="#004E60" size={30} />
         <Text variant="labelMedium" style={styles.navLabel}>
           Resources
         </Text>
@@ -46,7 +40,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: '#FAF5FF',
+    backgroundColor: '#EBEEF3',
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
