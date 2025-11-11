@@ -72,15 +72,32 @@ async function extractData() {
 function formatData(records) {
   console.log('Processing data');
 
-  const cleanString = (str) => str?.trim() || null;
+  const cleanString = (str) => {
+    const trimmed = str?.trim();
+    return trimmed === '' ? null : trimmed ?? null;
+  };
+    
+  const parseOptionalInt = (value) => {
+    const cleaned = cleanString(value);
+    if (cleaned === null) return null;
+    const parsed = Number.parseInt(cleaned, 10);
+    return Number.isNaN(parsed) ? null : parsed;
+  };
+    
+  const parseOptionalFloat = (value) => {
+    const cleaned = cleanString(value);
+    if (cleaned === null) return null;
+    const parsed = Number.parseFloat(cleaned);
+    return Number.isNaN(parsed) ? null : parsed;
+  };
 
   return records.map((row) => ({
-    pharm_id: parseInt(cleanString(row['Pharmacy ID']), 10) || null,
-    npi_id: parseInt(cleanString(row['Pharmacy NPI ID']), 10) || null,
+    pharm_id: parseOptionalInt(row['Pharmacy ID']),
+    npi_id: parseOptionalInt(row['Pharmacy NPI ID']),
     name: cleanString(row['Pharmacy Name']),
-    affiliation_id: parseInt(cleanString(row['Pharmacy Affiliation ID']), 10) || null,
+    affiliation_id: parseOptionalInt(row['Pharmacy Affiliation ID']),
     affiliation_name: cleanString(row['Pharmacy Affiliation Name']),
-    chain_id: parseInt(cleanString(row['Pharmacy Chain ID']), 10) || null,
+    chain_id: parseOptionalInt(row['Pharmacy Chain ID']),
     chain_name: cleanString(row['Pharmacy Chain Name']),
     address_line1: cleanString(row['Pharmacy Address Line 1']),
     address_line2: cleanString(row['Pharmacy Address Line 2']),
@@ -90,8 +107,8 @@ function formatData(records) {
     phone_no: cleanString(row['Pharmacy Phone No']),
     fax_no: cleanString(row['Pharmacy Fax No']),
     county: cleanString(row['Pharmacy County Name']),
-    latitude: parseFloat(cleanString(row['Pharmacy Latitude'])) || null,
-    longitude: parseFloat(cleanString(row['Pharmacy Longitude'])) || null,
+    latitude: parseOptionalFloat(row['Pharmacy Latitude']),
+    longitude: parseOptionalFloat(row['Pharmacy Longitude']),
   }));
 }
 
