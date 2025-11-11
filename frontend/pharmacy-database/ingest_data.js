@@ -4,8 +4,20 @@ const dotenv = require('dotenv');
 const { open } = require('sqlite');
 const sqlite3 = require('sqlite3');
 const path = require('path');
+
 const ENV_PATH = path.resolve(__dirname, '.env');
+if (!fs.existsSync(ENV_PATH)) {
+  throw new Error(`Missing .env file for: ${ENV_PATH}`);
+}
 dotenv.config({ path: ENV_PATH });
+
+if (!process.env.DATASHEET_PATH) {
+  throw new Error("Missing required environment variable DATASHEET_PATH (raw dataset)");
+}
+
+if (!process.env.DATABASE_URL) {
+  throw new Error("Missing required environment variable DATABASE_URL (location for database)");
+}
 
 const DATASHEET_PATH = path.resolve(__dirname, process.env.DATASHEET_PATH);
 const DATABASE_URL = path.resolve(__dirname, process.env.DATABASE_URL);
