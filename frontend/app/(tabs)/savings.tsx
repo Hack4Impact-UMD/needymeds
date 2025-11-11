@@ -10,7 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomNavBar from '../components/BottomNavBar';
 const logo = require('../assets/horizontal_logo.png');
 
-const EducationScreen = () => {
+const SavingsScreen = () => {
   // language dropdown
   const langOptions = [
     { label: 'EN', value: 'EN' },
@@ -57,12 +57,12 @@ const EducationScreen = () => {
             marginRight: 20,
           }}
         >
-          Educational Resources
+          Prescription Savings Tips
         </Text>
 
         {/* description + left icon */}
         <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 20 }}>
-          <Icon source="book-open-page-variant-outline" size={30} />
+          <Icon source="medical-cotton-swab" color="#41484D" size={30} />
           <Text
             style={{
               fontSize: 14,
@@ -70,57 +70,13 @@ const EducationScreen = () => {
               margin: 10,
             }}
           >
-            Learn more about frequently asked questions, prescription savings tips, and more
-            information.
+            Saving money on prescription is possible! Try these steps to make sure you're getting
+            the best price for you're medications:
           </Text>
         </View>
 
         {/* make into card components */}
-
-        {/* saving tips card, add  left={LeftContent} */}
-        <Card style={styles.cards}>
-          <Card.Title
-            title="Prescription Saving Tips"
-            subtitle="Click here to learn more!"
-            left={(props) => <Icon source="piggy-bank-outline" size={30} />}
-          />
-        </Card>
-
-        {/* FAQ cards */}
-        <Card style={styles.cards}>
-          <Card.Title
-            title="Frequently Asked Questions"
-            subtitle="Find answers quickly:"
-            left={(props) => <Icon source="help-circle-outline" size={30} />}
-          />
-        </Card>
-        <Card style={styles.cards}>
-          <Card.Title
-            title="General FAQ"
-            subtitle="Click arrow to learn more!"
-            left={(props) => <Icon source="forum-outline" size={30} />}
-            right={(props) => <Icon source="menu-right" size={25} />}
-          />
-        </Card>
-        <Card style={styles.cards}>
-          <Card.Title
-            title="Manufacturer Coupon FAQ"
-            subtitle="Click arrow to learn more!"
-            left={(props) => <Icon source="currency-usd-off" size={30} />}
-            right={(props) => <Icon source="menu-right" size={25} />}
-          />
-        </Card>
-
-        {/* NeedyMeds website card */}
-        {/* notes: make workable link */}
-        {/* use other logo here */}
-        <Card style={styles.cards}>
-          <Card.Title
-            title="Visit the NeedyMeds' website for more information"
-            subtitle="https://needymeds.org/"
-            left={(props) => <Image source={logo} style={{ width: 50 }} resizeMode="contain" />}
-          />
-        </Card>
+        <Text>collapsible cards</Text>
       </View>
       <BottomNavBar />
     </SafeAreaView>
@@ -173,4 +129,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EducationScreen;
+export default SavingsScreen;
