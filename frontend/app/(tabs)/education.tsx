@@ -78,38 +78,39 @@ const EducationScreen = () => {
         {/* make into card components */}
 
         {/* saving tips card, add  left={LeftContent} */}
-        <Card style={styles.cards}>
+        <Card style={styles.cards} onPress={() => router.push("/(tabs)/tips")}>
           <Card.Title
             title="Prescription Saving Tips"
             subtitle="Click here to learn more!"
             left={(props) => <Icon source="piggy-bank-outline" size={30} />}
           />
         </Card>
-
-        {/* FAQ cards */}
-        <Card style={styles.cards}>
-          <Card.Title
-            title="Frequently Asked Questions"
-            subtitle="Find answers quickly:"
-            left={(props) => <Icon source="help-circle-outline" size={30} />}
-          />
-        </Card>
-        <Card style={styles.cards}>
-          <Card.Title
-            title="General FAQ"
-            subtitle="Click arrow to learn more!"
-            left={(props) => <Icon source="forum-outline" size={30} />}
-            right={(props) => <Icon source="menu-right" size={25} />}
-          />
-        </Card>
-        <Card style={styles.cards}>
-          <Card.Title
-            title="Manufacturer Coupon FAQ"
-            subtitle="Click arrow to learn more!"
-            left={(props) => <Icon source="currency-usd-off" size={30} />}
-            right={(props) => <Icon source="menu-right" size={25} />}
-          />
-        </Card>
+        <View style={{ marginTop: 25, marginBottom: 25 }}>
+            {/* FAQ cards */}
+          <Card style={styles.cards}>
+            <Card.Title
+              title="Frequently Asked Questions"
+              subtitle="Find answers quickly:"
+              left={(props) => <Icon source="help-circle-outline" size={30} />}
+            />
+          </Card>
+          <Card style={styles.cards}>
+            <Card.Title
+              title="General FAQ"
+              subtitle="Click arrow to learn more!"
+              left={(props) => <Icon source="forum-outline" size={30} />}
+              right={(props) => <Icon source="menu-right" size={25} />}
+            />
+          </Card>
+          <Card style={styles.cards}>
+            <Card.Title
+              title="Manufacturer Coupon FAQ"
+              subtitle="Click arrow to learn more!"
+              left={(props) => <Icon source="currency-usd-off" size={30} />}
+              right={(props) => <Icon source="menu-right" size={25} />}
+            />
+          </Card>
+        </View>
 
         {/* NeedyMeds website card */}
         {/* notes: make workable link */}
@@ -145,7 +146,6 @@ const styles = StyleSheet.create({
   header: {
     width: 340,
     height: 85,
-
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

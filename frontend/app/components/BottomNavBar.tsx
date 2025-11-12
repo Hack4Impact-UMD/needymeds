@@ -1,73 +1,126 @@
-// import React from 'react';
-import { TouchableOpacity, StyleSheet } from 'react-native'; // View, Image
-import { Icon, Surface, Text } from 'react-native-paper';
-// import { MaterialCommunityIcons } from '@expo/vector-icons';
-// import { usePathname } from 'expo-router';
+import React from "react";
+import { View, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { Surface, Text } from "react-native-paper";
+import { MaterialCommunityIcons as MCI } from "@expo/vector-icons";
+import { usePathname, useRouter } from "expo-router";
 
-// const resourcesIcon = require('../assets/Icon.png');
-// const cardIcon = require('../assets/confirmation_number.png');
+const BG = "#EEF2F6";
+const ICON_ACTIVE_BG = "#D7F1FF";
+const ICON = "#0F5561";
+const LABEL = "#6B7280";
+const LABEL_ACTIVE = "#111827";
+const BORDER = "#E5E7EB";
 
-const BottomNavBar = () => {
-  // const pathname = usePathname();
+export default function BottomNavBar() {
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const isActive = (seg: string) => pathname?.includes(seg);
 
   return (
     <Surface style={styles.bottomNav} elevation={0}>
-      <TouchableOpacity style={styles.navItem} activeOpacity={0.85}>
-        <Icon source="medication-outline" color="#004E60" size={30} />
-        <Text variant="labelMedium" style={styles.navLabel}>
-          Home
+      {/* Drug Prices */}
+      <TouchableOpacity
+        style={styles.navItem}
+        activeOpacity={0.9}
+        onPress={() => router.push("/(tabs)/search")}
+      >
+        <View style={isActive("/search") ? styles.iconPill : styles.iconWrap}>
+          <MCI name="pill" size={22} color={ICON} />
+        </View>
+        <Text
+          variant="labelMedium"
+          style={[styles.navLabel, isActive("/search") && styles.navLabelActive]}
+        >
+          Drug Prices
         </Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.navItem}>
-        <Icon source="store-plus-outline" color="#004E60" size={30} />
-        <Text variant="labelMedium" style={styles.navLabel}>
+
+      {/* Pharmacies */}
+      <TouchableOpacity
+        style={styles.navItem}
+        activeOpacity={0.9}
+        onPress={() => router.push("/(tabs)/welcome")}
+      >
+        <View style={isActive("/welcome") ? styles.iconPill : styles.iconWrap}>
+          <MCI name="store-plus-outline" size={22} color={ICON} />
+        </View>
+        <Text
+          variant="labelMedium"
+          style={[styles.navLabel, isActive("/search") && styles.navLabelActive]}
+        >
           Pharmacies
         </Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.navItem}>
-        <Icon source="account" color="#004E60" size={30} />
-        <Text variant="labelMedium" style={styles.navLabel}>
+
+      {/* Resources */}
+      <TouchableOpacity
+        style={styles.navItem}
+        activeOpacity={0.9}
+        onPress={() => router.push("/(tabs)/education")}
+      >
+        <View style={isActive("/education") ? styles.iconPill : styles.iconWrap}>
+          <Image source={require("../assets/resource.png")} style={{ width: 25, height: 25 }} />
+        </View>
+        <Text
+          variant="labelMedium"
+          style={[
+            styles.navLabel,
+            isActive("/education") && styles.navLabelActive,
+          ]}
+        >
           Resources
         </Text>
       </TouchableOpacity>
     </Surface>
   );
-};
+}
 
 const styles = StyleSheet.create({
   bottomNav: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: '#EBEEF3',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingTop: 4,
+    backgroundColor: BG,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    paddingTop: 6,
+    paddingBottom: 12, // room above the device edge
     borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
+    borderTopColor: BORDER,
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
   },
   navItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 88,
-    paddingVertical: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 96,
+  },
+  iconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  iconPill: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: ICON_ACTIVE_BG, 
   },
   navLabel: {
     marginTop: 6,
     fontSize: 12,
-    color: '#625B71',
-    fontWeight: '500',
+    color: LABEL,
+    fontWeight: "500",
   },
-  navActiveContainer: {
-    width: 60,
-    height: 30,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#E8DEF8',
+  navLabelActive: {
+    color: LABEL_ACTIVE,
+    fontWeight: "700",
   },
 });
-
-export default BottomNavBar;

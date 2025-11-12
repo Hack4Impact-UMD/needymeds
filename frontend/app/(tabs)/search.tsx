@@ -15,7 +15,6 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import HomeBackgroundShape from '../components/HomeBackgroundShape';
 import BottomNavBar from '../components/BottomNavBar';
-//import ResourcesIcon from '../assets/resource.svg';
 const logo = require('../assets/horizontal_logo.png');
 
 const MOCK_MEDS = [
