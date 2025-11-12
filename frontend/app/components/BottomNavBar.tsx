@@ -1,6 +1,6 @@
 import React from "react";
 import { View, TouchableOpacity, StyleSheet, Image } from "react-native";
-import { Surface, Text } from "react-native-paper";
+import { Icon, Surface, Text } from "react-native-paper";
 import { MaterialCommunityIcons as MCI } from "@expo/vector-icons";
 import { usePathname, useRouter } from "expo-router";
 
@@ -26,7 +26,7 @@ export default function BottomNavBar() {
         onPress={() => router.push("/(tabs)/search")}
       >
         <View style={isActive("/search") ? styles.iconPill : styles.iconWrap}>
-          <MCI name="pill" size={22} color={ICON} />
+          <Icon source="medication-outline" color="#004E60" size={30} />
         </View>
         <Text
           variant="labelMedium"
@@ -43,7 +43,7 @@ export default function BottomNavBar() {
         onPress={() => router.push("/(tabs)/welcome")}
       >
         <View style={isActive("/welcome") ? styles.iconPill : styles.iconWrap}>
-          <MCI name="store-plus-outline" size={22} color={ICON} />
+          <Icon source="store-plus-outline" color="#004E60" size={30} />
         </View>
         <Text
           variant="labelMedium"

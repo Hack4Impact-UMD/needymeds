@@ -100,7 +100,7 @@ export default function Tips() {
         <Text style={styles.title}>Prescription{"\n"}Savings Tips</Text>
 
         <View style={styles.introRow}>
-          <Image source={med_liquid} />
+          <Icon source="medical-cotton-swab" color="#41484D" size={30} />
           <Text style={styles.intro}>
             Saving money on prescriptions is possible! Try these steps to make sure you’re getting the
             best price for your medications:
@@ -160,7 +160,7 @@ logoImage: {
     textAlign: "center",
     fontSize: 28,
     lineHeight: 34,
-    fontWeight: "800",
+    fontWeight: "500",
     color: "#111827",
     marginBottom: 8,
   },
@@ -174,7 +174,7 @@ logoImage: {
     marginVertical: 4,
   },
   row: { flexDirection: "row", alignItems: "center" },
-  rowTitle: { flex: 1, fontSize: 16, fontWeight: "700", color: "#111827" },
+  rowTitle: { flex: 1, fontSize: 16, fontWeight: "600", color: "#111827" },
   body: { marginTop: 8, gap: 6 },
   line: { fontSize: 15, color: "#374151", lineHeight: 22 },
 });
