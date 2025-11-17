@@ -1,42 +1,62 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "NeedyMeds",
+    "slug": "needymeds-ddc",
+    "scheme": "needymeds",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "frontend",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "icon": "./assets/needymeds.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/needymeds.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFFFFF"
+    },
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "org.needymeds.ddcapp",
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Location data helps identify nearby assistance programs."
+      }
     },
     "android": {
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "package": "org.needymeds.ddcapp",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/needymeds.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "permissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
+      ]
     },
     "web": {
-      "output": "static"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ]
-    ],
-    "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
+      "favicon": "./assets/needymeds.png"
     },
     "extra": {
       "router": {},
       "eas": {
         "projectId": "8f383cc3-4987-4ea9-820f-d3f841ebc13f"
       }
-    }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/8f383cc3-4987-4ea9-820f-d3f841ebc13f"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-build-properties",
+        {
+          "ios": { "useFrameworks": "static" },
+          "android": { "compileSdkVersion": 34, "targetSdkVersion": 34 }
+        }
+      ]
+    ]
   }
 }
