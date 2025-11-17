@@ -41,5 +41,4 @@ app-example
 /ios
 /android
 
-/backend/.env
-/frontend/pharmacy-database/.env
+.env
