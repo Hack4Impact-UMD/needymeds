@@ -25,6 +25,7 @@ export interface Pharmacy {
   latitude?: number;
   longitude?: number;
   distance?: number;
+  phoneNumber?: string;
 }
 
 /* Requests */

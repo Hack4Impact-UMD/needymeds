@@ -19,7 +19,7 @@ interface PharmacyRow {
   zip_code: string;
   latitude: number;
   longitude: number;
-  phone?: string;
+  phoneNumber?: string;
 }
 
 async function openDatabase(): Promise<any> {
@@ -28,7 +28,7 @@ async function openDatabase(): Promise<any> {
 
 async function queryAllPharmacies(db: any): Promise<Pharmacy[]> {
   const result = (await db.getAllAsync(
-    'SELECT name, address_line1, address_line2, city, state, zip_code, latitude, longitude, phone FROM Pharmacy'
+    'SELECT name, address_line1, address_line2, city, state, zip_code, latitude, longitude, phoneNumber FROM Pharmacy'
   )) as PharmacyRow[];
 
   return result.map((row: PharmacyRow) => ({
@@ -40,7 +40,7 @@ async function queryAllPharmacies(db: any): Promise<Pharmacy[]> {
     pharmacyZipCode: row.zip_code,
     latitude: row.latitude,
     longitude: row.longitude,
-    phone: row.phone,
+    phoneNumber: row.phoneNumber,
   }));
 }
 

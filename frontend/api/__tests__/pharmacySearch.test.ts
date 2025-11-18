@@ -192,19 +192,6 @@ describe('searchPharmacies', () => {
   });
 
   it('handles pharmacies without stored coordinates by converting zip code', async () => {
-    (mockDatabase.getAllAsync as jest.Mock).mockResolvedValueOnce([
-      {
-        name: mockPharmacy1.pharmacyName,
-        address_line1: mockPharmacy1.pharmacyStreet1,
-        address_line2: null,
-        city: mockPharmacy1.pharmacyCity,
-        state: mockPharmacy1.pharmacyState,
-        zip_code: mockPharmacy1.pharmacyZipCode,
-        latitude: null,
-        longitude: null,
-      },
-    ]);
-
     (zipToCoords as jest.Mock).mockResolvedValueOnce(mockUserCoords); // For user zip
     (zipToCoords as jest.Mock).mockResolvedValueOnce(mockPharmacy1Coords); // For pharmacy zip
 
