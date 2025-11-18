@@ -1,6 +1,7 @@
 import { Colors } from '@/constants/theme';
+import { router } from 'expo-router';
 import { useState } from 'react';
-import { Image, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,7 +13,6 @@ const expandIcon = require('../../assets/aspect_ratio.svg');
 const shareIcon = require('../../assets/share.svg');
 const DDCCardFront = require('../../assets/DST_DDCDetailsFront.svg');
 const DDCCardBack = require('../../assets/DST_DDCBackDetails.svg');
-
 const langOptions = [
   { label: 'EN', value: 'EN' },
   { label: 'SP', value: 'SP' },
@@ -48,7 +48,9 @@ const DST = () => {
         <View style={styles.pageBody}>
           <View style={styles.pageHeader}>
             <View style={styles.backButton}>
-              <Image source={backArrow} style={styles.backIcon} resizeMode="contain" />
+              <Pressable onPress={() => router.navigate('/selected')}>
+                <Image source={backArrow} style={styles.backIcon} resizeMode="contain" />
+              </Pressable>
             </View>
             <Text variant="headlineLarge" style={styles.title}>
               Drug Discount Card
