@@ -1,4 +1,4 @@
-name: CI/CD Backend Deploy
+name: Deploy Backend
 
 on:
   push:
@@ -6,57 +6,45 @@ on:
 
 jobs:
   deploy:
-    name: Deploy to EC2
     runs-on: ubuntu-latest
 
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          node-version: '20'
+          role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/github-actions-backend-deploy
+          aws-region: us-east-1
 
-      - name: Install dependencies
-        run: |
-          cd backend
-          npm ci
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Run tests
-        run: |
-          cd backend
-          npm test
-
-      - name: Archive project files
-        run: |
-          zip -r project.zip . -x "*.git*" "*.github*" "node_modules/*"
-
-      - name: Copy files to EC2
-        uses: appleboy/scp-action@v0.1.7
+      - name: Build & Push (ARM)
+        uses: docker/build-push-action@v5
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: 'project.zip'
-          target: '~/deploy'
+          context: ./backend
+          push: true
+          platforms: linux/arm64
+          tags: <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/needymeds-backend:latest
 
-      - name: SSH into EC2 and deploy
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd ~/deploy
-            unzip -o project.zip
+      - name: List EC2 instance IDs
+        id: ec2
+        run: |
+          ids=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=needymeds-backend" \
+            --query "Reservations[*].Instances[*].InstanceId" --output text)
+          echo "INSTANCE_IDS=$ids" >> $GITHUB_ENV
 
-            # Stop old containers
-            docker compose down || true
-
-            # Rebuild and restart backend
-            docker compose build
-            docker compose up -d
-
-            # Clean unused Docker data
-            docker system prune -af || true
+      - name: Deploy via SSM SendCommand
+        run: |
+          aws ssm send-command \
+            --instance-ids $INSTANCE_IDS \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploy backend" \
+            --parameters '{"commands":["/opt/deploy/deploy.sh"]}'

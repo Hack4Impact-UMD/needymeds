@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   backend:
-    build: ./backend
+    image: <AWS_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/needymeds-backend:latest
     container_name: needymeds-backend
     ports:
       - '9000:3000'
