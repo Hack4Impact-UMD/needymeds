@@ -4,6 +4,7 @@ try {
 } catch {
   SQLite = { openDatabaseAsync: () => Promise.reject(new Error('expo-sqlite not available')) };
 }
+
 import { setCacheEntry } from '../redux/pharmacySearchSlice';
 import { store } from '../redux/store';
 import { distanceBetweenCoordinates, zipToCoords } from './distance';
@@ -15,17 +16,19 @@ interface PharmacyRow {
   address_line2: string | null;
   city: string;
   state: string;
-  zip_code?: string | null;
-  latitude: number | null;
-  longitude: number | null;
+  zip_code: string;
+  latitude: number;
+  longitude: number;
+  phone?: string;
 }
+
 async function openDatabase(): Promise<any> {
   return await SQLite.openDatabaseAsync('pharmacy.db');
 }
 
 async function queryAllPharmacies(db: any): Promise<Pharmacy[]> {
   const result = (await db.getAllAsync(
-    'SELECT name, address_line1, address_line2, city, state, latitude, longitude FROM Pharmacy'
+    'SELECT name, address_line1, address_line2, city, state, zip_code, latitude, longitude, phone FROM Pharmacy'
   )) as PharmacyRow[];
 
   return result.map((row: PharmacyRow) => ({
@@ -34,9 +37,10 @@ async function queryAllPharmacies(db: any): Promise<Pharmacy[]> {
     pharmacyStreet2: row.address_line2 || '',
     pharmacyCity: row.city || '',
     pharmacyState: row.state || '',
-    pharmacyZipCode: row.zip_code || '', // Will be empty string if zip_code column doesn't exist
-    latitude: row.latitude ?? undefined,
-    longitude: row.longitude ?? undefined,
+    pharmacyZipCode: row.zip_code,
+    latitude: row.latitude,
+    longitude: row.longitude,
+    phone: row.phone,
   }));
 }
 
@@ -115,21 +119,8 @@ export async function searchPharmacies(zipCode: number, radius: number): Promise
     const pharmaciesWithDistance: Pharmacy[] = [];
 
     for (const pharmacy of allPharmacies) {
-      let pharmacyLat: string;
-      let pharmacyLon: string;
-
-      // Use stored coordinates if available, otherwise convert zip code
-      if (pharmacy.latitude !== undefined && pharmacy.longitude !== undefined) {
-        pharmacyLat = String(pharmacy.latitude);
-        pharmacyLon = String(pharmacy.longitude);
-      } else {
-        const pharmacyCoords = await zipToCoords(pharmacy.pharmacyZipCode);
-        pharmacyLat = pharmacyCoords.lat;
-        pharmacyLon = pharmacyCoords.lon;
-      }
-
       const distance = distanceBetweenCoordinates(
-        { lat: pharmacyLat, lon: pharmacyLon },
+        { lat: String(pharmacy.latitude), lon: String(pharmacy.longitude) },
         { lat: userCoords.lat, lon: userCoords.lon }
       );
 
@@ -137,8 +128,8 @@ export async function searchPharmacies(zipCode: number, radius: number): Promise
       if (distance <= radius) {
         pharmaciesWithDistance.push({
           ...pharmacy,
-          latitude: parseFloat(pharmacyLat),
-          longitude: parseFloat(pharmacyLon),
+          latitude: pharmacy.latitude,
+          longitude: pharmacy.longitude,
           distance,
         });
       }
