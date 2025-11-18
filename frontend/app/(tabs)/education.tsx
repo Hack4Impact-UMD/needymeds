@@ -2,13 +2,14 @@ import { useState } from 'react';
 
 import { router } from 'expo-router';
 
-import { Image, StyleSheet, Text, View } from 'react-native';
-import { Card, Icon } from 'react-native-paper';
+import { Image, Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Card, Divider, Icon, IconButton } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BottomNavBar from '../components/BottomNavBar';
-const logo = require('../assets/horizontal_logo.png');
+const h_logo = require('../assets/horizontal_logo.png');
+const v_logo = require('../assets/vertical_logo.png');
 
 const EducationScreen = () => {
   // language dropdown
@@ -23,12 +24,20 @@ const EducationScreen = () => {
     console.log(lang);
   };
 
+  const general_faq_url = 'https://needymeds.org/faq';
+  const coupon_faq_url = 'https://www.needymeds.org/copay-cards-faqs';
+  const nm_url = 'https://needymeds.org/';
+
+  const handleLink = (url: string) => {
+    Linking.openURL(url);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         {/* HEADER */}
         <View style={styles.header}>
-          <Image source={logo} style={styles.logo} resizeMode="contain" />
+          <Image source={h_logo} style={{ width: 80 }} resizeMode="contain" />
           <Dropdown
             placeholder="EN"
             value={lang}
@@ -46,83 +55,89 @@ const EducationScreen = () => {
         </View>
 
         {/* TITLE */}
-        <Text
-          style={{
-            textAlign: 'center',
-            fontSize: 32,
-            fontWeight: 500,
-            color: '#181C20',
-            margin: 10,
-            marginLeft: 20,
-            marginRight: 20,
-          }}
-        >
-          Educational Resources
-        </Text>
+        <Text style={styles.title}>Educational Resources</Text>
 
         {/* description + left icon */}
         <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 20 }}>
-          <Icon source="book-open-page-variant-outline" size={30} />
-          <Text
-            style={{
-              fontSize: 14,
-              color: '#181C20',
-              margin: 10,
-            }}
-          >
+          <Icon source="book-open-page-variant-outline" color="#41484D" size={30} />
+          <Text style={styles.description}>
             Learn more about frequently asked questions, prescription savings tips, and more
             information.
           </Text>
         </View>
 
-        {/* make into card components */}
-
-        {/* saving tips card, add  left={LeftContent} */}
-        <Card style={styles.cards} onPress={() => router.push("/(tabs)/tips")}>
+        {/* saving tips card */}
+        <Card style={styles.cards}>
           <Card.Title
             title="Prescription Saving Tips"
-            subtitle="Click here to learn more!"
-            left={(props) => <Icon source="piggy-bank-outline" size={30} />}
+            subtitle={
+              <Text onPress={() => router.push('/(tabs)/tips')}>Click here to learn more!</Text>
+            }
+            left={() => <Icon source="piggy-bank-outline" color="#41484D" size={40} />}
+            style={styles.title_cards}
+            titleStyle={{ marginBottom: -2 }}
+            subtitleStyle={{ letterSpacing: 0.5 }}
           />
         </Card>
-        <View style={{ marginTop: 25, marginBottom: 25 }}>
-            {/* FAQ cards */}
-          <Card style={styles.cards}>
-            <Card.Title
-              title="Frequently Asked Questions"
-              subtitle="Find answers quickly:"
-              left={(props) => <Icon source="help-circle-outline" size={30} />}
-            />
-          </Card>
-          <Card style={styles.cards}>
-            <Card.Title
-              title="General FAQ"
-              subtitle="Click arrow to learn more!"
-              left={(props) => <Icon source="forum-outline" size={30} />}
-              right={(props) => <Icon source="menu-right" size={25} />}
-            />
-          </Card>
-          <Card style={styles.cards}>
-            <Card.Title
-              title="Manufacturer Coupon FAQ"
-              subtitle="Click arrow to learn more!"
-              left={(props) => <Icon source="currency-usd-off" size={30} />}
-              right={(props) => <Icon source="menu-right" size={25} />}
-            />
-          </Card>
-        </View>
+
+        {/* FAQ cards */}
+        <Card style={styles.cards}>
+          <Card.Title
+            title="Frequently Asked Questions"
+            subtitle="Find answers quickly:"
+            left={() => <Icon source="help-circle-outline" color="#41484D" size={40} />}
+            style={styles.grouped_cards}
+            titleStyle={{ marginBottom: -2 }}
+            subtitleStyle={{ letterSpacing: 0.5 }}
+          />
+          <Divider style={{ marginHorizontal: 16 }} />
+          <Card.Title
+            title="General FAQ"
+            subtitle="Click arrow to learn more!"
+            left={() => <Icon source="forum-outline" color="#41484D" size={40} />}
+            right={() => (
+              <IconButton
+                icon="menu-right"
+                iconColor="#181C20"
+                size={25}
+                onPress={() => handleLink(general_faq_url)}
+              />
+            )}
+            style={styles.grouped_cards}
+            titleStyle={{ marginBottom: -2 }}
+            subtitleStyle={{ letterSpacing: 0.5 }}
+          />
+          <Divider style={{ marginHorizontal: 16 }} />
+          <Card.Title
+            title="Manufacturer Coupon FAQ"
+            subtitle="Click arrow to learn more!"
+            left={() => <Icon source="currency-usd-off" color="#41484D" size={40} />}
+            right={() => (
+              <IconButton
+                icon="menu-right"
+                iconColor="#181C20"
+                size={25}
+                onPress={() => handleLink(coupon_faq_url)}
+              />
+            )}
+            style={styles.grouped_cards}
+            titleStyle={{ marginBottom: -2 }}
+            subtitleStyle={{ letterSpacing: 0.5 }}
+          />
+        </Card>
 
         {/* NeedyMeds website card */}
-        {/* notes: make workable link */}
-        {/* use other logo here */}
-        <Card style={styles.cards}>
+        <Card style={styles.cards} onPress={() => handleLink(nm_url)}>
           <Card.Title
             title="Visit the NeedyMeds' website for more information"
             subtitle="https://needymeds.org/"
-            left={(props) => <Image source={logo} style={{ width: 50 }} resizeMode="contain" />}
+            left={() => <Image source={v_logo} style={{ width: 40 }} resizeMode="contain" />}
+            style={styles.title_cards}
+            titleNumberOfLines={2}
+            subtitleStyle={{ textDecorationLine: 'underline', letterSpacing: 0.5 }}
           />
         </Card>
-      </View>
+      </ScrollView>
       <BottomNavBar />
     </SafeAreaView>
   );
@@ -142,7 +157,6 @@ const styles = StyleSheet.create({
     alignContent: 'space-between',
     justifyContent: 'flex-start',
   },
-
   header: {
     width: 340,
     height: 85,
@@ -150,26 +164,39 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-
-  logo: {
-    width: 80,
-  },
   drop: {
     width: 60,
     height: 30,
     alignSelf: 'center',
-
     borderColor: '#C1C7CE',
     borderWidth: 1,
     padding: 5,
     paddingLeft: 10,
     borderRadius: 8,
   },
-
+  title: {
+    textAlign: 'center',
+    fontSize: 32,
+    fontWeight: 300,
+    color: '#181C20',
+    margin: 10,
+    width: '60%',
+  },
+  description: {
+    fontSize: 14,
+    color: '#181C20',
+    margin: 10,
+  },
   cards: {
-    height: 80,
-    width: 300,
+    marginVertical: 10,
+    width: '100%',
     backgroundColor: '#F1F4F9',
+  },
+  title_cards: {
+    height: 100,
+  },
+  grouped_cards: {
+    paddingVertical: 12,
   },
 });
 
