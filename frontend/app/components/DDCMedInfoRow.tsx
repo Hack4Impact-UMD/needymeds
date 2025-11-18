@@ -38,13 +38,13 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 8,
     paddingHorizontal: 4,
-    backgroundColor: '#F7FAFE',
+    backgroundColor: 'transparent',
   },
   icon: {
-    width: 20,
-    height: 20,
+    width: 28,
+    height: 28,
     marginRight: 12,
   },
   textContainer: {
@@ -64,10 +64,12 @@ const styles = StyleSheet.create({
   },
   details: {
     marginTop: 2,
-    color: '#6C747A',
+    color: '#5D6670',
     fontSize: 13,
   },
   divider: {
-    marginTop: 4,
+    marginTop: 0,
+    height: 0,
+    backgroundColor: 'transparent',
   },
 });
