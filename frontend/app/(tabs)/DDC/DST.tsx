@@ -1,7 +1,8 @@
 import { Colors } from '@/constants/theme';
 import { StyleSheet, View } from 'react-native';
-import { Button, Text, useTheme } from 'react-native-paper';
+import { Text, useTheme } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import DDCMedInfoRow from '../../components/DDCMedInfoRow';
 
 const DST = () => {
   const theme = useTheme();
@@ -12,36 +13,11 @@ const DST = () => {
           <Text variant="headlineMedium" style={styles.title}>
             Welcome to the{'\n'}DST App!
           </Text>
-          <Text
-            variant="bodyMedium"
-            style={[styles.description, { color: theme.colors.onSurfaceVariant }]}
-          >
-            This is a dedicated app for DST users to access their services easily.
-          </Text>
+          <DDCMedInfoRow name="abreva cream" price="$35.95" details="2% / 1 tube"></DDCMedInfoRow>
         </View>
         <View style={styles.actions}>
-          <View style={styles.primaryButtonWrapper}>
-            <Button
-              mode="contained"
-              buttonColor="#236488"
-              textColor={Colors.default.neutrallt}
-              style={styles.primaryButton}
-              contentStyle={styles.primaryButtonContent}
-              labelStyle={styles.primaryButtonLabel}
-            >
-              Continue to DST Services
-            </Button>
-          </View>
-          <Text variant="bodySmall" style={styles.secondaryMessage}>
-            No sign-up or personal{'\n'}information needed
-          </Text>
-          <Text variant="bodySmall" style={styles.languageSwitcher}>
-            English <Text style={styles.languageDivider}>|</Text> Español
-          </Text>
+          <View style={styles.primaryButtonWrapper}></View>
         </View>
-        <Text variant="bodySmall" style={styles.footer}>
-          © {new Date().getFullYear()} DST App
-        </Text>
       </View>
     </SafeAreaView>
   );
