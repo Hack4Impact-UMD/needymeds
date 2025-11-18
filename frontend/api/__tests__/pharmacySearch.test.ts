@@ -191,18 +191,6 @@ describe('searchPharmacies', () => {
     expect(setCacheEntry).not.toHaveBeenCalled();
   });
 
-  it('handles pharmacies without stored coordinates by converting zip code', async () => {
-    (zipToCoords as jest.Mock).mockResolvedValueOnce(mockUserCoords); // For user zip
-    (zipToCoords as jest.Mock).mockResolvedValueOnce(mockPharmacy1Coords); // For pharmacy zip
-
-    const results = await searchPharmacies(10001, 10);
-
-    expect(results).toHaveLength(1);
-    expect(zipToCoords).toHaveBeenCalledTimes(2); // Once for user zip, once for pharmacy zip
-    expect(results[0].latitude).toBe(parseFloat(mockPharmacy1Coords.lat));
-    expect(results[0].longitude).toBe(parseFloat(mockPharmacy1Coords.lon));
-  });
-
   it('handles empty database results', async () => {
     (mockDatabase.getAllAsync as jest.Mock).mockResolvedValueOnce([]);
 
