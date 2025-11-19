@@ -7,6 +7,7 @@ import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Adjudicator, DrugSearchResult } from '../../api/types';
 import DDCMedInfoRow from '../components/DDCMedInfoRow';
+import DDCFaqScreen from './DDCFaqScreen';
 const logo = require('../assets/horizontal_logo.png');
 const backArrow = require('../assets/arrow_back.svg');
 const expandIcon = require('../assets/aspect_ratio.svg');
@@ -53,6 +54,7 @@ const DST = () => {
   };
 
   const [lang, setLang] = useState('EN');
+  const [showFAQ, setShowFAQ] = useState(false);
 
   function handleButton(item: any): void {
     if (item && item.value) setLang(item.value);
@@ -79,66 +81,76 @@ const DST = () => {
           />
         </View>
         <View style={styles.pageBody}>
-          <View style={styles.pageHeader}>
-            <View style={styles.backButton}>
-              <Pressable onPress={() => router.navigate('/selected')}>
-                <Image source={backArrow} style={styles.backIcon} resizeMode="contain" />
-              </Pressable>
-            </View>
-            <Text variant="headlineLarge" style={styles.title}>
-              Drug Discount Card
-            </Text>
-          </View>
+          {showFAQ ? (
+            <DDCFaqScreen onClose={() => setShowFAQ(false)} />
+          ) : (
+            <>
+              <View style={styles.pageHeader}>
+                <View style={styles.backButton}>
+                  <Pressable onPress={() => router.navigate('/selected')}>
+                    <Image source={backArrow} style={styles.backIcon} resizeMode="contain" />
+                  </Pressable>
+                </View>
+                <Text variant="headlineLarge" style={styles.title}>
+                  Drug Discount Card
+                </Text>
+              </View>
 
-          <View style={styles.medInfoWrapper}>
-            {/* hardcoded to match figma but chaneg later */}
-            <DDCMedInfoRow result={sampleResult} />
-          </View>
+              <View style={styles.medInfoWrapper}>
+                {/* hardcoded to match figma but chaneg later */}
+                <DDCMedInfoRow result={sampleResult} />
+              </View>
 
-          <View style={styles.cardSection}>
-            <Text variant="titleMedium" style={styles.sectionLabel}>
-              Front of Card:
-            </Text>
-            <View style={styles.cardImageWrapper}>
-              <Image
-                source={result.adjudicator === 'DSNT' ? DST_DDCCardFront : ScriptSave_DDCCardFront}
-                style={styles.cardImage}
-                resizeMode="contain"
-              />
-            </View>
-          </View>
+              <View style={styles.cardSection}>
+                <Text variant="titleMedium" style={styles.sectionLabel}>
+                  Front of Card:
+                </Text>
+                <View style={styles.cardImageWrapper}>
+                  <Image
+                    source={
+                      result.adjudicator === 'DSNT' ? DST_DDCCardFront : ScriptSave_DDCCardFront
+                    }
+                    style={styles.cardImage}
+                    resizeMode="contain"
+                  />
+                </View>
+              </View>
 
-          <View style={styles.cardSection}>
-            <Text variant="titleMedium" style={styles.sectionLabel}>
-              Back of Card:
-            </Text>
-            <View style={styles.cardImageWrapper}>
-              <Image
-                source={result.adjudicator === 'DSNT' ? DST_DDCCardBack : ScriptSave_DDCCardBack}
-                style={styles.cardImage}
-                resizeMode="contain"
-              />
-            </View>
-          </View>
+              <View style={styles.cardSection}>
+                <Text variant="titleMedium" style={styles.sectionLabel}>
+                  Back of Card:
+                </Text>
+                <View style={styles.cardImageWrapper}>
+                  <Image
+                    source={
+                      result.adjudicator === 'DSNT' ? DST_DDCCardBack : ScriptSave_DDCCardBack
+                    }
+                    style={styles.cardImage}
+                    resizeMode="contain"
+                  />
+                </View>
+              </View>
 
-          <View style={styles.actionRow}>
-            <View style={styles.actionButton}>
-              <Image source={expandIcon} style={styles.actionIcon} resizeMode="contain" />
-              <Text style={styles.buttonText}>Expand</Text>
-            </View>
-            <View style={styles.actionButton}>
-              <Image source={shareIcon} style={styles.actionIcon} resizeMode="contain" />
-              <Text style={styles.buttonText}>Share</Text>
-            </View>
-          </View>
+              <View style={styles.actionRow}>
+                <View style={styles.actionButton}>
+                  <Image source={expandIcon} style={styles.actionIcon} resizeMode="contain" />
+                  <Text style={styles.buttonText}>Expand</Text>
+                </View>
+                <View style={styles.actionButton}>
+                  <Image source={shareIcon} style={styles.actionIcon} resizeMode="contain" />
+                  <Text style={styles.buttonText}>Share</Text>
+                </View>
+              </View>
 
-          <View style={styles.footerNote}>
-            <Pressable onPress={() => router.navigate('/search')}>
-              <Text style={styles.footerQuestion}>
-                Have questions? Learn more about the Drug Discount Card here!
-              </Text>
-            </Pressable>
-          </View>
+              <View style={styles.footerNote}>
+                <Pressable onPress={() => setShowFAQ(true)}>
+                  <Text style={styles.footerQuestion}>
+                    Have questions? Learn more about the Drug Discount Card here!
+                  </Text>
+                </Pressable>
+              </View>
+            </>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -253,5 +265,6 @@ const styles = StyleSheet.create({
   footerQuestion: {
     color: '#41484D',
     textAlign: 'center',
+    textDecorationLine: 'underline',
   },
 });
