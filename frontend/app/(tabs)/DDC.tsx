@@ -1,7 +1,8 @@
 import { Colors } from '@/constants/theme';
+import { MaterialIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -55,6 +56,7 @@ const DST = () => {
 
   const [lang, setLang] = useState('EN');
   const [showFAQ, setShowFAQ] = useState(false);
+  const [showShare, setShowShare] = useState(false);
 
   function handleButton(item: any): void {
     if (item && item.value) setLang(item.value);
@@ -132,14 +134,18 @@ const DST = () => {
               </View>
 
               <View style={styles.actionRow}>
+
+                {/* Need to replace with pressables for popup pages */}
                 <View style={styles.actionButton}>
                   <Image source={expandIcon} style={styles.actionIcon} resizeMode="contain" />
                   <Text style={styles.buttonText}>Expand</Text>
                 </View>
-                <View style={styles.actionButton}>
+
+                <Pressable style={styles.actionButton} onPress={() => setShowShare(true)}>
                   <Image source={shareIcon} style={styles.actionIcon} resizeMode="contain" />
                   <Text style={styles.buttonText}>Share</Text>
-                </View>
+                </Pressable>
+
               </View>
 
               <View style={styles.footerNote}>
@@ -153,6 +159,49 @@ const DST = () => {
           )}
         </View>
       </ScrollView>
+
+      <Modal
+        transparent
+        animationType="slide"
+        visible={showShare}
+        onRequestClose={() => setShowShare(false)}
+      >
+        {/* Background overlay */}
+        <Pressable style={styles.overlay} onPress={() => setShowShare(false)} />
+
+        {/* Bottom popup container */}
+        <View style={styles.bottomSheet}>
+
+          <Pressable style={styles.closeIconContainer} onPress={() => setShowShare(false)}>
+            <MaterialIcons name="close" size={24} color="#555" />
+          </Pressable>
+
+          <Text style={styles.sheetTitle}>Share Drug Discount Card</Text>
+
+          <Text style={styles.sheetSubTitle}>Send image to:</Text>
+
+          <Pressable style={styles.sheetRow} onPress={() => {}}>
+            <MaterialIcons name="sms" size={24} color="#007AFF" />
+            <Text style={styles.sheetText}>Text</Text>
+          </Pressable>
+
+          <View style={styles.separator} />
+
+          <Pressable style={styles.sheetRow} onPress={() => {}}>
+            <MaterialIcons name="email" size={24} color="#007AFF" />
+            <Text style={styles.sheetText}>Email</Text>
+          </Pressable>
+
+          <View style={styles.separator} />
+
+          <Pressable style={styles.sheetRow} onPress={() => {}}>
+            <MaterialIcons name="file-download" size={24} color="#007AFF" />
+            <Text style={styles.sheetText}>Download to device</Text>
+          </Pressable>
+
+        </View>
+      </Modal>
+
     </SafeAreaView>
   );
 };
@@ -266,5 +315,71 @@ const styles = StyleSheet.create({
     color: '#41484D',
     textAlign: 'center',
     textDecorationLine: 'underline',
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingTop: 40,
+    backgroundColor: 'rgba(0,0,0,0.4)'
+  },
+  bottomSheet: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#FFF',
+    paddingTop: 20,
+    paddingBottom: 36,
+    paddingHorizontal: 24,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+  
+    // iOS-style drop shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+  
+    // Android elevation
+    elevation: 10,
+  },
+  sheetTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  sheetSubTitle: {
+    width: '100%',
+    fontSize: 16,
+    paddingVertical: 14,
+    textAlign: 'center',
+  },
+  sheetText: {
+    width: '100%',
+    fontSize: 16,
+    paddingVertical: 14,
+  },
+  separator: {
+    width: '100%',
+    height: 1,
+    backgroundColor: '#E5E5EA',
+  },
+  closeIconContainer: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    zIndex: 10,
+    padding: 4,
+  },
+  sheetRow: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    flexDirection: 'row',
+    gap: 12,
   },
 });

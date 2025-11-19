@@ -1,8 +1,7 @@
-import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { Surface, Text } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { usePathname } from 'expo-router';
+import { router, usePathname } from 'expo-router';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Surface, Text } from 'react-native-paper';
 
 const resourcesIcon = require('../assets/Icon.png');
 const cardIcon = require('../assets/confirmation_number.png');
@@ -24,7 +23,7 @@ const BottomNavBar = () => {
           Search
         </Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.navItem}>
+      <TouchableOpacity style={styles.navItem} onPress={() => router.push('/DDC')}>
         <Image source={cardIcon} style={{ width: 26, height: 26 }} resizeMode="contain" />
         <Text variant="labelMedium" style={styles.navLabel}>
           My Cards
