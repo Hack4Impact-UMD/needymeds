@@ -13,6 +13,19 @@ const expandIcon = require('../../assets/aspect_ratio.svg');
 const shareIcon = require('../../assets/share.svg');
 const DDCCardFront = require('../../assets/DST_DDCDetailsFront.svg');
 const DDCCardBack = require('../../assets/DST_DDCBackDetails.svg');
+
+//pass in from DrugSearchResult
+// ?
+const MOCK_MEDS = [
+  { id: '1', name: 'Atorvastatin', strength: '10 mg', price: '$4' },
+  { id: '2', name: 'Lisinopril', strength: '20 mg', price: '$6' },
+  { id: '3', name: 'Metformin', strength: '500 mg', price: '$5' },
+  { id: '4', name: 'Levothyroxine', strength: '50 mcg', price: '$8' },
+  { id: '5', name: 'Amlodipine', strength: '5 mg', price: '$7' },
+];
+
+const sample_med = MOCK_MEDS.find((m) => m.id === '3');
+
 const langOptions = [
   { label: 'EN', value: 'EN' },
   { label: 'SP', value: 'SP' },
@@ -58,6 +71,7 @@ const DST = () => {
           </View>
 
           <View style={styles.medInfoWrapper}>
+            {/* hardcoded to match figma but chaneg later */}
             <DDCMedInfoRow name="Abreva cream" price="$35.95" details="2% / 1 tube" />
           </View>
 
@@ -91,9 +105,11 @@ const DST = () => {
           </View>
 
           <View style={styles.footerNote}>
-            <Text style={styles.footerQuestion}>
-              Have questions? Learn more about the Drug Discount Card here!
-            </Text>
+            <Pressable onPress={() => router.navigate('/search')}>
+              <Text style={styles.footerQuestion}>
+                Have questions? Learn more about the Drug Discount Card here!
+              </Text>
+            </Pressable>
           </View>
         </View>
       </ScrollView>
