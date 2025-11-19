@@ -1,15 +1,14 @@
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Divider, Text } from 'react-native-paper';
+import { DrugSearchResult } from '../../api/types';
 
 const medIcon = require('../assets/healing.svg');
 
 type Props = {
-  name: string;
-  price: string;
-  details: string; // for "2% / 1 tube" (change later to whatever its supposed to bee)
+  result: DrugSearchResult;
 };
 
-export default function PharmacyRow({ name, price, details }: Props) {
+export default function PharmacyRow({ result }: Props) {
   return (
     <View>
       <Pressable style={styles.row}>
@@ -18,14 +17,12 @@ export default function PharmacyRow({ name, price, details }: Props) {
         <View style={styles.textContainer}>
           <View style={styles.topRow}>
             <Text variant="titleMedium" style={styles.name}>
-              {name}
+              {result.labelName}
             </Text>
             <Text variant="titleMedium" style={styles.price}>
-              {price}
+              {result.price}
             </Text>
           </View>
-
-          <Text style={styles.details}>{details}</Text>
         </View>
       </Pressable>
 
