@@ -181,21 +181,27 @@ const DST = () => {
           <Text style={styles.sheetSubTitle}>Send image to:</Text>
 
           <Pressable style={styles.sheetRow} onPress={() => {}}>
-            <MaterialIcons name="sms" size={24} color="#007AFF" />
+            <View style={styles.iconCircle}>
+              <MaterialIcons name="sms" size={24} color="#fff" />
+            </View>
             <Text style={styles.sheetText}>Text</Text>
           </Pressable>
 
           <View style={styles.separator} />
 
           <Pressable style={styles.sheetRow} onPress={() => {}}>
-            <MaterialIcons name="email" size={24} color="#007AFF" />
+            <View style={styles.iconCircle}>
+              <MaterialIcons name="email" size={24} color="#fff" />
+            </View>
             <Text style={styles.sheetText}>Email</Text>
           </Pressable>
 
           <View style={styles.separator} />
 
           <Pressable style={styles.sheetRow} onPress={() => {}}>
-            <MaterialIcons name="file-download" size={24} color="#007AFF" />
+            <View style={styles.iconCircle}>
+              <MaterialIcons name="file-download" size={24} color="#fff" />
+            </View>
             <Text style={styles.sheetText}>Download to device</Text>
           </Pressable>
 
@@ -381,5 +387,14 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     flexDirection: 'row',
     gap: 12,
+    paddingVertical: 10,
+  },
+  iconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,          // makes it a circle
+    backgroundColor: '#1d658c', // navy blue
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
