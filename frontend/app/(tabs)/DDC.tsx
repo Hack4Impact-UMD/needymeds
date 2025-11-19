@@ -5,14 +5,17 @@ import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { DrugSearchResult } from '../../../api/types';
-import DDCMedInfoRow from '../../components/DDCMedInfoRow';
-const logo = require('../../assets/horizontal_logo.png');
-const backArrow = require('../../assets/arrow_back.svg');
-const expandIcon = require('../../assets/aspect_ratio.svg');
-const shareIcon = require('../../assets/share.svg');
-const DDCCardFront = require('../../assets/DST_DDCDetailsFront.svg');
-const DDCCardBack = require('../../assets/DST_DDCBackDetails.svg');
+import { DrugSearchResult } from '../../api/types';
+import DDCMedInfoRow from '../components/DDCMedInfoRow';
+const logo = require('../assets/horizontal_logo.png');
+const backArrow = require('../assets/arrow_back.svg');
+const expandIcon = require('../assets/aspect_ratio.svg');
+const shareIcon = require('../assets/share.svg');
+
+const DST_DDCCardFront = require('../assets/DST_DDCDetailsFront.svg');
+const DST_DDCCardBack = require('../assets/DST_DDCBackDetails.svg');
+const ScriptSave_DDCCardFront = require('../assets/ScriptSave_DDCDetailsFront.svg');
+const ScriptSave_DDCCardBack = require('../assets/ScriptSave_DDCBackDetails.svg');
 
 //pass in from DrugSearchResult
 const sampleResult: DrugSearchResult = {
@@ -82,7 +85,7 @@ const DST = () => {
               Front of Card:
             </Text>
             <View style={styles.cardImageWrapper}>
-              <Image source={DDCCardFront} style={styles.cardImage} resizeMode="contain" />
+              <Image source={DST_DDCCardFront} style={styles.cardImage} resizeMode="contain" />
             </View>
           </View>
 
@@ -91,7 +94,7 @@ const DST = () => {
               Back of Card:
             </Text>
             <View style={styles.cardImageWrapper}>
-              <Image source={DDCCardBack} style={styles.cardImage} resizeMode="contain" />
+              <Image source={DST_DDCCardBack} style={styles.cardImage} resizeMode="contain" />
             </View>
           </View>
 
