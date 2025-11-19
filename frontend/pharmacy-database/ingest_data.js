@@ -12,11 +12,11 @@ if (!fs.existsSync(ENV_PATH)) {
 dotenv.config({ path: ENV_PATH });
 
 if (!process.env.DATASHEET_PATH) {
-  throw new Error("Missing required environment variable DATASHEET_PATH (raw dataset)");
+  throw new Error('Missing required environment variable DATASHEET_PATH (raw dataset)');
 }
 
 if (!process.env.DATABASE_URL) {
-  throw new Error("Missing required environment variable DATABASE_URL (location for database)");
+  throw new Error('Missing required environment variable DATABASE_URL (location for database)');
 }
 
 const DATASHEET_PATH = path.resolve(__dirname, process.env.DATASHEET_PATH);
@@ -74,16 +74,16 @@ function formatData(records) {
 
   const cleanString = (str) => {
     const trimmed = str?.trim();
-    return trimmed === '' ? null : trimmed ?? null;
+    return trimmed === '' ? null : (trimmed ?? null);
   };
-    
+
   const parseOptionalInt = (value) => {
     const cleaned = cleanString(value);
     if (cleaned === null) return null;
     const parsed = Number.parseInt(cleaned, 10);
     return Number.isNaN(parsed) ? null : parsed;
   };
-    
+
   const parseOptionalFloat = (value) => {
     const cleaned = cleanString(value);
     if (cleaned === null) return null;
@@ -152,7 +152,7 @@ async function loadData(db, pharmacies) {
 }
 
 async function previewData(db, limit = 5) {
-  console.log(`\nPPreview of top ${limit} rows:`);
+  console.log(`\nPreview of top ${limit} rows:`);
   const rows = await db.all(`SELECT * FROM Pharmacy LIMIT ?`, [limit]);
   console.table(rows);
 }
@@ -172,7 +172,7 @@ async function main() {
 
     console.log('Data ingestion complete!');
   } catch (error) {
-    console.error("Error occurred: ", error.message)
+    console.error('Error occurred: ', error.message);
   } finally {
     if (db) {
       await db.close();
