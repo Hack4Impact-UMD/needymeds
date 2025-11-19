@@ -36,7 +36,11 @@ const langOptions = [
   { label: 'SP', value: 'SP' },
 ];
 
-const DST = () => {
+type Props = {
+  result: DrugSearchResult;
+};
+
+const DST = ({ result }: Props) => {
   const [lang, setLang] = useState('EN');
 
   function handleButton(item: any): void {
@@ -85,7 +89,11 @@ const DST = () => {
               Front of Card:
             </Text>
             <View style={styles.cardImageWrapper}>
-              <Image source={DST_DDCCardFront} style={styles.cardImage} resizeMode="contain" />
+              <Image
+                source={result.adjudicator === 'DSNT' ? DST_DDCCardFront : ScriptSave_DDCCardFront}
+                style={styles.cardImage}
+                resizeMode="contain"
+              />
             </View>
           </View>
 
@@ -94,7 +102,11 @@ const DST = () => {
               Back of Card:
             </Text>
             <View style={styles.cardImageWrapper}>
-              <Image source={DST_DDCCardBack} style={styles.cardImage} resizeMode="contain" />
+              <Image
+                source={result.adjudicator === 'DSNT' ? DST_DDCCardBack : ScriptSave_DDCCardBack}
+                style={styles.cardImage}
+                resizeMode="contain"
+              />
             </View>
           </View>
 
