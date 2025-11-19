@@ -1,6 +1,6 @@
 /* Data */
 
-type Adjudicator = 'DSNT' | 'ScriptSave';
+export type Adjudicator = 'DSNT' | 'ScriptSave';
 
 export interface DrugSearchResult {
   adjudicator: Adjudicator;

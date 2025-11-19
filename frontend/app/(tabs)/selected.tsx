@@ -1,10 +1,27 @@
 import { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Button, Searchbar, TextInput, Provider as PaperProvider } from 'react-native-paper';
+import { StyleSheet, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
+import { Button, Provider as PaperProvider, Searchbar, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import PharmacyRow from '../components/PharmacyRow'; // adjust alias if needed
 import BottomNavBar from '../components/BottomNavBar';
+import PharmacyRow from '../components/PharmacyRow'; // adjust alias if needed
+
+import { DrugSearchResult } from '../../api/types';
+
+import { router } from 'expo-router';
+
+const sampleResult: DrugSearchResult = {
+  adjudicator: 'DSNT',
+  pharmacyName: 'CVS Pharmacy',
+  pharmacyAddress: '123 Main St, Rockville, MD 20850',
+  pharmacyPhone: '(301) 555-1293',
+  ndc: '00781-1506-01',
+  labelName: 'Amoxicillin 500mg Capsule',
+  price: '$8.42',
+  latitude: '39.0840',
+  longitude: '-77.1528',
+  distance: '1.2',
+};
 
 const SelectedScreen = () => {
   const langOptions = [
@@ -50,6 +67,24 @@ const SelectedScreen = () => {
 
   const handleSort = (e: any) => {
     setSort(e.value);
+  };
+
+  const onPharmacyPress = (result: DrugSearchResult) => {
+    router.push({
+      pathname: '/DDC',
+      params: {
+        adjudicator: result.adjudicator,
+        pharmacyName: result.pharmacyName,
+        pharmacyAddress: result.pharmacyAddress,
+        pharmacyPhone: result.pharmacyPhone,
+        ndc: result.ndc,
+        labelName: result.labelName,
+        price: result.price,
+        latitude: result.latitude,
+        longitude: result.longitude,
+        distance: result.distance,
+      },
+    });
   };
 
   return (
@@ -177,7 +212,7 @@ const SelectedScreen = () => {
               name="Walgreens"
               price="$35.93"
               distance="0.3mi"
-              onPress={() => console.log('Walgreens pressed')}
+              onPress={() => onPharmacyPress(sampleResult)}
               onCouponPress={() => console.log('Coupon for Walgreens')}
             />
             <PharmacyRow

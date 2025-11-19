@@ -1,11 +1,11 @@
 import { Colors } from '@/constants/theme';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { DrugSearchResult } from '../../api/types';
+import { Adjudicator, DrugSearchResult } from '../../api/types';
 import DDCMedInfoRow from '../components/DDCMedInfoRow';
 const logo = require('../assets/horizontal_logo.png');
 const backArrow = require('../assets/arrow_back.svg');
@@ -36,11 +36,22 @@ const langOptions = [
   { label: 'SP', value: 'SP' },
 ];
 
-type Props = {
-  result: DrugSearchResult;
-};
+const DST = () => {
+  const params = useLocalSearchParams();
 
-const DST = ({ result }: Props) => {
+  const result: DrugSearchResult = {
+    adjudicator: params.adjudicator as Adjudicator,
+    pharmacyName: params.pharmacyName as string,
+    pharmacyAddress: params.pharmacyAddress as string,
+    pharmacyPhone: params.pharmacyPhone as string,
+    ndc: params.ndc as string,
+    labelName: params.labelName as string,
+    price: params.price as string,
+    latitude: params.latitude as string,
+    longitude: params.longitude as string,
+    distance: params.distance as string,
+  };
+
   const [lang, setLang] = useState('EN');
 
   function handleButton(item: any): void {
