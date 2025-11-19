@@ -4,26 +4,13 @@ import { router } from 'expo-router';
 
 import { Image, Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Card, Divider, Icon, IconButton } from 'react-native-paper';
-import { Dropdown } from 'react-native-element-dropdown';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BottomNavBar from '../components/BottomNavBar';
-const h_logo = require('../assets/horizontal_logo.png');
+import Header from '../components/Header';
 const v_logo = require('../assets/vertical_logo.png');
 
 const EducationScreen = () => {
-  // language dropdown
-  const langOptions = [
-    { label: 'EN', value: 'EN' },
-    { label: 'SP', value: 'SP' },
-  ];
-  const [lang, setLang] = useState('EN');
-
-  const handleLang = (e: any) => {
-    setLang(e.value);
-    console.log(lang);
-  };
-
   const general_faq_url = 'https://needymeds.org/faq';
   const coupon_faq_url = 'https://www.needymeds.org/copay-cards-faqs';
   const nm_url = 'https://needymeds.org/';
@@ -36,29 +23,13 @@ const EducationScreen = () => {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
         {/* HEADER */}
-        <View style={styles.header}>
-          <Image source={h_logo} style={{ width: 80 }} resizeMode="contain" />
-          <Dropdown
-            placeholder="EN"
-            value={lang}
-            labelField="label"
-            valueField="value"
-            data={langOptions}
-            onChange={handleLang}
-            style={styles.drop}
-            dropdownPosition="bottom"
-            placeholderStyle={{ color: '#41484D', fontWeight: 500 }}
-            itemTextStyle={{ color: '#41484D' }}
-            itemContainerStyle={{}}
-            searchPlaceholderTextColor="#41484D"
-          />
-        </View>
+        <Header />
 
         {/* TITLE */}
-        <Text style={styles.title}>Educational Resources</Text>
+        <Text style={styles.title}>Educational{'\n'}Resources</Text>
 
         {/* description + left icon */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 20 }}>
+        <View style={styles.subtitle}>
           <Icon source="book-open-page-variant-outline" color="#41484D" size={30} />
           <Text style={styles.description}>
             Learn more about frequently asked questions, prescription savings tips, and more
@@ -150,12 +121,8 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    paddingHorizontal: 32,
-    paddingTop: 24,
-    paddingBottom: 32,
-    alignItems: 'center',
-    alignContent: 'space-between',
-    justifyContent: 'flex-start',
+    paddingHorizontal: 20,
+    paddingVertical: 20,
   },
   header: {
     width: 340,
@@ -164,23 +131,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  drop: {
-    width: 60,
-    height: 30,
-    alignSelf: 'center',
-    borderColor: '#C1C7CE',
-    borderWidth: 1,
-    padding: 5,
-    paddingLeft: 10,
-    borderRadius: 8,
-  },
   title: {
     textAlign: 'center',
     fontSize: 32,
     fontWeight: 300,
     color: '#181C20',
     margin: 10,
-    width: '60%',
+  },
+  subtitle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 20,
   },
   description: {
     fontSize: 14,

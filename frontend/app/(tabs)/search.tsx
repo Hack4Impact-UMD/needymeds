@@ -1,21 +1,14 @@
 import { useMemo, useState } from 'react';
-import {
-  View,
-  TextInput,
-  TouchableOpacity,
-  FlatList,
-  StyleSheet,
-  Platform,
-  Image,
-} from 'react-native';
+import { View, TextInput, TouchableOpacity, FlatList, StyleSheet, Platform } from 'react-native';
 import { Text, TouchableRipple } from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { Dropdown } from 'react-native-element-dropdown';
-import { SafeAreaView } from 'react-native-safe-area-context';
+
 import HomeBackgroundShape from '../components/HomeBackgroundShape';
 import BottomNavBar from '../components/BottomNavBar';
-const logo = require('../assets/horizontal_logo.png');
+import Header from '../components/Header';
 
 const MOCK_MEDS = [
   { id: '1', name: 'Atorvastatin', strength: '10 mg', price: '$4' },
@@ -23,11 +16,6 @@ const MOCK_MEDS = [
   { id: '3', name: 'Metformin', strength: '500 mg', price: '$5' },
   { id: '4', name: 'Levothyroxine', strength: '50 mcg', price: '$8' },
   { id: '5', name: 'Amlodipine', strength: '5 mg', price: '$7' },
-];
-
-const langOptions = [
-  { label: 'EN', value: 'EN' },
-  { label: 'SP', value: 'SP' },
 ];
 
 const SearchScreen = () => {
@@ -48,40 +36,12 @@ const SearchScreen = () => {
     }
   };
 
-  const [lang, setLang] = useState('EN');
-  function handleButton(item: any): void {
-    if (item && item.value) setLang(item.value);
-  }
-
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
         <HomeBackgroundShape top={200} height={800} color="#226488" />
 
-        {/* header area */}
-        <View style={styles.headerRow}>
-          <View>
-            <Image source={logo} style={styles.logoImage} resizeMode="contain" />
-          </View>
-          <Dropdown
-            placeholder="EN"
-            value={lang}
-            labelField="label"
-            valueField="value"
-            data={langOptions}
-            onChange={handleButton}
-            style={{
-              width: 60,
-              borderColor: '#C1C7CE',
-              borderWidth: 1,
-              padding: 5,
-              paddingLeft: 10,
-              borderRadius: 10,
-            }}
-            placeholderStyle={{ color: '#41484D' }}
-            itemTextStyle={{ color: '#41484D' }}
-          />
-        </View>
+        <Header />
 
         {/* promo area */}
         <View style={styles.promoWrap}>

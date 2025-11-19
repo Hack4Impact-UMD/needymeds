@@ -1,13 +1,11 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Image } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
-import { Appbar, Icon } from 'react-native-paper';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { Icon } from 'react-native-paper';
 
 import { router } from 'expo-router';
 
 import BottomNavBar from '../components/BottomNavBar';
-
-const logo = require('../assets/horizontal_logo.png');
+import Header from '../components/Header';
 
 const DATA = [
   {
@@ -52,43 +50,24 @@ const DATA = [
   },
 ];
 
-const langOptions = [
-  { label: 'EN', value: 'EN' },
-  { label: 'SP', value: 'SP' },
-];
-
 export default function Tips() {
   const [open, setOpen] = useState<number | null>(null);
-  const [lang, setLang] = useState('EN');
-  function handleButton(item: any): void {
-    if (item && item.value) setLang(item.value);
-  }
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerRow}>
-        <View>
-          <Image source={logo} style={styles.logoImage} resizeMode="contain" />
-        </View>
-        <Dropdown
-          placeholder="EN"
-          value={lang}
-          labelField="label"
-          valueField="value"
-          data={langOptions}
-          onChange={handleButton}
-          style={styles.dropdown}
-          placeholderStyle={{ color: '#41484D' }}
-          itemTextStyle={{ color: '#41484D' }}
-        />
-      </View>
-      <Appbar.Header mode="small" style={styles.header}>
-        <Appbar.Action icon="arrow-left" onPress={() => router.push('/(tabs)/education')} />
-        <Appbar.Content title="" />
-      </Appbar.Header>
+      <Header />
       <BottomNavBar />
+
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title}>Prescription{'\n'}Savings Tips</Text>
+        <View style={styles.heading}>
+          <TouchableOpacity
+            onPress={() => router.push('/(tabs)/education')}
+            style={styles.backButton}
+          >
+            <Icon source="arrow-left" size={28} color="#41484D" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Prescription{'\n'}Savings Tips</Text>
+        </View>
 
         <View style={styles.introRow}>
           <Icon source="medical-cotton-swab" color="#41484D" size={30} />
@@ -141,8 +120,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    paddingRight: 5,
-    paddingLeft: 5,
+    paddingHorizontal: 20,
     paddingBottom: 68,
     fontFamily: 'Nunito Sans',
     backgroundColor: '#F6FAFE',
@@ -151,20 +129,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#F6FAFE',
     elevation: 0,
   },
-  dropdown: {
-    width: 60,
-    height: 30,
-    borderColor: '#C1C7CE',
-    borderWidth: 1,
-    padding: 5,
-    paddingLeft: 10,
-    borderRadius: 8,
-    marginRight: 20,
-  },
   content: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 16,
+    paddingVertical: 8,
+  },
+  heading: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 10,
   },
   title: {
     textAlign: 'center',
@@ -172,7 +143,10 @@ const styles = StyleSheet.create({
     lineHeight: 34,
     fontWeight: 300,
     color: '#181C20',
-    margin: 10,
+  },
+  backButton: {
+    position: 'absolute',
+    left: 0,
   },
   introRow: {
     marginVertical: 20,
