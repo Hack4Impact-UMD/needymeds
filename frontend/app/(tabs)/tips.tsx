@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { Icon } from 'react-native-paper';
 
 import { router } from 'expo-router';
@@ -12,16 +12,16 @@ const DATA = [
     title: '1. Check for savings programs.',
     body: [
       'Look up:',
-      'NeedyMeds Drug Discount Card (DDC)> \n      Save up to 80% at participating pharmacies nationwide.',
-      'Patient Assistance Programs (PAPs) \n      Offered by manufacturers to provide free or low-cost medications to eligible patients.',
-      'Coupons & Rebates \n      May lower your out-of-pocket cost at the pharmacy.',
-      'Direct-to-Consumer (DTC) Pricing \n      See which pharmacies offer transparent, discounted cash prices.',
+      'NeedyMeds Drug Discount Card (DDC) - Save up to 80% at participating pharmacies nationwide.',
+      'Patient Assistance Programs (PAPs) - Offered by manufacturers to provide free or low-cost medications to eligible patients.',
+      'Coupons & Rebates - May lower your out-of-pocket cost at the pharmacy.',
+      'Direct-to-Consumer (DTC) Pricing - See which pharmacies offer transparent, discounted cash prices.',
     ],
   },
   {
     title: '2. Shop around — pharmacy prices can vary!',
     body: [
-      'Even with the NeedyMeds Drug Discount Card, different pharmacies may offer different prices. Use our free tool to compare prices before filling your prescription.',
+      'Even with the NeedyMeds Drug Discount Card, different pharmacies may offer different prices. Use our free tool to compare prices before you fill your prescription.',
     ],
   },
   {
@@ -81,18 +81,24 @@ export default function Tips() {
           const isOpen = open === idx;
           return (
             <View key={idx} style={styles.card}>
-              <TouchableOpacity onPress={() => setOpen(isOpen ? null : idx)} style={styles.row}>
+              <Pressable onPress={() => setOpen(isOpen ? null : idx)} style={styles.row}>
                 <Text style={styles.rowTitle}>{item.title}</Text>
-                <Icon source={isOpen ? 'chevron-up' : 'chevron-down'} size={20} color="#374151" />
-              </TouchableOpacity>
+                <Icon source={isOpen ? 'menu-up' : 'menu-down'} size={20} color="#181C20" />
+              </Pressable>
 
               {isOpen && (
                 <View style={styles.body}>
-                  {item.body.map((line, i) => (
-                    <Text key={i} style={styles.line}>
-                      • {line}
-                    </Text>
-                  ))}
+                  {item.body.map((line, i) => {
+                    const isBullet = idx === 0 && i > 0; // bulleted only if it's in the first section AND after the "Look up:" line
+
+                    // \u2022 is the bullet unicode
+                    return (
+                      <View key={i} style={styles.bulletRow}>
+                        {isBullet && <Text style={styles.bullet}>{'\u2022'}</Text>}
+                        <Text style={[styles.line, isBullet && { flex: 1 }]}>{line}</Text>
+                      </View>
+                    );
+                  })}
                 </View>
               )}
             </View>
@@ -149,17 +155,16 @@ const styles = StyleSheet.create({
     left: 0,
   },
   introRow: {
-    marginVertical: 20,
+    marginVertical: 22,
     flexDirection: 'row',
-    gap: 10,
+    gap: 15,
     alignItems: 'center',
-    marginBottom: 10,
   },
   intro: {
     flex: 1,
     fontSize: 15,
     lineHeight: 22,
-    color: '#374151',
+    color: '#181C20',
   },
   card: {
     borderRadius: 12,
@@ -175,7 +180,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: 400,
-    color: '#111827',
+    color: '#181C20',
   },
   body: {
     marginTop: 8,
@@ -183,7 +188,18 @@ const styles = StyleSheet.create({
   },
   line: {
     fontSize: 15,
-    color: '#374151',
+    color: '#181C20',
     lineHeight: 22,
+  },
+  bulletRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 6,
+  },
+  bullet: {
+    fontSize: 20,
+    lineHeight: 16,
+    color: '#181C20',
+    marginTop: 2,
   },
 });

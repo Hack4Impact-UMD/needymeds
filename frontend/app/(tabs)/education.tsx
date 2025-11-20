@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { router } from 'expo-router';
 
 import { Image, Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -142,15 +140,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: 20,
+    margin: 12,
+    paddingBottom: 20,
   },
   description: {
     fontSize: 14,
     color: '#181C20',
-    margin: 10,
+    paddingLeft: 15,
   },
   cards: {
-    marginVertical: 10,
+    marginVertical: 8,
     width: '100%',
     backgroundColor: '#F1F4F9',
   },

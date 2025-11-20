@@ -1,13 +1,13 @@
-import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Icon, Surface, Text } from 'react-native-paper';
 import { usePathname, useRouter } from 'expo-router';
 
-const BG = '#EEF2F6';
-const ICON_ACTIVE_BG = '#D7F1FF';
-// const ICON = "#0F5561";
-const LABEL = '#6B7280';
-const LABEL_ACTIVE = '#111827';
-const BORDER = '#E5E7EB';
+const BG = '#EBEEF3';
+const ICON_ACTIVE_BG = '#B6EBFF';
+const ICON = '#004E60';
+const LABEL = '#41484D';
+const LABEL_ACTIVE = '#181C20';
+const BORDER = '#EBEEF3';
 
 export default function BottomNavBar() {
   const pathname = usePathname();
@@ -24,7 +24,7 @@ export default function BottomNavBar() {
         onPress={() => router.push('/(tabs)/search')}
       >
         <View style={isActive('/search') ? styles.iconPill : styles.iconWrap}>
-          <Icon source="medication-outline" color="#004E60" size={30} />
+          <Icon source="medication-outline" color={ICON} size={30} />
         </View>
         <Text
           variant="labelMedium"
@@ -41,7 +41,7 @@ export default function BottomNavBar() {
         onPress={() => router.push('/(tabs)/welcome')}
       >
         <View style={isActive('/welcome') ? styles.iconPill : styles.iconWrap}>
-          <Icon source="store-plus-outline" color="#004E60" size={30} />
+          <Icon source="store-plus-outline" color={ICON} size={30} />
         </View>
         <Text
           variant="labelMedium"
@@ -58,7 +58,7 @@ export default function BottomNavBar() {
         onPress={() => router.push('/(tabs)/education')}
       >
         <View style={isActive('/education') ? styles.iconPill : styles.iconWrap}>
-          <Image source={require('../assets/resource.png')} style={{ width: 25, height: 25 }} />
+          <Icon source="library" color={ICON} size={30} />
         </View>
         <Text
           variant="labelMedium"
@@ -83,10 +83,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 6,
     paddingBottom: 12, // room above the device edge
-    borderTopWidth: 1,
+    borderTopWidth: 4,
     borderTopColor: BORDER,
-    borderTopLeftRadius: 18,
-    borderTopRightRadius: 18,
   },
   navItem: {
     alignItems: 'center',
@@ -101,8 +99,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconPill: {
-    width: 36,
-    height: 36,
+    width: 64,
+    height: 32,
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',

@@ -6,7 +6,7 @@ const h_logo = require('../assets/horizontal_logo.png');
 
 const langOptions = [
   { label: 'EN', value: 'EN' },
-  { label: 'SP', value: 'SP' },
+  { label: 'ES', value: 'ES' },
 ];
 
 export default function Header() {
