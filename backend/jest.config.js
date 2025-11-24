@@ -1,10 +1,6 @@
-export default {
-  preset: 'ts-jest/presets/default-esm',
+module.exports = {
+  preset: 'ts-jest',
   testEnvironment: 'node',
-  extensionsToTreatAsEsm: ['.ts'],
-  globals: {
-    'ts-jest': {
-      useESM: true,
-    },
-  },
+  testMatch: ['**/src/**/*.test.ts'],
+  setupFiles: ['./jest.setup.js'],
 };

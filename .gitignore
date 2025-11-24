@@ -40,3 +40,7 @@ app-example
 # generated native folders
 /ios
 /android
+
+.env
+
+./google-play-service-account.json
