@@ -1,38 +1,38 @@
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
 type Props = {
   top?: number;
-  height?: number;
+  maxHeight?: number;
   color?: string;
   translateY?: number;
+  maxWidth?: number;
 };
 
 export default function HomeBackgroundShape({
-  top = 160,
-  height = 320,
+  top = 50,
+  maxHeight,
   color = '#226488',
-  translateY = 0,
+  translateY = 30,
+  maxWidth,
 }: Props) {
-  const circleWidth = width * 1.35;      
-  const radius = circleWidth;           
+  const containerWidth = maxWidth || width;
+  const circleWidth = containerWidth * 0.85;
+  const radius = circleWidth;
 
   return (
-    <View
-      pointerEvents="none"
-      style={[styles.wrap, { top }]}
-    >
+    <View pointerEvents="none" style={[styles.wrap, { top, maxWidth: maxWidth }]}>
       <View
         style={{
           width: circleWidth,
-          height,
+          height: maxHeight ?? Math.round(circleWidth * 0.5),
           backgroundColor: color,
           borderTopLeftRadius: radius,
           borderTopRightRadius: radius,
           transform: [
-            { scaleX: 1.05 },            // wide
-            { translateY: 30 },              // arc up/down 
+            { scaleX: 1.05 }, // wide
+            { translateY }, // arc up/down, controlled by prop
           ],
         }}
       />
@@ -46,6 +46,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: 'center',
-    zIndex: -1, 
+    zIndex: -1,
   },
 });
