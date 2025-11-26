@@ -38,14 +38,14 @@ export default function BottomNavBar() {
       <TouchableOpacity
         style={styles.navItem}
         activeOpacity={0.9}
-        onPress={() => router.push('/(tabs)/welcome')}
+        onPress={() => router.push('/(tabs)/paramstyping')}
       >
-        <View style={isActive('/welcome') ? styles.iconPill : styles.iconWrap}>
+        <View style={isActive('/paramstyping') ? styles.iconPill : styles.iconWrap}>
           <Icon source="store-plus-outline" color={ICON} size={30} />
         </View>
         <Text
           variant="labelMedium"
-          style={[styles.navLabel, isActive('/search') && styles.navLabelActive]}
+          style={[styles.navLabel, isActive('/paramstyping') && styles.navLabelActive]}
         >
           Pharmacies
         </Text>
