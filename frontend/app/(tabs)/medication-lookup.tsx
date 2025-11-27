@@ -75,7 +75,7 @@ const MedicationLookupScreen = () => {
             <View style={styles.inputWrap}>
               <Text style={styles.inputPlaceholder}>Search for a drug</Text>
               <View style={styles.searchIcon}>
-                <MaterialCommunityIcons name="magnify" size={20} color="#6B7280" />
+                <MaterialCommunityIcons name="magnify" size={20} color="#41484D" />
               </View>
             </View>
           </TouchableOpacity>
@@ -92,7 +92,7 @@ const MedicationLookupScreen = () => {
           >
             <View style={styles.eligibleInner}>
               <View style={styles.eligibleIconCircle}>
-                <MaterialCommunityIcons name="information-outline" size={14} color="white" />
+                <MaterialCommunityIcons name="information-outline" size={17} color="white" />
               </View>
               <Text style={styles.eligibleText}>What is eligible?</Text>
             </View>
@@ -222,8 +222,8 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   promoSubtitle: {
-    fontSize: 16,
-    fontFamily: 'Nunito Sans',
+    fontSize: 14.5,
+    fontFamily: 'Open Sans',
     color: '#41484D',
     marginTop: 4,
     fontWeight: '400',
@@ -243,21 +243,19 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 16,
     borderRadius: 28,
-    backgroundColor: '#fff',
+    backgroundColor: '#E5E8ED',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    borderWidth: 1,
-    borderColor: '#E5E8ED',
     minHeight: 48,
   },
   inputPlaceholder: {
     flex: 1,
-    fontSize: 16,
-    color: '#9aa0a6',
-    fontFamily: 'Nunito Sans',
+    fontSize: 14.5,
+    color: '#41484D',
+    fontFamily: 'Open Sans',
   },
   searchIcon: {
     padding: 4,
@@ -273,18 +271,17 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   eligibleIconCircle: {
-    width: 20,
-    height: 20,
+    width: 17,
+    height: 17,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
   },
   eligibleText: {
-    color: '#6E9FC0',
+    color: 'white',
     textDecorationLine: 'underline',
     fontSize: 14,
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
     fontWeight: '400',
   },
 

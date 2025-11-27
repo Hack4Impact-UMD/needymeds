@@ -9,6 +9,9 @@ const cardIcon = require('../assets/confirmation_number.png');
 const BottomNavBar = () => {
   const pathname = usePathname();
   const isMedicationLookupActive = pathname.includes('medication-lookup') || pathname === '/(tabs)';
+  const isPharmacyLookupActive = pathname.includes('pharmacy-lookup') || pathname === '/(tabs)';
+  const isEducationalResourcesActive =
+    pathname.includes('educational-resources') || pathname === '/(tabs)';
 
   return (
     <View style={styles.mobileWrapper}>
@@ -18,11 +21,11 @@ const BottomNavBar = () => {
           activeOpacity={0.85}
           onPress={() => router.push('medication-lookup')}
         >
-          <View style={isMedicationLookupActive ? styles.navActiveContainer : undefined}>
+          <View>
             <MaterialCommunityIcons
-              name="pill"
+              name={isMedicationLookupActive ? 'medication' : 'medication-outline'}
               size={24}
-              color={isMedicationLookupActive ? '#236488' : '#6B7280'}
+              color="#004E60"
             />
           </View>
           <Text
@@ -32,14 +35,30 @@ const BottomNavBar = () => {
             Drug Prices
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} activeOpacity={0.85}>
-          <MaterialCommunityIcons name="hospital-building" size={24} color="#6B7280" />
+        <TouchableOpacity
+          style={styles.navItem}
+          activeOpacity={0.85}
+          onPress={() => router.push('pharmacy-lookup')}
+        >
+          <MaterialCommunityIcons
+            name={isPharmacyLookupActive ? 'store' : 'store-outline'}
+            size={24}
+            color="#004E60"
+          />
           <Text variant="labelMedium" style={styles.navLabel}>
             Pharmacies
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} activeOpacity={0.85}>
-          <MaterialCommunityIcons name="book-open-variant" size={24} color="#6B7280" />
+        <TouchableOpacity
+          style={styles.navItem}
+          activeOpacity={0.85}
+          onPress={() => router.push('educational-resources')}
+        >
+          <MaterialCommunityIcons
+            name={isEducationalResourcesActive ? 'library' : 'library-outline'}
+            size={24}
+            color="#004E60"
+          />
           <Text variant="labelMedium" style={styles.navLabel}>
             Resources
           </Text>
@@ -86,15 +105,6 @@ const styles = StyleSheet.create({
   navLabelActive: {
     color: '#111827',
     fontWeight: '600',
-  },
-  navActiveContainer: {
-    width: 56,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#E0F2FE',
-    marginBottom: 2,
   },
 });
 
