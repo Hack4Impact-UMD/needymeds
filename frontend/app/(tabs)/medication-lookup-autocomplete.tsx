@@ -1,109 +1,23 @@
+import { autoCompleteSearchDrug } from '@/api/drugSearch';
 import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FlatList, Keyboard, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomNavBar from '../components/BottomNavBar';
 import { SearchBar } from '../components/SearchBar';
-const logo = require('../assets/horizontal_logo.png');
-
-const MOCK_MEDS = [
-  {
-    id: '1',
-    name: 'Abraxane injectable suspension',
-    genericName: 'paclitaxel protein-bound particles injectable',
-    strength: '100 mg/vial',
-    price: '$450',
-  },
-  {
-    id: '2',
-    name: 'Abreva cream 2%',
-    genericName: 'docosanol',
-    strength: '2% topical',
-    price: '$18',
-  },
-  {
-    id: '3',
-    name: 'Abrilada injection',
-    genericName: 'adalimumab-afzb injection',
-    strength: '40 mg/0.8 mL',
-    price: '$850',
-  },
-  {
-    id: '4',
-    name: 'Abryxvo solution',
-    genericName: 'respiratory syncytial virus vaccine solution',
-    strength: '1 dose',
-    price: '$295',
-  },
-  {
-    id: '5',
-    name: 'BACKAID Max caplet',
-    genericName: 'acetaminophen paracetamol caplet',
-    strength: '500 mg',
-    price: '$12',
-  },
-  {
-    id: '6',
-    name: 'Calquence',
-    genericName: 'n/a',
-    strength: '100 mg',
-    price: '$680',
-  },
-  {
-    id: '7',
-    name: 'Cibinqo tablet',
-    genericName: 'abrocitinib tablet',
-    strength: '50 mg',
-    price: '$425',
-  },
-  {
-    id: '8',
-    name: 'Corlanor',
-    genericName: 'ivabradine',
-    strength: '5 mg',
-    price: '$560',
-  },
-  {
-    id: '9',
-    name: 'Diurex Max caplets',
-    genericName: 'pamabrom',
-    strength: '50 mg',
-    price: '$9',
-  },
-  {
-    id: '10',
-    name: 'Atorvastatin',
-    genericName: 'atorvastatin calcium',
-    strength: '10 mg',
-    price: '$4',
-  },
-  {
-    id: '11',
-    name: 'Lisinopril',
-    genericName: 'lisinopril',
-    strength: '20 mg',
-    price: '$6',
-  },
-  {
-    id: '12',
-    name: 'Metformin',
-    genericName: 'metformin hydrochloride',
-    strength: '500 mg',
-    price: '$5',
-  },
-];
 
 const langOptions = [
   { label: 'EN', value: 'EN' },
   { label: 'SP', value: 'SP' },
 ];
 
-const SelectedScreen = () => {
+const MedicationLookupAutocompleteScreen = () => {
   const [query, setQuery] = useState('');
+  const [results, setResults] = useState<string[]>([]);
   const [lang, setLang] = useState('EN');
   const inputRef = useRef<TextInput>(null);
 
@@ -114,25 +28,32 @@ const SelectedScreen = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const results = useMemo(() => {
+  useEffect(() => {
+    const fetchAutoCompleteDrugNames = async (q: string) => {
+      try {
+        const autoCompleteDrugNames: string[] = await autoCompleteSearchDrug(q);
+        setResults(autoCompleteDrugNames);
+      } catch (error: any) {
+        console.log(error);
+        // TODO: Set error state
+      }
+    };
+
     const q = query.trim().toLowerCase();
-    if (q.length < 1) return [];
-    return MOCK_MEDS.filter(
-      (m) => m.name.toLowerCase().includes(q) || m.genericName.toLowerCase().includes(q)
-    );
+    if (q.length < 3) {
+      setResults([]);
+    } else {
+      fetchAutoCompleteDrugNames(q);
+    }
   }, [query]);
 
-  const handleSelectMed = (item: (typeof MOCK_MEDS)[0]) => {
+  const handleSelectMed = (item: string) => {
     Keyboard.dismiss();
     // Navigate to selected medication details with params
     router.push({
-      pathname: '/pharmacy-search',
+      pathname: '/medication-lookup-selected',
       params: {
-        id: item.id,
-        name: item.name,
-        genericName: item.genericName,
-        strength: item.strength,
-        price: item.price,
+        drugName: item,
       },
     });
   };
@@ -193,7 +114,7 @@ const SelectedScreen = () => {
               // Show results list
               <FlatList
                 data={results}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item}
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}
                 renderItem={({ item }) => (
@@ -203,10 +124,7 @@ const SelectedScreen = () => {
                     activeOpacity={0.7}
                   >
                     <View style={styles.resultContent}>
-                      <Text style={styles.resultName}>{item.name}</Text>
-                      {item.genericName !== 'n/a' && (
-                        <Text style={styles.resultGeneric}>/ {item.genericName}</Text>
-                      )}
+                      <Text style={styles.resultName}>{item}</Text>
                     </View>
                     <MaterialCommunityIcons name="chevron-right" size={20} color="#9CA3AF" />
                   </TouchableOpacity>
@@ -226,6 +144,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: Colors.default.neutrallt,
+    margin: 0,
   },
   wrapper: {
     flex: 1,
@@ -273,27 +192,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  searchBar: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#DBD6DF',
-    borderRadius: 30,
-    paddingHorizontal: 20,
-    paddingVertical: 1,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: '#111827',
-    paddingVertical: 12,
-    fontFamily: 'Nunito Sans',
-    width: 255,
-  },
-  clearButton: {
-    padding: 4,
-    marginLeft: 4,
-  },
   resultsContainer: {
     flex: 1,
     backgroundColor: '#F6FAFE',
@@ -339,13 +237,6 @@ const styles = StyleSheet.create({
     color: '#111827',
     lineHeight: 22,
   },
-  resultGeneric: {
-    fontSize: 13,
-    fontFamily: 'Nunito Sans',
-    color: '#6B7280',
-    marginTop: 2,
-    lineHeight: 18,
-  },
 });
 
-export default SelectedScreen;
+export default MedicationLookupAutocompleteScreen;

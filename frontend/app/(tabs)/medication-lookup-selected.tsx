@@ -1,8 +1,8 @@
+import getUserLocation from '@/api/userLocation';
 import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
-import * as ExpoLocation from 'expo-location';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Image,
@@ -20,9 +20,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomNavBar from '../components/BottomNavBar';
 import { SearchBar } from '../components/SearchBar';
 
-type PaperInputRef = React.ComponentRef<typeof TextInput>;
-
-interface PharmacySearchScreenProps {
+interface MedicationLookupSelectedScreenProps {
   medicationName: string;
   genericName: string;
   strength: string;
@@ -41,12 +39,9 @@ interface Pharmacy {
   label?: string;
 }
 
-const formOptions = [
-  { label: 'tube', value: 'tube' },
-  { label: 'cream', value: 'cream' },
-  { label: 'ointment', value: 'ointment' },
-  { label: 'gel', value: 'gel' },
-];
+const [formOptions, setFormOptions] = useState([]);
+
+useEffect(() => {});
 
 const langOptions = [
   { label: 'EN', value: 'EN' },
@@ -58,7 +53,7 @@ const sortOptions = [
   { label: 'Distance', value: 'distance' },
 ];
 
-const PharmacySearchScreen: React.FC<PharmacySearchScreenProps> = ({
+const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenProps> = ({
   medicationName,
   genericName,
   strength,
@@ -124,36 +119,9 @@ const PharmacySearchScreen: React.FC<PharmacySearchScreenProps> = ({
   const detectZipFromLocation = async () => {
     if (detectingZip) return;
     try {
-      setDetectingZip(true);
-      const { status } = await ExpoLocation.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Location', 'Location permission denied');
-        return;
-      }
-      const pos = await ExpoLocation.getCurrentPositionAsync({
-        accuracy: ExpoLocation.Accuracy.Highest,
-      });
-      const { latitude, longitude } = pos.coords;
-
-      // Try expo reverse geocode first
-      const rev = await ExpoLocation.reverseGeocodeAsync({ latitude, longitude });
-      const postcode = rev && rev[0]?.postalCode;
-      if (postcode) {
-        setZipCode(postcode.toString());
-        return;
-      }
-      try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`
-        );
-        const json = await res.json();
-        const nomPostcode = json?.address?.postcode;
-        if (nomPostcode) {
-          setZipCode(nomPostcode.toString());
-          return;
-        }
-      } catch {}
-      Alert.alert('Location', 'Could not determine ZIP code from your location');
+      const userLocationResult = await getUserLocation();
+      setZipCode(userLocationResult.userZipCode);
+      return;
     } catch (err) {
       Alert.alert('Location', 'Error detecting location');
     } finally {
@@ -540,6 +508,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   formField: {
+    flexDirection: 'column',
     flex: 1,
   },
   label: {
@@ -974,4 +943,4 @@ const styles = StyleSheet.create({
     gap: 4,
   },
 });
-export default PharmacySearchScreen;
+export default MedicationLookupSelectedScreen;

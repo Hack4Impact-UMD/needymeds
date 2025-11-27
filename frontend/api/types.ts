@@ -45,6 +45,12 @@ export interface DsntPriceNpiRequest {
   zipCode?: string;
 }
 
+export interface ScriptSaveAutoCompleteRequest {
+  prefixText: string;
+  groupID: string;
+  count?: string;
+}
+
 export interface ScriptSaveFindDrugsRequest {
   groupID: string;
   brandIndicator?: string;
@@ -55,6 +61,11 @@ export interface ScriptSaveFindDrugsRequest {
   numPharm?: string;
   zipCode?: string;
   useUC?: string;
+}
+
+export interface ScriptSaveGetDrugFormStrengthRequest {
+  groupID: string;
+  gsn: string;
 }
 
 export interface ScriptSavePriceRequest {
@@ -89,6 +100,14 @@ export interface DsntDrugPricingItem {
 
 export type DsntPriceNpiResponse = DsntPriceResponse;
 
+export interface ScriptSaveAutoCompleteResponse {
+  DrugNames: ScriptSaveAutoCompleteItem[];
+}
+
+export interface ScriptSaveAutoCompleteItem {
+  DrugName: string;
+}
+
 export interface ScriptSaveFindDrugsResponse {
   Drugs: ScriptSaveDrugItem[];
 }
@@ -121,6 +140,42 @@ export interface ScriptSaveDrugItem {
   GroupNum: string;
   GSN: string;
   Splittable: string;
+}
+
+export interface ScriptSaveGetDrugFormStrengthResponse {
+  DrugName: string;
+  BrandGeneric: string;
+  Forms: ScriptSaveDrugForm[];
+  Strengths: ScriptSaveDrugStrength[];
+  Quantities: ScriptSaveDrugQuantity[];
+}
+
+export interface ScriptSaveDrugForm {
+  GSN: string;
+  Form: string;
+  Ranking: string;
+  IsSelected: string;
+  LN: string;
+  CommonQty: string;
+  IsDiscontinued: string;
+  DiscontinuedDate: string;
+}
+
+export interface ScriptSaveDrugStrength {
+  GSN: string;
+  Strength: string;
+  Ranking: string;
+  IsSelected: string;
+  LN: string;
+  CommonQty: string;
+}
+
+export interface ScriptSaveDrugQuantity {
+  GSN: string;
+  Quantity: string;
+  QuantityLabel: string;
+  Ranking: string;
+  IsSelected: string;
 }
 
 export interface ScriptSavePriceResponse {

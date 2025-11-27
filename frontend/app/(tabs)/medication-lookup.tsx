@@ -24,13 +24,13 @@ const langOptions = [
   { label: 'SP', value: 'SP' },
 ];
 
-const SearchScreen = () => {
+const MedicationLookupScreen = () => {
   const [showEligibilityModal, setShowEligibilityModal] = useState(false);
   const [lang, setLang] = useState('EN');
 
   // Navigate to full-page autocomplete when input is focused
   const handleSearchPress = () => {
-    router.push('/selected');
+    router.push('/medication-lookup-autocomplete');
   };
 
   function handleButton(item: any): void {
@@ -81,7 +81,7 @@ const SearchScreen = () => {
           </TouchableOpacity>
 
           {/* Blue Background */}
-          <HomeBackgroundShape top={280} color="#236488" maxWidth={462} maxHeight={1500} />
+          <HomeBackgroundShape top={280} color="#236488" maxWidth={700} maxHeight={1500} />
           {/* Eligible Link */}
           <TouchableRipple
             onPress={() => setShowEligibilityModal(true)}
@@ -373,4 +373,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SearchScreen;
+export default MedicationLookupScreen;

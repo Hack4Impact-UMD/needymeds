@@ -14,7 +14,7 @@ export default function HomeBackgroundShape({
   top = 50,
   maxHeight,
   color = '#226488',
-  translateY = 30,
+  translateY = -100,
   maxWidth,
 }: Props) {
   const containerWidth = maxWidth || width;
@@ -46,6 +46,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: 'center',
-    zIndex: -1,
+    zIndex: 1,
   },
 });

@@ -33,7 +33,7 @@ const WelcomeScreen = () => {
             <View style={styles.primaryButtonWrapper}>
               <Button
                 mode="contained"
-                onPress={() => router.navigate('/search')}
+                onPress={() => router.navigate('/medication-lookup')}
                 buttonColor="#236488"
                 textColor={Colors.default.neutrallt}
                 style={styles.primaryButton}
@@ -103,13 +103,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Nunito Sans',
   },
   description: {
+    fontFamily: 'Roboto',
     textAlign: 'center',
     lineHeight: 20,
     maxWidth: 412,
     color: '#181C20',
     fontSize: 14,
     paddingHorizontal: 8,
-    fontFamily: 'Roboto',
     letterSpacing: 0.25,
     paddingTop: 10,
   },
@@ -145,7 +145,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   primaryButtonLabel: {
-    fontSize: 16,
+    fontFamily: 'Open Sans',
+    fontSize: 15,
     fontWeight: '400',
     letterSpacing: 0.3,
     textAlign: 'center',

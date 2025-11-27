@@ -1,5 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { usePathname } from 'expo-router';
+import { router, usePathname } from 'expo-router';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Surface, Text } from 'react-native-paper';
 
@@ -8,22 +8,26 @@ const cardIcon = require('../assets/confirmation_number.png');
 
 const BottomNavBar = () => {
   const pathname = usePathname();
-  const isSearchActive = pathname.includes('search') || pathname === '/(tabs)';
+  const isMedicationLookupActive = pathname.includes('medication-lookup') || pathname === '/(tabs)';
 
   return (
     <View style={styles.mobileWrapper}>
       <Surface style={styles.bottomNav} elevation={0}>
-        <TouchableOpacity style={styles.navItem} activeOpacity={0.85}>
-          <View style={isSearchActive ? styles.navActiveContainer : undefined}>
+        <TouchableOpacity
+          style={styles.navItem}
+          activeOpacity={0.85}
+          onPress={() => router.push('medication-lookup')}
+        >
+          <View style={isMedicationLookupActive ? styles.navActiveContainer : undefined}>
             <MaterialCommunityIcons
               name="pill"
               size={24}
-              color={isSearchActive ? '#236488' : '#6B7280'}
+              color={isMedicationLookupActive ? '#236488' : '#6B7280'}
             />
           </View>
           <Text
             variant="labelMedium"
-            style={[styles.navLabel, isSearchActive && styles.navLabelActive]}
+            style={[styles.navLabel, isMedicationLookupActive && styles.navLabelActive]}
           >
             Drug Prices
           </Text>
@@ -58,10 +62,13 @@ const styles = StyleSheet.create({
     height: Platform.OS === 'ios' ? 84 : 68,
   },
   mobileWrapper: {
+    position: 'absolute',
+    bottom: 0,
     width: '100%',
     maxWidth: 412,
     alignSelf: 'center',
     backgroundColor: '#fff',
+    zIndex: 1000,
   },
   navItem: {
     alignItems: 'center',

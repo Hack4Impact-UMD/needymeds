@@ -7,12 +7,37 @@ import { groupID, ndcOverride, scriptSaveClient } from './scriptSaveClient';
 import {
   type DrugSearchResult,
   DsntPriceRequest,
+  ScriptSaveAutoCompleteItem,
+  ScriptSaveAutoCompleteResponse,
   ScriptSaveFindDrugsResponse,
   ScriptSavePriceRequest,
 } from './types';
 
 const MAX_DSNT_RADIUS = 125.99;
 const MAX_SCRIPTSAVE_NUMRESULTS = 100;
+
+export async function autoCompleteSearchDrug(drugPrefix: string): Promise<string[]> {
+  const autoCompleteResponse: ScriptSaveAutoCompleteResponse = await scriptSaveClient.autoComplete({
+    prefixText: drugPrefix,
+    groupID: String(groupID),
+  });
+
+  if (!autoCompleteResponse.DrugNames?.length) {
+    return [];
+  }
+
+  const autoCompleteDrugNames = autoCompleteResponse.DrugNames.map(
+    (autoCompleteItem: ScriptSaveAutoCompleteItem) => {
+      return autoCompleteItem.DrugName.split(' ')
+        .map((word) => {
+          return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        })
+        .join(' ') as string;
+    }
+  );
+
+  return autoCompleteDrugNames;
+}
 
 /**
  * This function queries both adjudicator APIs to find pharmacy drugs with
@@ -29,20 +54,20 @@ async function searchDrug(
   radius: number,
   includeGeneric: boolean,
   effectiveZip: string
-) {
+): Promise<DrugSearchResult[]> {
   const userCoords = await zipToCoords(effectiveZip);
 
   // Find the drug’s NDC
-  const drugsByName: ScriptSaveFindDrugsResponse = await scriptSaveClient.getDrugsByName({
+  const findDrugsResponse: ScriptSaveFindDrugsResponse = await scriptSaveClient.getDrugsByName({
     drugName,
     groupID: String(groupID),
   });
 
-  if (!drugsByName?.Drugs?.length) {
+  if (!findDrugsResponse.Drugs?.length) {
     return [];
   }
 
-  const ndc = drugsByName.Drugs[0].NDC;
+  const ndc = findDrugsResponse.Drugs[0].NDC;
 
   // Prepare adjudicator queries
   const dsntSearchQuery: DsntPriceRequest = {
