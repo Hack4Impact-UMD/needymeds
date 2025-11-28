@@ -1,19 +1,27 @@
 import { useState, useEffect } from 'react';
-import { View, StyleSheet, Platform, Alert, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, Platform, Alert, TouchableOpacity } from 'react-native';
 import { Text, TextInput, Button } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import * as Location from 'expo-location';
 import HomeBackgroundShape from '../components/HomeBackgroundShape';
 import BottomNavBar from '../components/BottomNavBar';
 import Header from '../components/Header';
+import { Ionicons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const PharmacyLocatorScreen = () => {
-  const [zipCode, setZipCode] = useState('');
-  const [radius, setRadius] = useState('5');
+  const params = useLocalSearchParams();
+  const zipParam = Array.isArray(params.zipCode) ? params.zipCode[0] : (params.zipCode ?? '');
+  const radiusParam = Array.isArray(params.radius) ? params.radius[0] : (params.radius ?? '5');
+
+  const [zipCode, setZipCode] = useState(zipParam);
+  const [radius, setRadius] = useState(radiusParam);
   const [isSearchEnabled, setIsSearchEnabled] = useState(false);
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [showZipDropdown, setShowZipDropdown] = useState(false);
+  const [filterText, setFilterText] = useState('');
+  const [emptyResults, setEmptyResults] = useState(true);
 
   // Validate inputs and enable/disable search button
   useEffect(() => {
@@ -21,15 +29,6 @@ const PharmacyLocatorScreen = () => {
     const isRadiusValid = radius.length > 0 && parseFloat(radius) > 0;
     setIsSearchEnabled(isZipValid && isRadiusValid);
   }, [zipCode, radius]);
-
-  // ✅ remove this whole effect:
-  // useEffect(() => {
-  //   console.log('zipCode changed to:', zipCode, 'length:', zipCode.length);
-  //   if (zipCode.length === 5) {
-  //     console.log('ZIP is 5 digits, closing dropdown');
-  //     setShowZipDropdown(false);
-  //   }
-  // }, [zipCode]);
 
   // Handle ZIP code input - restrict to 5 digits only
   const handleZipChange = (text: string) => {
@@ -245,19 +244,43 @@ const PharmacyLocatorScreen = () => {
             </View>
           </View>
 
-          {/* Search Button */}
-          <Button
-            mode="contained"
-            onPress={handleSearch}
-            disabled={!isSearchEnabled}
-            buttonColor="#226488"
-            style={styles.searchButton}
-            contentStyle={styles.searchButtonContent}
-            labelStyle={styles.searchButtonLabel}
-            icon="magnify"
-          >
-            Search
-          </Button>
+          {/* Filter Input */}
+          <View style={styles.inputWrapper}>
+            <TextInput
+              label="Filter by name"
+              value={filterText}
+              onChangeText={setFilterText}
+              placeholder=""
+              mode="outlined"
+              style={styles.textInput}
+              outlineStyle={styles.inputOutline}
+              textColor="#41484D"
+              activeOutlineColor="#246387" // outline color when focused (blue)
+              right={
+                <TextInput.Icon
+                  icon={() => <Ionicons name="close-circle" size={20} color="#41484D" />}
+                  onPress={() => setFilterText('')}
+                />
+              }
+            />
+          </View>
+
+          <ScrollView contentContainerStyle={{ flexGrow: 0, paddingTop: 0 }}>
+            {emptyResults ? (
+              <View>
+                <View style={styles.emptyContainer}>
+                  <MaterialIcons name="add-business" size={41} color="#41484D" />
+                  <Text style={styles.emptyMessage}>
+                    {' '}
+                    We are sorry there are no matching pharmacies in our network yet. Try checking
+                    other ZIP Codes or increasing search radius.
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <View></View>
+            )}
+          </ScrollView>
         </View>
       </View>
       <BottomNavBar />
@@ -293,7 +316,8 @@ const styles = StyleSheet.create({
     lineHeight: 32,
   },
   inputsContainer: {
-    gap: 60,
+    gap: 20,
+    flex: 1,
   },
   inputRow: {
     flexDirection: 'row',
@@ -335,14 +359,16 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#41484D',
   },
-  searchButton: {
-    borderRadius: 8,
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 0,
   },
-  searchButtonContent: {
-    height: 48,
-  },
-  searchButtonLabel: {
+  emptyMessage: {
     fontSize: 16,
-    fontWeight: '600',
+    color: '#41484D',
+    textAlign: 'center',
+    lineHeight: 22,
   },
 });
