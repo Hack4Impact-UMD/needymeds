@@ -173,6 +173,12 @@ const PharmacyLocatorScreen = () => {
     }
   };
 
+  const goToParamsTyping = () => {
+    router.push({
+      pathname: '/paramstyping',
+    });
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
@@ -181,8 +187,12 @@ const PharmacyLocatorScreen = () => {
 
         {/* Title Section */}
         <View style={styles.titleSection}>
-          <Text style={styles.subtitle}>Savings at 65,000+ pharmacies</Text>
-          <Text style={styles.title}>Find participating pharmacies near you.</Text>
+          <Text style={styles.subtitle}>
+            <TouchableOpacity onPress={() => goToParamsTyping()}>
+              <Ionicons name="arrow-back" size={16} color="#41484D" />
+            </TouchableOpacity>
+            Participating Pharmacies
+          </Text>
         </View>
 
         {/* Input Fields */}
