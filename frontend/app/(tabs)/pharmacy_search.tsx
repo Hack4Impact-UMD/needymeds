@@ -10,6 +10,11 @@ import Header from '../components/Header';
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 
+import SearchResult from '../components/SearchResult';
+import { searchPharmacies } from '../../api/pharmacySearch';
+import { Pharmacy } from '../../api/types';
+
+
 const PharmacyLocatorScreen = () => {
   const params = useLocalSearchParams();
   const zipParam = Array.isArray(params.zipCode) ? params.zipCode[0] : (params.zipCode ?? '');
@@ -23,11 +28,34 @@ const PharmacyLocatorScreen = () => {
   const [filterText, setFilterText] = useState('');
   const [emptyResults, setEmptyResults] = useState(true);
 
+  const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
+  const [loading, setLoading] = useState(false);
+
+
   // Validate inputs and enable/disable search button
   useEffect(() => {
     const isZipValid = zipCode.length === 5 && /^\d{5}$/.test(zipCode);
     const isRadiusValid = radius.length > 0 && parseFloat(radius) > 0;
     setIsSearchEnabled(isZipValid && isRadiusValid);
+
+    const fetchPharmacies = async () => {
+      if (!setIsSearchEnabled) return;
+
+      setLoading(true);
+      try {
+        const results = await searchPharmacies(Number(zipCode), Number(radius));
+        setPharmacies(results);
+        setEmptyResults(results.length === 0);
+        console.log("Search results:", results);
+      } catch (error) {
+        console.error('Error fetching pharmacies: ', error);
+        setEmptyResults(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPharmacies();
   }, [zipCode, radius]);
 
   // Handle ZIP code input - restrict to 5 digits only
@@ -275,20 +303,30 @@ const PharmacyLocatorScreen = () => {
             />
           </View>
 
+        {/* put a placeholder for the route to the Pharmacy Detail page / component */}
+        {/* also picked a random attribute for pharmacy ID */}
           <ScrollView contentContainerStyle={{ flexGrow: 0, paddingTop: 0 }}>
-            {emptyResults ? (
-              <View>
-                <View style={styles.emptyContainer}>
-                  <MaterialIcons name="add-business" size={41} color="#41484D" />
-                  <Text style={styles.emptyMessage}>
-                    {' '}
-                    We are sorry there are no matching pharmacies in our network yet. Try checking
-                    other ZIP Codes or increasing search radius.
-                  </Text>
-                </View>
+            {loading ? (
+              <Text style={{ textAlign: 'center', marginTop: 20 }}>Searching...</Text>
+            ) : emptyResults ? (
+              <View style={styles.emptyContainer}>
+                <MaterialIcons name="add-business" size={41} color="#41484D" />
+                <Text style={styles.emptyMessage}>
+                  {' '}
+                  We are sorry there are no matching pharmacies in our network yet. Try checking
+                  other ZIP Codes or increasing search radius.
+                </Text>
               </View>
             ) : (
-              <View></View>
+              pharmacies.map((pharmacy, index) => (
+                <SearchResult
+                    key={index}
+                    name={pharmacy.pharmacyName}
+                    address={`${pharmacy.pharmacyStreet1}, ${pharmacy.pharmacyCity}`}
+                    distance={pharmacy.distance ? `${pharmacy.distance.toFixed(1)} mi` : ''}
+                    onPress={() => router.push({ pathname: '/education', params: { pharmacyId: pharmacy.latitude } })}
+                />
+              ))
             )}
           </ScrollView>
         </View>
