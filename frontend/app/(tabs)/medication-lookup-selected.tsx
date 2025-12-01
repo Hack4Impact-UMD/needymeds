@@ -1,8 +1,11 @@
+import { searchDrugByPrice } from '@/api/drugSearch';
+import { DrugSearchResult } from '@/api/types';
 import getUserLocation from '@/api/userLocation';
 import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
-import React, { useEffect, useRef, useState } from 'react';
+import { router } from 'expo-router';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   Image,
@@ -27,78 +30,67 @@ interface MedicationLookupSelectedScreenProps {
   onClose: () => void;
 }
 
-interface Pharmacy {
-  id: number;
-  name: string;
-  price: number;
-  distance: string;
-  address: string;
-  city: string;
-  phone: string;
-  generic: boolean;
-  label?: string;
-}
-
-const [formOptions, setFormOptions] = useState([]);
-
-useEffect(() => {});
-
 const langOptions = [
   { label: 'EN', value: 'EN' },
   { label: 'SP', value: 'SP' },
 ];
 
 const sortOptions = [
-  { label: 'Price', value: 'price' },
-  { label: 'Distance', value: 'distance' },
+  { label: 'By price', value: 'price' },
+  { label: 'By distance', value: 'distance' },
 ];
+
+const ZIPCODE_LENGTH = 5;
 
 const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenProps> = ({
   medicationName,
-  genericName,
-  strength,
-  onClose,
 }) => {
-  const [value, setValue] = useState('1');
   const [form, setForm] = useState('tube');
   const [quantity, setQuantity] = useState('1');
-  const [zipCode, setZipCode] = useState('20740');
-  const [radius, setRadius] = useState('2');
+  const [zipCode, setZipCode] = useState('');
+  const [radius, setRadius] = useState('5');
   const [sortBy, setSortBy] = useState<'price' | 'distance'>('price');
   const [includeGeneric, setIncludeGeneric] = useState(true);
-  const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(null);
+  const [genericName, setGenericName] = useState('');
+  const [selectedDrugResult, setSelectedDrugResult] = useState<DrugSearchResult | null>(null);
   const [query, setQuery] = useState('');
   const [lang, setLang] = useState('EN');
-  type PaperInputRef = React.ComponentRef<typeof TextInput>;
-  const inputRef = useRef<PaperInputRef>(null);
   const [zipFocused, setZipFocused] = useState(false);
   const [detectingZip, setDetectingZip] = useState(false);
+  const [formOptions, setFormOptions] = useState(['tube']);
+  const [drugResults, setDrugResults] = useState<DrugSearchResult[]>([]);
 
-  const allPharmacies: Pharmacy[] = [];
+  type PaperInputRef = React.ComponentRef<typeof TextInput>;
+  const inputRef = useRef<PaperInputRef>(null);
 
-  // Filter pharmacies based on search query and includeGeneric
-  const filteredPharmacies = allPharmacies
-    .filter((p) => includeGeneric || !p.generic)
-    .filter(
-      (p) =>
-        query.trim() === '' ||
-        p.name.toLowerCase().includes(query.toLowerCase()) ||
-        p.address.toLowerCase().includes(query.toLowerCase()) ||
-        p.city.toLowerCase().includes(query.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (sortBy === 'price') {
-        return a.price - b.price;
-      }
-      if (sortBy === 'distance') {
-        const distA = parseFloat(String(a.distance)) || 0;
-        const distB = parseFloat(String(b.distance)) || 0;
-        return distA - distB;
-      }
-      return 0;
-    });
+  const drugName = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('drugName') || '';
+  }, []);
 
-  const pharmacies = filteredPharmacies;
+  useEffect(() => {
+    // TODO: Get forms
+    setFormOptions([]);
+  }, []);
+
+  useEffect(() => {
+    if (!radius || !includeGeneric || !zipCode || zipCode.length !== ZIPCODE_LENGTH) {
+      return;
+    }
+
+    const fetchDrugSearchResults = async () => {
+      // TODO: Add generic form to DrugSearchResult
+      const drugSearchResults: DrugSearchResult[] = await searchDrugByPrice(
+        drugName,
+        Number(radius),
+        includeGeneric,
+        Number(zipCode)
+      );
+      setDrugResults(drugSearchResults);
+    };
+
+    fetchDrugSearchResults();
+  }, [radius, includeGeneric, zipCode]);
 
   const copyToClipboard = async (text: string) => {
     await Clipboard.setStringAsync(text);
@@ -110,22 +102,27 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
     inputRef.current?.focus();
   };
 
-  const openMaps = (address: string, city: string) => {
-    const fullAddress = `${address}, ${city}`;
-    const url = `https://maps.google.com/?q=${encodeURIComponent(fullAddress)}`;
+  const openMaps = (address: string) => {
+    const url = `https://maps.google.com/?q=${encodeURIComponent(address)}`;
     Linking.openURL(url);
   };
 
   const detectZipFromLocation = async () => {
     if (detectingZip) return;
+
+    setDetectingZip(true);
     try {
       const userLocationResult = await getUserLocation();
-      setZipCode(userLocationResult.userZipCode);
-      return;
+      if (userLocationResult?.userZipCode) {
+        setZipCode(userLocationResult.userZipCode);
+      } else {
+        Alert.alert('Location', 'Could not detect ZIP code.');
+      }
     } catch (err) {
       Alert.alert('Location', 'Error detecting location');
     } finally {
       setDetectingZip(false);
+      setZipFocused(false);
     }
   };
 
@@ -138,12 +135,12 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
     if (item && item.value) setLang(item.value);
   };
 
-  const PharmacyDetailsModal = ({ pharmacy }: { pharmacy: Pharmacy }) => (
+  const PharmacyDetailsModal = ({ result }: { result: DrugSearchResult }) => (
     <Modal
       visible={true}
       animationType="slide"
       transparent={true}
-      onRequestClose={() => setSelectedPharmacy(null)}
+      onRequestClose={() => setSelectedDrugResult(null)}
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
@@ -151,8 +148,8 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
             <View style={styles.dragHandle} />
           </View>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{pharmacy.name}</Text>
-            <TouchableOpacity onPress={() => setSelectedPharmacy(null)}>
+            <Text style={styles.modalTitle}>{result.pharmacyName}</Text>
+            <TouchableOpacity onPress={() => setSelectedDrugResult(null)}>
               <MaterialCommunityIcons name="close" size={24} color="#000" />
             </TouchableOpacity>
           </View>
@@ -161,20 +158,19 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
             {/* Address Section */}
             <View style={styles.infoCard}>
               <View style={styles.infoContent}>
-                <Text style={styles.infoText}>{pharmacy.address}</Text>
-                <Text style={styles.infoText}>{pharmacy.city}</Text>
-                <Text style={styles.infoSubtext}>{pharmacy.distance}</Text>
+                <Text style={styles.infoText}>{result.pharmacyAddress}</Text>
+                <Text style={styles.infoSubtext}>{result.distance}</Text>
               </View>
               <View style={styles.buttonGroup}>
                 <TouchableOpacity
                   style={styles.iconButton}
-                  onPress={() => copyToClipboard(`${pharmacy.address}, ${pharmacy.city}`)}
+                  onPress={() => copyToClipboard(`${result.pharmacyAddress}`)}
                 >
                   <MaterialCommunityIcons name="content-copy" size={20} color="#6B7280" />
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.iconButtonUI}
-                  onPress={() => openMaps(pharmacy.address, pharmacy.city)}
+                  onPress={() => openMaps(result.pharmacyAddress)}
                 >
                   <MaterialCommunityIcons name="directions" size={20} color="#236488" />
                 </TouchableOpacity>
@@ -183,17 +179,17 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
 
             {/* Phone Section */}
             <View style={styles.infoCard}>
-              <Text style={styles.infoText}>{pharmacy.phone}</Text>
+              <Text style={styles.infoText}>{result.pharmacyPhone}</Text>
               <View style={styles.buttonGroup}>
                 <TouchableOpacity
                   style={styles.iconButton}
-                  onPress={() => copyToClipboard(pharmacy.phone)}
+                  onPress={() => copyToClipboard(result.pharmacyPhone)}
                 >
                   <MaterialCommunityIcons name="content-copy" size={20} color="#6B7280" />
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.iconButtonUI}
-                  onPress={() => makeCall(pharmacy.phone)}
+                  onPress={() => makeCall(result.pharmacyPhone)}
                 >
                   <MaterialCommunityIcons name="phone" size={20} color="#236488" />
                 </TouchableOpacity>
@@ -206,7 +202,7 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
                 <Text style={styles.priceLabel}>
                   {medicationName} {quantity} {form}
                 </Text>
-                <Text style={styles.priceAmount}>${pharmacy.price}</Text>
+                <Text style={styles.priceAmount}>${result.price}</Text>
               </View>
               <TouchableOpacity style={styles.sendButtonIcon}>
                 <Image source={require('../assets/sendIcon.svg')} />
@@ -225,7 +221,12 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
           {/* Header with Search */}
           <View style={styles.header}>
             <View style={styles.searchContainer}>
-              <SearchBar query={query} onChangeText={setQuery} onClear={clearSearch} />
+              <SearchBar
+                query={drugName}
+                onChangeText={setQuery}
+                onClear={clearSearch}
+                onFocus={() => router.push('/medication-lookup-autocomplete')}
+              />
               <Dropdown
                 mode="modal"
                 placeholder="EN"
@@ -242,82 +243,94 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
             </View>
           </View>
 
-          {/* Form Inputs */}
           <View style={styles.formContainer}>
             <View style={styles.formRow}>
               <View style={styles.formField}>
-                <Text style={styles.label}>Form</Text>
-
-                <View style={styles.outlinedWrapper}>
-                  <Dropdown
-                    data={formOptions}
-                    labelField="label"
-                    valueField="value"
-                    value={form}
-                    onChange={(item) => setForm(item.value)}
-                    style={styles.dropdownInner}
-                    selectedTextStyle={styles.dropdownText}
-                    itemTextStyle={styles.dropdownText}
-                    containerStyle={styles.dropdownContainer}
-                    placeholder="Select"
-                  />
-                </View>
+                {/* Form field */}
+                <TextInput
+                  mode="outlined"
+                  label="Form"
+                  value={form}
+                  render={() => (
+                    <Dropdown
+                      data={formOptions}
+                      labelField="label"
+                      valueField="value"
+                      value={form}
+                      onChange={(item) => setForm(item.value)}
+                      style={styles.dropdownInner}
+                      selectedTextStyle={styles.dropdownText}
+                      itemTextStyle={styles.dropdownText}
+                      containerStyle={styles.dropdownContainer}
+                    />
+                  )}
+                  outlineStyle={{ borderRadius: 5 }}
+                  style={{ backgroundColor: Colors.default.neutrallt }}
+                />
               </View>
+
+              {/* How much? field */}
               <View style={styles.formField}>
                 <TextInput
                   mode="outlined"
                   label="How much?"
-                  value={value}
-                  onChangeText={setValue}
+                  value={quantity}
+                  onChangeText={setQuantity}
                   keyboardType="numeric"
                   outlineStyle={{ borderRadius: 5 }}
-                  style={{ backgroundColor: 'white' }}
+                  style={{ backgroundColor: Colors.default.neutrallt }}
                 />
               </View>
             </View>
 
+            {/* ZIP Code field */}
             <View style={styles.formRow}>
               <View style={styles.formField}>
-                <Text style={styles.label}>ZIP Code</Text>
-                <View style={[styles.zipInputContainer, zipFocused && styles.zipInputFocused]}>
-                  <MaterialCommunityIcons
-                    name="map-marker"
-                    size={18}
-                    color="#6B7280"
-                    style={styles.inputIcon}
-                  />
-                  <TextInput
-                    placeholder="ZIP Code"
-                    placeholderTextColor="#9CA3AF"
-                    value={zipCode}
-                    onChangeText={setZipCode}
-                    keyboardType="numeric"
-                    maxLength={5}
-                    style={styles.zipInput}
-                    onFocus={() => setZipFocused(true)}
-                    onBlur={() => {
-                      // Delay blur to allow button click
-                      setTimeout(() => setZipFocused(false), 200);
-                    }}
-                    underlineColor="transparent"
-                    activeUnderlineColor="transparent"
-                  />
-                  {zipCode.length > 0 && (
-                    <TouchableOpacity onPress={() => setZipCode('')} style={styles.zipClearButton}>
-                      <MaterialCommunityIcons name="close-circle" size={18} color="#9CA3AF" />
-                    </TouchableOpacity>
-                  )}
-                </View>
+                <TextInput
+                  mode="outlined"
+                  label="ZIP Code"
+                  value={zipCode}
+                  onChangeText={setZipCode}
+                  keyboardType="numeric"
+                  outlineStyle={{ borderRadius: 5 }}
+                  style={{ backgroundColor: Colors.default.neutrallt }}
+                  maxLength={5}
+                  left={
+                    <TextInput.Icon
+                      icon={() => (
+                        <MaterialCommunityIcons
+                          name="map-marker-outline"
+                          size={22}
+                          color="#41484D"
+                        />
+                      )}
+                    />
+                  }
+                  right={
+                    zipFocused ? (
+                      <TextInput.Icon
+                        icon={() => (
+                          <MaterialCommunityIcons
+                            name="close-circle-outline"
+                            size={22}
+                            color="#41484D"
+                          />
+                        )}
+                        onPress={() => setZipCode('')}
+                      />
+                    ) : null
+                  }
+                  onFocus={() => setZipFocused(true)}
+                />
+
                 {zipFocused && (
                   <TouchableOpacity
                     style={styles.detectLocationButton}
-                    onPress={detectZipFromLocation}
+                    onPress={() => detectZipFromLocation()}
                     disabled={detectingZip}
                   >
-                    {detectingZip ? (
+                    {detectingZip && (
                       <ActivityIndicator size="small" color="#3B82F6" style={{ marginRight: 6 }} />
-                    ) : (
-                      <MaterialCommunityIcons name="crosshairs-gps" size={16} color="#3B82F6" />
                     )}
                     <Text style={styles.detectLocationText}>
                       {detectingZip ? 'Detecting...' : 'Detect my location'}
@@ -325,6 +338,8 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
                   </TouchableOpacity>
                 )}
               </View>
+
+              {/* Radius field */}
               <View style={styles.formField}>
                 <View style={styles.radiusRow}>
                   <TextInput
@@ -334,7 +349,7 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
                     onChangeText={setRadius}
                     keyboardType="numeric"
                     outlineStyle={{ borderRadius: 5 }}
-                    style={{ backgroundColor: 'white' }}
+                    style={{ backgroundColor: Colors.default.neutrallt }}
                   />
                   <Text style={styles.radiusUnit}>miles</Text>
                 </View>
@@ -343,41 +358,54 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
           </View>
 
           {/* Filter Options */}
-          <View style={styles.filterContainer}>
-            <View style={{ marginRight: 8 }}>
-              <Dropdown
-                data={sortOptions}
-                labelField="label"
-                valueField="value"
-                value={sortBy}
-                onChange={(item) => setSortBy(item.value)}
-                style={styles.sortDropdown}
-                selectedTextStyle={styles.sortDropdownText}
-                placeholderStyle={styles.sortDropdownText}
-                itemTextStyle={styles.sortDropdownText}
-                showsVerticalScrollIndicator={false}
-              />
-            </View>
-            <TouchableOpacity
-              style={[styles.simpleFilterButton, includeGeneric && styles.filterButtonActive]}
-              onPress={() => setIncludeGeneric(!includeGeneric)}
-              activeOpacity={0.8}
-            >
-              {includeGeneric ? (
-                <MaterialCommunityIcons
-                  name="check"
-                  size={18}
-                  color="#6B7280"
-                  style={{ marginRight: 8 }}
+          {drugResults.length > 0 && (
+            <View style={styles.filterContainer}>
+              <View style={{ marginRight: 8 }}>
+                <Dropdown
+                  data={sortOptions}
+                  labelField="label"
+                  valueField="value"
+                  value={sortBy}
+                  onChange={(item) => setSortBy(item.value)}
+                  style={styles.sortDropdown}
+                  selectedTextStyle={styles.sortDropdownText}
+                  placeholderStyle={styles.sortDropdownText}
+                  itemTextStyle={styles.sortDropdownText}
+                  showsVerticalScrollIndicator={false}
+                  renderLeftIcon={() => (
+                    <MaterialCommunityIcons
+                      name="check"
+                      size={18}
+                      color="#004E60"
+                      style={{ marginRight: 9 }}
+                    />
+                  )}
+                  renderRightIcon={() => (
+                    <MaterialCommunityIcons name="chevron-down" size={18} color="#004E60" />
+                  )}
                 />
-              ) : (
-                <View style={{ width: 18, height: 18, marginRight: 8 }} />
-              )}
-              <Text style={[styles.filterText, includeGeneric && styles.filterTextActive]}>
-                Include generic ({genericName})
-              </Text>
-            </TouchableOpacity>
-          </View>
+              </View>
+              <TouchableOpacity
+                style={[styles.simpleFilterButton, includeGeneric && styles.filterButtonActive]}
+                onPress={() => setIncludeGeneric(!includeGeneric)}
+                activeOpacity={0.8}
+              >
+                {includeGeneric ? (
+                  <MaterialCommunityIcons
+                    name="check"
+                    size={18}
+                    color="#004E60"
+                    style={{ marginRight: 8 }}
+                  />
+                ) : (
+                  <View style={{ width: 18, height: 18, marginRight: 7 }} />
+                )}
+                <Text style={[styles.filterText, includeGeneric && styles.filterTextActive]}>
+                  Include generic ({genericName})
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           {/* Scrollable Pharmacy List */}
           <ScrollView
@@ -386,7 +414,7 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
             contentContainerStyle={styles.scrollContentContainer}
           >
             <View style={styles.pharmacyListContainer}>
-              {pharmacies.length === 0 ? (
+              {drugResults.length === 0 ? (
                 <View style={styles.emptyState}>
                   <Image source={require('../assets/add_shopping_cart.svg')} />
                   <Text style={styles.emptyStateTitle}>
@@ -396,11 +424,11 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
                   </Text>
                 </View>
               ) : (
-                pharmacies.map((item) => (
+                drugResults.map((result) => (
                   <TouchableOpacity
-                    key={item.id}
+                    key={result.pharmacyName}
                     style={styles.pharmacyItem}
-                    onPress={() => setSelectedPharmacy(item)}
+                    onPress={() => setSelectedDrugResult(result)}
                   >
                     <View style={styles.pharmacyLeft}>
                       <View style={styles.pharmacyIcon}>
@@ -411,14 +439,16 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
                       </View>
                       <View style={styles.pharmacyInfo}>
                         <View style={[styles.pharmacyHeader, styles.pharmacyHeaderColumn]}>
-                          {item.label && <Text style={styles.pharmacyLabel}>{item.label}</Text>}
-                          <Text style={styles.pharmacyName}>{item.name}</Text>
+                          {result.pharmacyName && (
+                            <Text style={styles.pharmacyLabel}>{result.pharmacyName}</Text>
+                          )}
+                          <Text style={styles.pharmacyName}>{result.pharmacyName}</Text>
                         </View>
-                        <Text style={styles.pharmacyPrice}>${item.price.toFixed(2)}</Text>
+                        <Text style={styles.pharmacyPrice}>${result.price}</Text>
                       </View>
                     </View>
                     <View style={styles.pharmacyRight}>
-                      <Text style={styles.pharmacyDistance}>{item.distance}</Text>
+                      <Text style={styles.pharmacyDistance}>{result.distance}</Text>
                       <MaterialCommunityIcons name="chevron-right" size={20} color="#9CA3AF" />
                     </View>
                   </TouchableOpacity>
@@ -431,7 +461,7 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
       <BottomNavBar />
 
       {/* Pharmacy Details Modal */}
-      {selectedPharmacy && <PharmacyDetailsModal pharmacy={selectedPharmacy} />}
+      {selectedDrugResult && <PharmacyDetailsModal result={selectedDrugResult} />}
     </SafeAreaView>
   );
 };
@@ -473,7 +503,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#111827',
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
   },
   clearButton: {
     padding: 4,
@@ -482,25 +512,22 @@ const styles = StyleSheet.create({
   langDropdown: {
     width: 70,
     height: 36,
-    borderColor: '#D1D5DB',
+    borderColor: '#C1C7CE',
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
-    backgroundColor: '#fff',
   },
   langText: {
     color: '#41484D',
     fontSize: 14,
-    fontFamily: 'Nunito Sans',
+    fontWeight: 600,
+    fontFamily: 'Open Sans',
   },
   scrollContent: {
     flex: 1,
   },
   formContainer: {
-    padding: 16,
-    backgroundColor: Colors.default.neutrallt,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    padding: 8,
   },
   formRow: {
     flexDirection: 'row',
@@ -510,12 +537,14 @@ const styles = StyleSheet.create({
   formField: {
     flexDirection: 'column',
     flex: 1,
+    position: 'relative',
+    zIndex: 0,
   },
   label: {
     fontSize: 13,
     color: '#6B7280',
     marginBottom: 8,
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
   },
   dropdown: {
     borderWidth: 1,
@@ -523,7 +552,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 14,
     height: 44,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255, 255, 255, 0)',
   },
   textInput: {
     borderWidth: 1,
@@ -532,46 +561,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     height: 44,
     fontSize: 15,
-    backgroundColor: '#fff',
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
     color: '#111827',
-  },
-  zipInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 2,
-  },
-  zipInputFocused: {
-    borderColor: '#7C3AED',
-    borderWidth: 2,
-  },
-  zipInput: {
-    flex: 1,
-    fontSize: 15,
-    color: '#111827',
-    paddingVertical: 10,
-    fontFamily: 'Nunito Sans',
-    backgroundColor: 'transparent',
-  },
-  zipClearButton: {
-    padding: 4,
   },
   detectLocationButton: {
+    position: 'absolute',
+    top: 56,
     flexDirection: 'row',
+    width: 190,
+    borderRadius: 5,
     alignItems: 'center',
-    marginTop: 8,
-    paddingVertical: 4,
+    paddingVertical: 15,
+    zIndex: 100,
+    paddingHorizontal: 8,
+    backgroundColor: '#EBEEF3',
+    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.30), 0 2px 6px 2px rgba(0, 0, 0, 0.15)',
   },
   detectLocationText: {
-    color: '#3B82F6',
-    fontSize: 14,
+    color: '#181C20',
+    fontSize: 16,
     marginLeft: 6,
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
   },
   inputIcon: {
     marginLeft: 8,
@@ -581,7 +591,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 8,
     fontSize: 15,
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
     color: '#111827',
   },
   radiusRow: {
@@ -589,22 +599,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  radiusInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    height: 44,
-    fontSize: 15,
-    backgroundColor: '#fff',
-    fontFamily: 'Nunito Sans',
-    color: '#111827',
-  },
   radiusUnit: {
-    fontSize: 14,
-    color: '#6B7280',
-    fontFamily: 'Nunito Sans',
+    position: 'absolute',
+    top: 20,
+    right: 10,
+    fontSize: 15,
+    color: '#181C20',
+    fontFamily: 'Open Sans',
   },
   filterContainer: {
     flexDirection: 'row',
@@ -612,9 +613,6 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    backgroundColor: Colors.default.neutrallt,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
   },
   filterButton: {
     flexDirection: 'row',
@@ -645,15 +643,13 @@ const styles = StyleSheet.create({
   },
   filterText: {
     fontSize: 14,
-    color: '#6B7280',
-    fontFamily: 'Nunito Sans',
+    color: '#41484D',
+    fontFamily: 'Open Sans',
   },
   filterTextActive: {
-    color: '#6B7280',
-    fontWeight: '500',
+    color: '#004E60',
   },
   pharmacyListContainer: {
-    backgroundColor: Colors.default.neutrallt,
     flex: 1,
   },
   pharmacyItem: {
@@ -693,7 +689,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '500',
     color: '#111827',
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
   },
   genericBadge: {
     backgroundColor: '#DBEAFE',
@@ -705,19 +701,19 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#3B82F6',
     fontWeight: '500',
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
   },
   pharmacyPrice: {
     fontSize: 16,
     fontWeight: '700',
     color: '#111827',
     marginBottom: 2,
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
   },
   pharmacyLabel: {
     fontSize: 12,
     color: '#6B7280',
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
   },
   pharmacyRight: {
     flexDirection: 'row',
@@ -728,7 +724,7 @@ const styles = StyleSheet.create({
   pharmacyDistance: {
     fontSize: 13,
     color: '#6B7280',
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
   },
   modalOverlay: {
     flex: 1,
@@ -769,7 +765,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: '600',
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
     color: '#111827',
   },
   modalBody: {
@@ -793,13 +789,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#374151',
     marginBottom: 2,
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
   },
   infoSubtext: {
     fontSize: 13,
     color: '#9CA3AF',
     marginTop: 4,
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
   },
   buttonGroup: {
     flexDirection: 'row',
@@ -840,12 +836,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6B7280',
     marginBottom: 4,
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
   },
   priceAmount: {
     fontSize: 14,
     color: '#111827',
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
   },
   sendButton: {
     width: 48,
@@ -864,10 +860,10 @@ const styles = StyleSheet.create({
   },
   emptyStateTitle: {
     fontSize: 16,
-    color: '#6B7280',
+    color: '#181C20',
     textAlign: 'center',
     marginTop: 16,
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
     lineHeight: 24,
   },
   emptyStateSubtext: {
@@ -875,7 +871,7 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     textAlign: 'center',
     marginTop: 8,
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
   },
   sendButtonIcon: {
     width: 40,
@@ -897,24 +893,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 12,
   },
-
   dropdownInner: {
-    paddingHorizontal: 0,
+    paddingHorizontal: 15,
     height: 48,
   },
-
   dropdownText: {
     fontSize: 15,
     color: '#111827',
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
   },
-
   dropdownContainer: {
     borderRadius: 8,
     borderColor: '#C1C7CE',
   },
   sortDropdown: {
-    width: 140,
+    width: 150,
     height: 40,
     borderRadius: 8,
     borderWidth: 0,
@@ -925,7 +918,7 @@ const styles = StyleSheet.create({
   sortDropdownText: {
     color: '#41484D',
     fontSize: 14,
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
   },
   simpleFilterButton: {
     flexDirection: 'row',

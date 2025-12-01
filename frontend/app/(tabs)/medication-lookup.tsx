@@ -143,7 +143,7 @@ const MedicationLookupScreen = () => {
 
                   <TouchableOpacity style={styles.modalFooter}>
                     <Text style={styles.modalFooterText}>Learn more</Text>
-                    <MaterialCommunityIcons name="open-in-new" size={18} color="#236488" />
+                    <MaterialCommunityIcons name="open-in-new" size={18} color="#181C20" />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     height: 32,
   },
   langDropdown: {
-    width: 60,
+    width: 72,
     height: 36,
     borderColor: '#C1C7CE',
     borderWidth: 1,
@@ -197,17 +197,17 @@ const styles = StyleSheet.create({
   langPlaceholder: {
     color: '#41484D',
     fontSize: 14,
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
   },
   langItemText: {
     color: '#41484D',
     fontSize: 14,
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
   },
   langSelectedText: {
     color: '#41484D',
     fontSize: 14,
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
   },
   promoWrap: {
     alignItems: 'center',
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: '400',
     fontFamily: 'Nunito Sans',
     color: '#111827',
   },
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
   modalItemText: {
     flex: 1,
     fontSize: 16,
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
     color: '#111827',
     lineHeight: 24,
   },
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 24,
+    paddingTop: 7,
     paddingHorizontal: 24,
     gap: 6,
     borderTopWidth: 1,
@@ -363,9 +363,12 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   modalFooterText: {
-    fontSize: 16,
-    fontFamily: 'Nunito Sans',
-    color: '#236488',
+    width: 500,
+    fontSize: 15,
+    textAlign: 'right',
+    textDecorationLine: 'underline',
+    fontFamily: 'Open Sans',
+    color: '#181C20',
     fontWeight: '400',
   },
 });

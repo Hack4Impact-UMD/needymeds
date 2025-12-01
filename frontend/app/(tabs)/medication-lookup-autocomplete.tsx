@@ -73,15 +73,7 @@ const MedicationLookupAutocompleteScreen = () => {
         <View style={styles.container}>
           {/* Search Bar */}
           <View style={styles.searchContainer}>
-            <SearchBar
-              query={query}
-              onChangeText={setQuery}
-              onClear={clearSearch}
-              lang={lang}
-              langOptions={langOptions}
-              onLangChange={handleLang}
-              showLanguageDropdown={true}
-            />
+            <SearchBar query={query} onChangeText={setQuery} onClear={clearSearch} />
             <Dropdown
               placeholder="EN"
               value={lang}
@@ -171,17 +163,18 @@ const styles = StyleSheet.create({
   },
   langDropdown: {
     width: 70,
-    height: 32,
-    borderColor: '#E5E7EB',
+    height: 36,
+    borderColor: '#C1C7CE',
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.default.neutrallt,
   },
   langText: {
     color: '#41484D',
     fontSize: 14,
-    fontFamily: 'Nunito Sans',
+    fontWeight: 600,
+    fontFamily: 'Open Sans',
   },
   searchContainer: {
     paddingHorizontal: 8,
@@ -199,17 +192,17 @@ const styles = StyleSheet.create({
   emptyState: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 60,
+    paddingTop: 20,
   },
   emptyText: {
-    color: '#6B7280',
+    color: '#181C20',
     textAlign: 'left',
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
     lineHeight: 22,
     fontSize: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#C1C7CE',
-    paddingBottom: 15,
+    paddingBottom: 25,
   },
   listContent: {
     paddingHorizontal: 20,

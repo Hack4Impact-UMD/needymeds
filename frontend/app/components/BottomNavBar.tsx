@@ -21,7 +21,16 @@ const BottomNavBar = () => {
           activeOpacity={0.85}
           onPress={() => router.push('medication-lookup')}
         >
-          <View>
+          <View
+            style={{
+              width: 60,
+              height: 30,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 30,
+              backgroundColor: isMedicationLookupActive ? '#B6EBFF' : '#EBEEF3',
+            }}
+          >
             <MaterialCommunityIcons
               name={isMedicationLookupActive ? 'medication' : 'medication-outline'}
               size={24}
@@ -40,11 +49,22 @@ const BottomNavBar = () => {
           activeOpacity={0.85}
           onPress={() => router.push('pharmacy-lookup')}
         >
-          <MaterialCommunityIcons
-            name={isPharmacyLookupActive ? 'store' : 'store-outline'}
-            size={24}
-            color="#004E60"
-          />
+          <View
+            style={{
+              width: 60,
+              height: 30,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 30,
+              backgroundColor: isPharmacyLookupActive ? '#B6EBFF' : '#EBEEF3',
+            }}
+          >
+            <MaterialCommunityIcons
+              name={isPharmacyLookupActive ? 'store' : 'store-outline'}
+              size={24}
+              color="#004E60"
+            />
+          </View>
           <Text variant="labelMedium" style={styles.navLabel}>
             Pharmacies
           </Text>
@@ -54,14 +74,25 @@ const BottomNavBar = () => {
           activeOpacity={0.85}
           onPress={() => router.push('educational-resources')}
         >
-          <MaterialCommunityIcons
-            name={isEducationalResourcesActive ? 'library' : 'library-outline'}
-            size={24}
-            color="#004E60"
-          />
-          <Text variant="labelMedium" style={styles.navLabel}>
-            Resources
-          </Text>
+          <View
+            style={{
+              width: 60,
+              height: 30,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 30,
+              backgroundColor: isEducationalResourcesActive ? '#B6EBFF' : '#EBEEF3',
+            }}
+          >
+            <MaterialCommunityIcons
+              name={isEducationalResourcesActive ? 'library' : 'library-outline'}
+              size={24}
+              color="#004E60"
+            />
+            <Text variant="labelMedium" style={styles.navLabel}>
+              Resources
+            </Text>
+          </View>
         </TouchableOpacity>
       </Surface>
     </View>

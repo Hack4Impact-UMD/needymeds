@@ -1,6 +1,6 @@
 import { Colors } from '@/constants/theme';
 import { router } from 'expo-router';
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image, Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -44,7 +44,7 @@ const WelcomeScreen = () => {
               </Button>
             </View>
             <Text variant="bodySmall" style={styles.secondaryMessage}>
-              No sign-up or personal information needed
+              No sign-up or personal information needed.
             </Text>
             <TouchableOpacity activeOpacity={0.7}>
               <Text variant="bodySmall" style={styles.languageSwitcher}>
@@ -53,7 +53,20 @@ const WelcomeScreen = () => {
             </TouchableOpacity>
           </View>
           <Text variant="bodySmall" style={styles.footer}>
-            Copyright © 2025 by NeedyMeds, Inc.{'\n'}Terms & Conditions | Privacy Policy
+            Copyright © 2025 by NeedyMeds, Inc.{'\n'}
+            <Text
+              style={styles.footerLink}
+              onPress={() => Linking.openURL('https://www.needymeds.org/terms')}
+            >
+              Terms & Conditions
+            </Text>
+            {' | '}
+            <Text
+              style={styles.footerLink}
+              onPress={() => Linking.openURL('https://www.needymeds.org/privacy')}
+            >
+              Privacy Policy
+            </Text>
           </Text>
         </View>
       </View>
@@ -153,28 +166,31 @@ const styles = StyleSheet.create({
   },
   secondaryMessage: {
     textAlign: 'center',
-    color: '#6F7787',
+    color: '#41484D',
     fontSize: 13,
     maxWidth: 280,
     lineHeight: 18,
   },
   languageSwitcher: {
     textAlign: 'center',
-    color: Colors.default.secondary,
+    color: '#41484D',
     fontWeight: '400',
     fontSize: 14,
-    paddingVertical: 8,
   },
   languageDivider: {
-    color: '#6F7787',
+    color: '#41484D',
     fontWeight: '400',
   },
   footer: {
     textAlign: 'center',
-    color: '#838A9B',
+    color: '#41484D',
     lineHeight: 18,
     fontSize: 11,
     marginTop: 16,
     paddingHorizontal: 16,
+  },
+  footerLink: {
+    color: '#41484D',
+    textDecorationLine: 'underline',
   },
 });
