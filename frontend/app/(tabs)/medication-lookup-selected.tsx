@@ -3,8 +3,8 @@ import { DrugSearchResult } from '@/api/types';
 import getUserLocation from '@/api/userLocation';
 import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Image,
@@ -47,10 +47,8 @@ const MedicationLookupSelectedScreen = () => {
   type PaperInputRef = React.ComponentRef<typeof TextInput>;
   const inputRef = useRef<PaperInputRef>(null);
 
-  const drugName = useMemo(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('drugName') || '';
-  }, []);
+  const params = useLocalSearchParams<{ drugName: string }>();
+  const drugName = Array.isArray(params.drugName) ? params.drugName[0] : params.drugName || '';
 
   useEffect(() => {
     // TODO: Get forms

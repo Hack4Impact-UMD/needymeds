@@ -15,6 +15,7 @@ import {
 
 const MAX_DSNT_RADIUS = 125.99;
 const MAX_SCRIPTSAVE_NUMRESULTS = 100;
+const ZIPCODE_LENGTH = 5;
 
 export async function autoCompleteSearchDrug(drugPrefix: string): Promise<string[]> {
   const autoCompleteResponse: ScriptSaveAutoCompleteResponse = await scriptSaveClient.autoComplete({
@@ -100,11 +101,6 @@ async function searchDrug(
     scriptSaveClient.getDrugPrices(scriptSaveSearchQuery),
   ]);
 
-  console.log('DSNT RESULTS:');
-  console.log(dsntDrugResults);
-  console.log('SCRIPTSAVE RESULTS:');
-  console.log(scriptSaveDrugResults);
-
   const pharmacyResultMap: Map<string, DrugSearchResult[]> = new Map();
 
   // Process DSNT results
@@ -113,7 +109,12 @@ async function searchDrug(
       continue;
     }
 
-    const pharmacyCoords = await zipToCoords(dsntResult.zipCode);
+    const dsntZipCode: string =
+      dsntResult.zipCode.length === ZIPCODE_LENGTH
+        ? dsntResult.zipCode
+        : dsntResult.zipCode.slice(0, 5);
+
+    const pharmacyCoords = await zipToCoords(dsntZipCode);
 
     const distance = distanceBetweenCoordinates(
       { lat: pharmacyCoords.lat, lon: pharmacyCoords.lon },
@@ -125,8 +126,8 @@ async function searchDrug(
     }
 
     const pharmacyAddress = dsntResult.street2
-      ? `${dsntResult.street1}, ${dsntResult.street2}, ${dsntResult.city}, ${dsntResult.state} ${dsntResult.zipCode}`
-      : `${dsntResult.street1}, ${dsntResult.city}, ${dsntResult.state} ${dsntResult.zipCode}`;
+      ? `${dsntResult.street1}, ${dsntResult.street2}, ${dsntResult.city}, ${dsntResult.state} ${dsntZipCode}`
+      : `${dsntResult.street1}, ${dsntResult.city}, ${dsntResult.state} ${dsntZipCode}`;
 
     const convertedResult: DrugSearchResult = {
       adjudicator: 'DSNT',
