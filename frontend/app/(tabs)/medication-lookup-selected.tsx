@@ -18,6 +18,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { ActivityIndicator, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomNavBar from '../components/BottomNavBar';
+import ErrorState from '../components/errorMessage';
 import LanguageDropdown from '../components/LanguageDropdown';
 import { LookupSearchbar } from '../components/LookupSearchbar';
 import MedicationLookupResultModal from '../components/medication-lookup/MedicationLookupResultModal';
@@ -43,6 +44,9 @@ const MedicationLookupSelectedScreen = () => {
   const [detectingZip, setDetectingZip] = useState(false);
   const [formOptions, setFormOptions] = useState(['tube']);
   const [drugResults, setDrugResults] = useState<DrugSearchResult[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
   type PaperInputRef = React.ComponentRef<typeof TextInput>;
   const inputRef = useRef<PaperInputRef>(null);
@@ -56,19 +60,30 @@ const MedicationLookupSelectedScreen = () => {
   }, []);
 
   useEffect(() => {
-    if (!radius || !includeGeneric || !zipCode || zipCode.length !== ZIPCODE_LENGTH) {
+    if (!radius || !zipCode || zipCode.length !== ZIPCODE_LENGTH) {
       return;
     }
 
     const fetchDrugSearchResults = async () => {
-      // TODO: Add generic form to DrugSearchResult
-      const drugSearchResults: DrugSearchResult[] = await searchDrugByPrice(
-        drugName,
-        Number(radius),
-        includeGeneric,
-        Number(zipCode)
-      );
-      setDrugResults(drugSearchResults);
+      try {
+        setIsLoading(true);
+        setHasError(false);
+        const drugSearchResults: DrugSearchResult[] = await searchDrugByPrice(
+          drugName,
+          Number(radius),
+          includeGeneric,
+          Number(zipCode)
+        );
+        setDrugResults(drugSearchResults);
+        setHasSearched(true);
+      } catch (error) {
+        console.error('Error fetching drug results:', error);
+        setHasError(true);
+        setDrugResults([]);
+        setHasSearched(true);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     fetchDrugSearchResults();
@@ -232,7 +247,7 @@ const MedicationLookupSelectedScreen = () => {
           </View>
 
           {/* Filter Options */}
-          {drugResults.length > 0 && (
+          {drugResults.length > 0 && !isLoading && (
             <View style={styles.filterContainer}>
               <View style={{ marginRight: 8 }}>
                 <Dropdown
@@ -288,16 +303,25 @@ const MedicationLookupSelectedScreen = () => {
             contentContainerStyle={styles.scrollContentContainer}
           >
             <View style={styles.pharmacyListContainer}>
-              {drugResults.length === 0 ? (
+              {isLoading ? (
+                // Show loading state
+                <ErrorState type="loading" />
+              ) : hasError ? (
+                // Show error state
+                <ErrorState
+                  type="generic"
+                  message="We couldn't load pharmacy results right now. Please check your connection and try again."
+                />
+              ) : drugResults.length === 0 ? (
+                // Show initial empty state (before search)
                 <View style={styles.emptyState}>
                   <MaterialIcons name="add-shopping-cart" size={64} color="#555" />
                   <Text style={styles.emptyStateTitle}>
-                    {query.trim() !== ''
-                      ? 'Looks like that’s not available here right \nnow. Try checking other zip codes or \nincreasing the search radius.'
-                      : "Tell us how much you're looking for,\nand where you can pick it up."}
+                    Tell us how much you're looking for,{'\n'}and where you can pick it up.
                   </Text>
                 </View>
               ) : (
+                // Show results list
                 drugResults.map((result) => (
                   <TouchableOpacity
                     key={result.pharmacyName}
