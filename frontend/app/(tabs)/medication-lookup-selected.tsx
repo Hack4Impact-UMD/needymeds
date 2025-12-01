@@ -364,9 +364,7 @@ const MedicationLookupSelectedScreen = () => {
                       </View>
                       <View style={styles.pharmacyInfo}>
                         <View style={[styles.pharmacyHeader, styles.pharmacyHeaderColumn]}>
-                          {result.pharmacyName && (
-                            <Text style={styles.pharmacyLabel}>{result.pharmacyName}</Text>
-                          )}
+                          <Text style={styles.pharmacyLabel}>{result.labelName}</Text>
                           <Text style={styles.pharmacyName}>{result.pharmacyName}</Text>
                         </View>
                         <Text style={styles.pharmacyPrice}>${result.price}</Text>
