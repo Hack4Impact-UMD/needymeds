@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router, usePathname } from 'expo-router';
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Surface, Text } from 'react-native-paper';
 
 const resourcesIcon = require('../assets/Icon.png');
@@ -8,70 +8,134 @@ const cardIcon = require('../assets/confirmation_number.png');
 
 const BottomNavBar = () => {
   const pathname = usePathname();
+  const isMedicationLookupActive = pathname.includes('medication-lookup') || pathname === '/(tabs)';
+  const isPharmacyLookupActive = pathname.includes('pharmacy-lookup') || pathname === '/(tabs)';
+  const isEducationalResourcesActive =
+    pathname.includes('educational-resources') || pathname === '/(tabs)';
 
   return (
-    <Surface style={styles.bottomNav} elevation={0}>
-      <TouchableOpacity style={styles.navItem} activeOpacity={0.85}>
-        <View style={pathname.includes('search') ? styles.navActiveContainer : undefined}>
-          <MaterialCommunityIcons
-            name="magnify"
-            size={21}
-            color={pathname.includes('search') ? '#7C3AED' : '#6B7280'}
-          />
-        </View>
-        <Text variant="labelMedium" style={styles.navLabel}>
-          Search
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.navItem} onPress={() => router.push('/DDC')}>
-        <Image source={cardIcon} style={{ width: 26, height: 26 }} resizeMode="contain" />
-        <Text variant="labelMedium" style={styles.navLabel}>
-          My Cards
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.navItem}>
-        <Image source={resourcesIcon} style={{ width: 26, height: 26 }} resizeMode="contain" />
-        <Text variant="labelMedium" style={styles.navLabel}>
-          Resources
-        </Text>
-      </TouchableOpacity>
-    </Surface>
+    <View style={styles.mobileWrapper}>
+      <Surface style={styles.bottomNav} elevation={0}>
+        <TouchableOpacity
+          style={styles.navItem}
+          activeOpacity={0.85}
+          onPress={() => router.push('medication-lookup')}
+        >
+          <View
+            style={{
+              width: 60,
+              height: 30,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 30,
+              backgroundColor: isMedicationLookupActive ? '#B6EBFF' : '#EBEEF3',
+            }}
+          >
+            <MaterialCommunityIcons
+              name={isMedicationLookupActive ? 'medication' : 'medication-outline'}
+              size={24}
+              color="#004E60"
+            />
+          </View>
+          <Text
+            variant="labelMedium"
+            style={[styles.navLabel, isMedicationLookupActive && styles.navLabelActive]}
+          >
+            Drug Prices
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navItem}
+          activeOpacity={0.85}
+          onPress={() => router.push('pharmacy-lookup')}
+        >
+          <View
+            style={{
+              width: 60,
+              height: 30,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 30,
+              backgroundColor: isPharmacyLookupActive ? '#B6EBFF' : '#EBEEF3',
+            }}
+          >
+            <MaterialCommunityIcons
+              name={isPharmacyLookupActive ? 'store' : 'store-outline'}
+              size={24}
+              color="#004E60"
+            />
+          </View>
+          <Text variant="labelMedium" style={styles.navLabel}>
+            Pharmacies
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navItem}
+          activeOpacity={0.85}
+          onPress={() => router.push('educational-resources')}
+        >
+          <View
+            style={{
+              width: 60,
+              height: 30,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 30,
+              backgroundColor: isEducationalResourcesActive ? '#B6EBFF' : '#EBEEF3',
+            }}
+          >
+            <MaterialCommunityIcons
+              name={isEducationalResourcesActive ? 'library' : 'library-outline'}
+              size={24}
+              color="#004E60"
+            />
+            <Text variant="labelMedium" style={styles.navLabel}>
+              Resources
+            </Text>
+          </View>
+        </TouchableOpacity>
+      </Surface>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   bottomNav: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: '#FAF5FF',
+    backgroundColor: '#EBEEF3',
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingTop: 4,
+    paddingTop: 8,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 8,
     borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
+    borderTopColor: '#E5E7EB',
+    height: Platform.OS === 'ios' ? 84 : 68,
+  },
+  mobileWrapper: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    maxWidth: 412,
+    alignSelf: 'center',
+    backgroundColor: '#fff',
+    zIndex: 1000,
   },
   navItem: {
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: 88,
-    paddingVertical: 8,
+    flex: 1,
+    paddingVertical: 4,
   },
   navLabel: {
-    marginTop: 6,
+    marginTop: 4,
     fontSize: 12,
-    color: '#625B71',
-    fontWeight: '500',
+    color: '#6B7280',
+    fontWeight: '400',
+    fontFamily: 'Nunito Sans',
   },
-  navActiveContainer: {
-    width: 60,
-    height: 30,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#E8DEF8',
+  navLabelActive: {
+    color: '#111827',
+    fontWeight: '600',
   },
 });
 

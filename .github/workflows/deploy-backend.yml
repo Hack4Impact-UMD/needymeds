@@ -1,0 +1,53 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches:
+      - 'backend-cicd'
+    paths:
+      - 'backend/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::076301327489>:role/github-actions-backend-deploy
+          aws-region: us-east-2
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build & Push (ARM)
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          platforms: linux/arm64
+          tags: 076301327489.dkr.ecr.us-east-2.amazonaws.com/needymeds-backend:latest
+
+      - name: List EC2 instance IDs
+        id: ec2
+        run: |
+          ids=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=needymeds-backend" \
+            --query "Reservations[*].Instances[*].InstanceId" --output text)
+          echo "INSTANCE_IDS=$ids" >> $GITHUB_ENV
+
+      - name: Deploy via SSM SendCommand
+        run: |
+          aws ssm send-command \
+            --instance-ids $INSTANCE_IDS \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploy backend" \
+            --parameters '{"commands":["/opt/deploy/deploy.sh"]}'

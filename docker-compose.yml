@@ -1,8 +1,8 @@
 version: '3.9'
 services:
   backend:
-    build: ./backend
-    container_name: needymeds-backend
+    image: 076301327489.dkr.ecr.us-east-2.amazonaws.com/needymeds-mobile-app:latest
+    container_name: needymeds-mobile-app
     ports:
       - '9000:3000'
     environment:
