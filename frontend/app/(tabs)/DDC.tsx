@@ -134,18 +134,25 @@ const DST = () => {
               </View>
 
               <View style={styles.actionRow}>
-
-                {/* Need to replace with pressables for popup pages */}
-                <View style={styles.actionButton}>
+                <Pressable
+                  style={styles.actionButton}
+                  onPress={() => {
+                    router.push({
+                      pathname: '/expand',
+                      params: {
+                        adjudicator: result.adjudicator,
+                      },
+                    });
+                  }}
+                >
                   <Image source={expandIcon} style={styles.actionIcon} resizeMode="contain" />
                   <Text style={styles.buttonText}>Expand</Text>
-                </View>
+                </Pressable>
 
                 <Pressable style={styles.actionButton} onPress={() => setShowShare(true)}>
                   <Image source={shareIcon} style={styles.actionIcon} resizeMode="contain" />
                   <Text style={styles.buttonText}>Share</Text>
                 </Pressable>
-
               </View>
 
               <View style={styles.footerNote}>
@@ -171,7 +178,6 @@ const DST = () => {
 
         {/* Bottom popup container */}
         <View style={styles.bottomSheet}>
-
           <Pressable style={styles.closeIconContainer} onPress={() => setShowShare(false)}>
             <MaterialIcons name="close" size={24} color="#555" />
           </Pressable>
@@ -204,10 +210,8 @@ const DST = () => {
             </View>
             <Text style={styles.sheetText}>Download to device</Text>
           </Pressable>
-
         </View>
       </Modal>
-
     </SafeAreaView>
   );
 };
@@ -329,7 +333,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     paddingTop: 40,
-    backgroundColor: 'rgba(0,0,0,0.4)'
+    backgroundColor: 'rgba(0,0,0,0.4)',
   },
   bottomSheet: {
     position: 'absolute',
@@ -342,13 +346,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-  
+
     // iOS-style drop shadow
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.15,
     shadowRadius: 12,
-  
+
     // Android elevation
     elevation: 10,
   },
@@ -392,7 +396,7 @@ const styles = StyleSheet.create({
   iconCircle: {
     width: 40,
     height: 40,
-    borderRadius: 20,          // makes it a circle
+    borderRadius: 20, // makes it a circle
     backgroundColor: '#1d658c', // navy blue
     alignItems: 'center',
     justifyContent: 'center',
