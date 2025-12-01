@@ -7,12 +7,15 @@ import { FlatList, Keyboard, StyleSheet, TextInput, TouchableOpacity, View } fro
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomNavBar from '../components/BottomNavBar';
+import ErrorState from '../components/errorMessage';
 import LanguageDropdown from '../components/LanguageDropdown';
 import { LookupSearchbar } from '../components/LookupSearchbar';
 
 const MedicationLookupAutocompleteScreen = () => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
@@ -25,17 +28,23 @@ const MedicationLookupAutocompleteScreen = () => {
   useEffect(() => {
     const fetchAutoCompleteDrugNames = async (q: string) => {
       try {
+        setIsLoading(true);
         const autoCompleteDrugNames: string[] = await autoCompleteSearchDrug(q);
         setResults(autoCompleteDrugNames);
+        setHasSearched(true);
       } catch (error: any) {
         console.log(error);
-        // TODO: Set error state
+        setResults([]);
+        setHasSearched(true);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     const q = query.trim().toLowerCase();
     if (q.length < 3) {
       setResults([]);
+      setHasSearched(false);
     } else {
       fetchAutoCompleteDrugNames(q);
     }
@@ -43,7 +52,6 @@ const MedicationLookupAutocompleteScreen = () => {
 
   const handleSelectMed = (item: string) => {
     Keyboard.dismiss();
-    // Navigate to selected medication details with params
     router.push({
       pathname: '/medication-lookup-selected',
       params: {
@@ -54,6 +62,7 @@ const MedicationLookupAutocompleteScreen = () => {
 
   const clearSearch = () => {
     setQuery('');
+    setHasSearched(false);
     inputRef.current?.focus();
   };
 
@@ -79,11 +88,12 @@ const MedicationLookupAutocompleteScreen = () => {
                   Type the first three letters to start searching.
                 </Text>
               </View>
-            ) : results.length === 0 ? (
-              // Show no results message
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyText}>No results found for "{query}"</Text>
-              </View>
+            ) : isLoading ? (
+              // Show loading error state
+              <ErrorState type="loading" />
+            ) : results.length === 0 && hasSearched ? (
+              // Show not found error state
+              <ErrorState type="notFound" query={query} />
             ) : (
               // Show results list
               <FlatList
@@ -131,18 +141,6 @@ const styles = StyleSheet.create({
     maxWidth: 412,
     backgroundColor: Colors.default.neutrallt,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: Colors.default.neutrallt,
-  },
-  logoImage: {
-    width: 120,
-    height: 32,
-  },
   searchContainer: {
     paddingHorizontal: 8,
     paddingVertical: 10,
@@ -159,12 +157,12 @@ const styles = StyleSheet.create({
   emptyState: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 20,
+    paddingTop: 60,
   },
   emptyText: {
     color: '#181C20',
     textAlign: 'left',
-    fontFamily: 'Open Sans',
+    fontFamily: 'Nunito Sans',
     lineHeight: 22,
     fontSize: 16,
     borderBottomWidth: 1,
@@ -193,7 +191,7 @@ const styles = StyleSheet.create({
   resultName: {
     fontSize: 15,
     fontWeight: '500',
-    fontFamily: 'Open Sans',
+    fontFamily: 'Nunito Sans',
     color: '#111827',
     lineHeight: 22,
   },
