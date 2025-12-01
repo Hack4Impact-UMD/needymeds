@@ -1,4 +1,4 @@
-import { searchDrugByPrice } from '@/api/drugSearch';
+import { searchDrugByDistance, searchDrugByPrice } from '@/api/drugSearch';
 import { DrugSearchResult } from '@/api/types';
 import getUserLocation from '@/api/userLocation';
 import { Colors } from '@/constants/theme';
@@ -56,23 +56,36 @@ const MedicationLookupSelectedScreen = () => {
   }, []);
 
   useEffect(() => {
-    if (!radius || !includeGeneric || !zipCode || zipCode.length !== ZIPCODE_LENGTH) {
+    if (!quantity || !radius || !includeGeneric || !zipCode || zipCode.length !== ZIPCODE_LENGTH) {
       return;
     }
 
     const fetchDrugSearchResults = async () => {
       // TODO: Add generic form to DrugSearchResult
-      const drugSearchResults: DrugSearchResult[] = await searchDrugByPrice(
-        drugName,
-        Number(radius),
-        includeGeneric,
-        Number(zipCode)
-      );
+      let drugSearchResults: DrugSearchResult[];
+      if (sortBy === 'price') {
+        drugSearchResults = await searchDrugByPrice(
+          drugName,
+          form,
+          Number(radius),
+          includeGeneric,
+          Number(zipCode)
+        );
+      } else {
+        drugSearchResults = await searchDrugByDistance(
+          drugName,
+          form,
+          Number(radius),
+          includeGeneric,
+          Number(zipCode)
+        );
+      }
+
       setDrugResults(drugSearchResults);
     };
 
     fetchDrugSearchResults();
-  }, [radius, includeGeneric, zipCode]);
+  }, [sortBy, radius, includeGeneric, zipCode]);
 
   const clearSearch = () => {
     setQuery('');
@@ -322,7 +335,9 @@ const MedicationLookupSelectedScreen = () => {
                       </View>
                     </View>
                     <View style={styles.pharmacyRight}>
-                      <Text style={styles.pharmacyDistance}>{result.distance}</Text>
+                      <Text style={styles.pharmacyDistance}>
+                        {Number(result.distance).toFixed(2)}
+                      </Text>
                       <MaterialCommunityIcons name="chevron-right" size={20} color="#9CA3AF" />
                     </View>
                   </TouchableOpacity>

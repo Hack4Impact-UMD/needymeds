@@ -110,6 +110,8 @@ export interface ScriptSaveAutoCompleteItem {
 
 export interface ScriptSaveFindDrugsResponse {
   Drugs: ScriptSaveDrugItem[];
+  Names: ScriptSaveNameItem[];
+  Forms: ScriptSaveFormItem[];
 }
 
 export interface ScriptSaveDrugItem {
@@ -142,15 +144,13 @@ export interface ScriptSaveDrugItem {
   Splittable: string;
 }
 
-export interface ScriptSaveGetDrugFormStrengthResponse {
+export interface ScriptSaveNameItem {
   DrugName: string;
   BrandGeneric: string;
-  Forms: ScriptSaveDrugForm[];
-  Strengths: ScriptSaveDrugStrength[];
-  Quantities: ScriptSaveDrugQuantity[];
+  IsSelected: string;
 }
 
-export interface ScriptSaveDrugForm {
+export interface ScriptSaveFormItem {
   GSN: string;
   Form: string;
   Ranking: string;
@@ -161,7 +161,7 @@ export interface ScriptSaveDrugForm {
   DiscontinuedDate: string;
 }
 
-export interface ScriptSaveDrugStrength {
+export interface ScriptSaveStrengthItem {
   GSN: string;
   Strength: string;
   Ranking: string;
@@ -170,12 +170,20 @@ export interface ScriptSaveDrugStrength {
   CommonQty: string;
 }
 
-export interface ScriptSaveDrugQuantity {
+export interface ScriptSaveQuantityItem {
   GSN: string;
   Quantity: string;
   QuantityLabel: string;
   Ranking: string;
   IsSelected: string;
+}
+
+export interface ScriptSaveGetDrugFormStrengthResponse {
+  DrugName: string;
+  BrandGeneric: string;
+  Forms: ScriptSaveFormItem[];
+  Strengths: ScriptSaveStrengthItem[];
+  Quantities: ScriptSaveQuantityItem[];
 }
 
 export interface ScriptSavePriceResponse {

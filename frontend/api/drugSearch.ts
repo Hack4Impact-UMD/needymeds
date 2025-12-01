@@ -16,6 +16,11 @@ import {
 const MAX_DSNT_RADIUS = 125.99;
 const MAX_SCRIPTSAVE_NUMRESULTS = 100;
 const ZIPCODE_LENGTH = 5;
+const DEFAULT_ZIPCODE = '01930';
+
+let ndc: string = '';
+let genericVersion: string | null = null;
+let availableForms: string[] = [];
 
 export async function autoCompleteSearchDrug(drugPrefix: string): Promise<string[]> {
   const autoCompleteResponse: ScriptSaveAutoCompleteResponse = await scriptSaveClient.autoComplete({
@@ -40,6 +45,37 @@ export async function autoCompleteSearchDrug(drugPrefix: string): Promise<string
   return autoCompleteDrugNames;
 }
 
+export async function initializeDrugSearch(drugName: string) {
+  // Find the drug’s NDC
+  const findDrugsResponse: ScriptSaveFindDrugsResponse = await scriptSaveClient.getDrugsByName({
+    drugName,
+    brandIndicator,
+    groupID: String(groupID),
+    includeDrugInfo: 'false',
+    includeDrugImage: 'false',
+    quantity: '1',
+    numPharm: '1',
+    zipCode: DEFAULT_ZIPCODE,
+    useUC: 'true',
+  });
+
+  if (!findDrugsResponse.Drugs?.length || !findDrugsResponse.Drugs?.length) {
+    throw new Error('Initializing drug search failed');
+  }
+
+  ndc = findDrugsResponse.Drugs[0].NDC;
+  for (const nameItem of findDrugsResponse.Names) {
+    if (nameItem.BrandGeneric === 'G') {
+      genericVersion = nameItem.DrugName;
+    }
+  }
+
+  availableForms = findDrugsResponse.Forms.map((form) => {
+    const formName = form.Form.replace(/\([^)]*\)/g, '').trim(); // Remove substrings in parentheses (and the parentheses themselves)
+    return formName;
+  });
+}
+
 /**
  * This function queries both adjudicator APIs to find pharmacy drugs with
  * the given 'drugName', within 'radius' miles of 'zipCode'. It de-duplicates
@@ -52,31 +88,16 @@ export async function autoCompleteSearchDrug(drugPrefix: string): Promise<string
  */
 async function searchDrug(
   drugName: string,
+  form: string,
   radius: number,
   includeGeneric: boolean,
   effectiveZip: string
 ): Promise<DrugSearchResult[]> {
-  console.log('Hello');
-  const userCoords = await zipToCoords(effectiveZip);
-
-  // Find the drug’s NDC
-  const findDrugsResponse: ScriptSaveFindDrugsResponse = await scriptSaveClient.getDrugsByName({
-    drugName,
-    brandIndicator,
-    groupID: String(groupID),
-    includeDrugInfo: 'false',
-    includeDrugImage: 'false',
-    quantity: '1',
-    numPharm: '1',
-    zipCode: effectiveZip,
-    useUC: 'true',
-  });
-
-  if (!findDrugsResponse.Drugs?.length) {
-    return [];
+  if (!ndc) {
+    throw new Error('The NDC has not been initialized');
   }
 
-  const ndc = findDrugsResponse.Drugs[0].NDC;
+  const userCoords = await zipToCoords(effectiveZip);
 
   // Prepare adjudicator queries
   const dsntSearchQuery: DsntPriceRequest = {
@@ -105,8 +126,16 @@ async function searchDrug(
 
   // Process DSNT results
   for (const dsntResult of dsntDrugResults.DrugPricing ?? []) {
-    if (!includeGeneric && !dsntResult.labelName.includes(drugName)) {
+    if (!includeGeneric && !dsntResult.labelName.includes(genericVersion)) {
       continue;
+    }
+
+    if (!dsntResult.labelName.includes(form)) {
+      for (const availableForm of availableForms) {
+        if (dsntResult.labelName.toLowerCase().includes(availableForm.toLowerCase())) {
+          continue;
+        }
+      }
     }
 
     const dsntZipCode: string =
@@ -152,6 +181,14 @@ async function searchDrug(
       continue;
     }
 
+    if (!scriptSaveResult.ln.includes(form)) {
+      for (const availableForm of availableForms) {
+        if (scriptSaveResult.ln.toLowerCase().includes(availableForm.toLowerCase())) {
+          continue;
+        }
+      }
+    }
+
     const distance = distanceBetweenCoordinates(
       { lat: scriptSaveResult.latitude, lon: scriptSaveResult.longitude },
       { lat: userCoords.lat, lon: userCoords.lon }
@@ -193,6 +230,7 @@ async function searchDrug(
 // -----------------------------------------------------------------------------
 export async function searchDrugByPrice(
   drugName: string,
+  form: string,
   radius: number,
   includeGeneric: boolean,
   zipCode?: number
@@ -202,13 +240,13 @@ export async function searchDrugByPrice(
 
     const effectiveZip = zipCode !== undefined && zipCode !== null ? String(zipCode) : userZipCode;
 
-    const key = `${drugName.toLowerCase()}-${effectiveZip}-${radius}-${includeGeneric}`;
+    const key = `${drugName.toLowerCase()}-${effectiveZip}-${radius}-${form}-${includeGeneric}`;
     const state = store.getState() as any;
     const cachedEntry = state.drugSearch.resultsByPrice[key];
     if (cachedEntry) return cachedEntry.results;
 
     // Reutilize distance-sorted cache if available
-    const byDistanceKey = `${drugName.toLowerCase()}-${effectiveZip}-${radius}-${includeGeneric}`;
+    const byDistanceKey = `${drugName.toLowerCase()}-${effectiveZip}-${radius}-${form}-${includeGeneric}`;
     const cachedDistanceEntry = state.drugSearch.resultsByDistance[byDistanceKey];
     if (cachedDistanceEntry) {
       const sorted = [...cachedDistanceEntry.results].sort((a, b) => +a.price - +b.price);
@@ -217,7 +255,7 @@ export async function searchDrugByPrice(
     }
 
     // Fresh query
-    const searchResults = await searchDrug(drugName, radius, includeGeneric, effectiveZip);
+    const searchResults = await searchDrug(drugName, form, radius, includeGeneric, effectiveZip);
     const sorted = [...searchResults].sort((a, b) => +a.price - +b.price);
     store.dispatch(setCacheEntry({ key, results: sorted, by: 'price' }));
     return sorted;
@@ -232,6 +270,7 @@ export async function searchDrugByPrice(
 // -----------------------------------------------------------------------------
 export async function searchDrugByDistance(
   drugName: string,
+  form: string,
   radius: number,
   includeGeneric: boolean,
   zipCode?: number
@@ -241,13 +280,13 @@ export async function searchDrugByDistance(
 
     const effectiveZip = zipCode !== undefined && zipCode !== null ? String(zipCode) : userZipCode;
 
-    const key = `${drugName.toLowerCase()}-${effectiveZip}-${radius}-${includeGeneric}`;
+    const key = `${drugName.toLowerCase()}-${effectiveZip}-${radius}-${form}-${includeGeneric}`;
     const state = store.getState() as any;
     const cachedEntry = state.drugSearch.resultsByDistance[key];
     if (cachedEntry) return cachedEntry.results;
 
     // Reutilize price-sorted cache if available
-    const byPriceKey = `${drugName.toLowerCase()}-${effectiveZip}-${radius}-${includeGeneric}`;
+    const byPriceKey = `${drugName.toLowerCase()}-${effectiveZip}-${radius}-${form}-${includeGeneric}`;
     const cachedByPriceEntry = state.drugSearch.resultsByPrice[byPriceKey];
     if (cachedByPriceEntry) {
       const sorted = [...cachedByPriceEntry.results].sort((a, b) => +a.distance - +b.distance);
@@ -256,7 +295,7 @@ export async function searchDrugByDistance(
     }
 
     // Fresh query
-    const searchResults = await searchDrug(drugName, radius, includeGeneric, effectiveZip);
+    const searchResults = await searchDrug(drugName, form, radius, includeGeneric, effectiveZip);
     const sorted = [...searchResults].sort((a, b) => +a.distance - +b.distance);
     store.dispatch(setCacheEntry({ key, results: sorted, by: 'distance' }));
     return sorted;
