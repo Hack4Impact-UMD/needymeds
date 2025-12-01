@@ -1,6 +1,6 @@
 import { Colors } from '@/constants/theme';
 import { router } from 'expo-router';
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image, Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -33,7 +33,7 @@ const WelcomeScreen = () => {
             <View style={styles.primaryButtonWrapper}>
               <Button
                 mode="contained"
-                onPress={() => router.navigate('/search')}
+                onPress={() => router.navigate('/medication-lookup')}
                 buttonColor="#236488"
                 textColor={Colors.default.neutrallt}
                 style={styles.primaryButton}
@@ -44,7 +44,7 @@ const WelcomeScreen = () => {
               </Button>
             </View>
             <Text variant="bodySmall" style={styles.secondaryMessage}>
-              No sign-up or personal information needed
+              No sign-up or personal information needed.
             </Text>
             <TouchableOpacity activeOpacity={0.7}>
               <Text variant="bodySmall" style={styles.languageSwitcher}>
@@ -52,9 +52,27 @@ const WelcomeScreen = () => {
               </Text>
             </TouchableOpacity>
           </View>
-          <Text variant="bodySmall" style={styles.footer}>
-            Copyright © 2025 by NeedyMeds, Inc.{'\n'}Terms & Conditions | Privacy Policy
-          </Text>
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Copyright © 2025 by NeedyMeds, Inc.</Text>
+
+            <View style={styles.footerLinkContainer}>
+              <Text
+                style={styles.footerLink}
+                onPress={() => Linking.openURL('https://www.needymeds.org/terms')}
+              >
+                Terms & Conditions
+              </Text>
+
+              <Text style={styles.footerSeparator}> | </Text>
+
+              <Text
+                style={styles.footerLink}
+                onPress={() => Linking.openURL('https://www.needymeds.org/privacy')}
+              >
+                Privacy Policy
+              </Text>
+            </View>
+          </View>
         </View>
       </View>
     </SafeAreaView>
@@ -103,13 +121,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Nunito Sans',
   },
   description: {
+    fontFamily: 'Roboto',
     textAlign: 'center',
     lineHeight: 20,
     maxWidth: 412,
     color: '#181C20',
     fontSize: 14,
     paddingHorizontal: 8,
-    fontFamily: 'Roboto',
     letterSpacing: 0.25,
     paddingTop: 10,
   },
@@ -145,35 +163,54 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   primaryButtonLabel: {
-    fontSize: 16,
+    fontFamily: 'Open Sans',
+    fontSize: 15,
     fontWeight: '400',
     letterSpacing: 0.3,
     textAlign: 'center',
   },
   secondaryMessage: {
     textAlign: 'center',
-    color: '#6F7787',
+    color: '#41484D',
     fontSize: 13,
     maxWidth: 280,
     lineHeight: 18,
   },
   languageSwitcher: {
     textAlign: 'center',
-    color: Colors.default.secondary,
+    color: '#41484D',
     fontWeight: '400',
     fontSize: 14,
-    paddingVertical: 8,
   },
   languageDivider: {
-    color: '#6F7787',
+    color: '#41484D',
     fontWeight: '400',
   },
   footer: {
-    textAlign: 'center',
-    color: '#838A9B',
-    lineHeight: 18,
-    fontSize: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 16,
     paddingHorizontal: 16,
+  },
+  footerText: {
+    textAlign: 'center',
+    color: '#41484D',
+    lineHeight: 18,
+    fontSize: 11,
+    marginBottom: 4,
+  },
+  footerLinkContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footerSeparator: {
+    color: '#41484D',
+    fontSize: 11,
+  },
+  footerLink: {
+    color: '#41484D',
+    textDecorationLine: 'underline',
+    fontSize: 11,
   },
 });

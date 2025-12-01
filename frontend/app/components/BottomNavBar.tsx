@@ -1,5 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { usePathname } from 'expo-router';
+import { router, usePathname } from 'expo-router';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Surface, Text } from 'react-native-paper';
 
@@ -8,37 +8,91 @@ const cardIcon = require('../assets/confirmation_number.png');
 
 const BottomNavBar = () => {
   const pathname = usePathname();
-  const isSearchActive = pathname.includes('search') || pathname === '/(tabs)';
+  const isMedicationLookupActive = pathname.includes('medication-lookup') || pathname === '/(tabs)';
+  const isPharmacyLookupActive = pathname.includes('pharmacy-lookup') || pathname === '/(tabs)';
+  const isEducationalResourcesActive =
+    pathname.includes('educational-resources') || pathname === '/(tabs)';
 
   return (
     <View style={styles.mobileWrapper}>
       <Surface style={styles.bottomNav} elevation={0}>
-        <TouchableOpacity style={styles.navItem} activeOpacity={0.85}>
-          <View style={isSearchActive ? styles.navActiveContainer : undefined}>
+        <TouchableOpacity
+          style={styles.navItem}
+          activeOpacity={0.85}
+          onPress={() => router.push('medication-lookup')}
+        >
+          <View
+            style={{
+              width: 60,
+              height: 30,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 30,
+              backgroundColor: isMedicationLookupActive ? '#B6EBFF' : '#EBEEF3',
+            }}
+          >
             <MaterialCommunityIcons
-              name="pill"
+              name={isMedicationLookupActive ? 'medication' : 'medication-outline'}
               size={24}
-              color={isSearchActive ? '#236488' : '#6B7280'}
+              color="#004E60"
             />
           </View>
           <Text
             variant="labelMedium"
-            style={[styles.navLabel, isSearchActive && styles.navLabelActive]}
+            style={[styles.navLabel, isMedicationLookupActive && styles.navLabelActive]}
           >
             Drug Prices
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} activeOpacity={0.85}>
-          <MaterialCommunityIcons name="hospital-building" size={24} color="#6B7280" />
+        <TouchableOpacity
+          style={styles.navItem}
+          activeOpacity={0.85}
+          onPress={() => router.push('pharmacy-lookup')}
+        >
+          <View
+            style={{
+              width: 60,
+              height: 30,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 30,
+              backgroundColor: isPharmacyLookupActive ? '#B6EBFF' : '#EBEEF3',
+            }}
+          >
+            <MaterialCommunityIcons
+              name={isPharmacyLookupActive ? 'store' : 'store-outline'}
+              size={24}
+              color="#004E60"
+            />
+          </View>
           <Text variant="labelMedium" style={styles.navLabel}>
             Pharmacies
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} activeOpacity={0.85}>
-          <MaterialCommunityIcons name="book-open-variant" size={24} color="#6B7280" />
-          <Text variant="labelMedium" style={styles.navLabel}>
-            Resources
-          </Text>
+        <TouchableOpacity
+          style={styles.navItem}
+          activeOpacity={0.85}
+          onPress={() => router.push('educational-resources')}
+        >
+          <View
+            style={{
+              width: 60,
+              height: 30,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 30,
+              backgroundColor: isEducationalResourcesActive ? '#B6EBFF' : '#EBEEF3',
+            }}
+          >
+            <MaterialCommunityIcons
+              name={isEducationalResourcesActive ? 'library' : 'library-outline'}
+              size={24}
+              color="#004E60"
+            />
+            <Text variant="labelMedium" style={styles.navLabel}>
+              Resources
+            </Text>
+          </View>
         </TouchableOpacity>
       </Surface>
     </View>
@@ -58,10 +112,13 @@ const styles = StyleSheet.create({
     height: Platform.OS === 'ios' ? 84 : 68,
   },
   mobileWrapper: {
+    position: 'absolute',
+    bottom: 0,
     width: '100%',
     maxWidth: 412,
     alignSelf: 'center',
     backgroundColor: '#fff',
+    zIndex: 1000,
   },
   navItem: {
     alignItems: 'center',
@@ -79,15 +136,6 @@ const styles = StyleSheet.create({
   navLabelActive: {
     color: '#111827',
     fontWeight: '600',
-  },
-  navActiveContainer: {
-    width: 56,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#E0F2FE',
-    marginBottom: 2,
   },
 });
 
