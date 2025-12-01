@@ -1,12 +1,18 @@
 import { useState, useEffect } from 'react';
-import { View, StyleSheet, Platform, Alert, TouchableOpacity } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Platform,
+  Alert,
+  TouchableOpacity,
+} from 'react-native';
 import { Text, TextInput, Button } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import * as Location from 'expo-location';
 import HomeBackgroundShape from '../components/HomeBackgroundShape';
 import BottomNavBar from '../components/BottomNavBar';
 import Header from '../components/Header';
+
 
 const PharmacyLocatorScreen = () => {
   const [zipCode, setZipCode] = useState('');
@@ -14,6 +20,7 @@ const PharmacyLocatorScreen = () => {
   const [isSearchEnabled, setIsSearchEnabled] = useState(false);
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [showZipDropdown, setShowZipDropdown] = useState(false);
+  const [isZipFocused, setIsZipFocused] = useState(false);
 
   // Validate inputs and enable/disable search button
   useEffect(() => {
@@ -22,37 +29,40 @@ const PharmacyLocatorScreen = () => {
     setIsSearchEnabled(isZipValid && isRadiusValid);
   }, [zipCode, radius]);
 
-  // ✅ remove this whole effect:
-  // useEffect(() => {
-  //   console.log('zipCode changed to:', zipCode, 'length:', zipCode.length);
-  //   if (zipCode.length === 5) {
-  //     console.log('ZIP is 5 digits, closing dropdown');
-  //     setShowZipDropdown(false);
-  //   }
-  // }, [zipCode]);
+  // Show/hide dropdown based on focus state
+  useEffect(() => {
+    if (isZipFocused) {
+      setShowZipDropdown(true);
+    } else {
+      setShowZipDropdown(false);
+    }
+  }, [isZipFocused]);
 
   // Handle ZIP code input - restrict to 5 digits only
   const handleZipChange = (text: string) => {
+    // Only allow digits and max 5 characters
     const numericText = text.replace(/[^0-9]/g, '');
     if (numericText.length <= 5) {
       setZipCode(numericText);
     }
+    // Dropdown stays visible while typing
   };
 
+  // Show dropdown when ZIP field is focused
   const handleZipFocus = () => {
-    setShowZipDropdown(true);
+    setIsZipFocused(true);
   };
 
-  // Hide dropdown shortly after blur so taps still register
+  // Hide dropdown when ZIP field loses focus
   const handleZipBlur = () => {
+    // Small delay to allow dropdown click to register
     setTimeout(() => {
-      setShowZipDropdown(false);
-    }, 100); // 100ms is enough
+      setIsZipFocused(false);
+    }, 200);
   };
 
   // Handle detect location from dropdown
   const handleDetectFromDropdown = () => {
-    setShowZipDropdown(false); // hide immediately after selection
     handleDetectLocation();
   };
 
@@ -67,6 +77,7 @@ const PharmacyLocatorScreen = () => {
   // Clear ZIP code
   const handleClearZip = () => {
     setZipCode('');
+    // Keep dropdown visible since field is still focused
   };
 
   // Detect user location and convert to ZIP code
@@ -75,62 +86,28 @@ const PharmacyLocatorScreen = () => {
     console.log('Starting location detection...');
 
     try {
-      // Request location permissions
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      console.log('Permission status:', status);
-
-      if (status !== 'granted') {
-        Alert.alert(
-          'Permission Denied',
-          'Location permission is required to detect your location. Please enable it in your device settings.',
-          [{ text: 'OK' }]
-        );
-        setIsDetectingLocation(false);
-        return;
-      }
-
-      // Get current location
-      console.log('Getting current position...');
-      const location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      });
-
-      const { latitude, longitude } = location.coords;
-      console.log('Coordinates:', latitude, longitude);
-
-      // Use BigDataCloud reverse geocoding API (free, no key required)
-      console.log('Fetching address from coordinates...');
-      const response = await fetch(
-        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
-      );
-
-      if (!response.ok) {
-        console.log('Geocoding API error:', response.status);
-        throw new Error('Geocoding service unavailable');
-      }
-
-      const data = await response.json();
-      console.log('Geocoding response:', data);
-
-      const postalCode = data.postcode || data.postalCode;
-      console.log('Postal code from API:', postalCode);
-
-      if (postalCode) {
+      // Use the existing getUserLocation function from your API
+      const { default: getUserLocation } = await import('../../api/userLocation');
+      const result = await getUserLocation();
+      
+      console.log('Location result:', result);
+      
+      if (result.userZipCode) {
         // Extract 5-digit ZIP if it exists
-        const zipMatch = postalCode.match(/\d{5}/);
+        const zipMatch = result.userZipCode.match(/\d{5}/);
         console.log('ZIP match result:', zipMatch);
-
+        
         if (zipMatch) {
           const detectedZip = zipMatch[0];
           console.log('Setting ZIP code to:', detectedZip);
           setZipCode(detectedZip);
           console.log('ZIP code set successfully');
-          console.log('Current zipCode state should update to:', detectedZip);
-
-          // Force a small delay to ensure state updates
-          setTimeout(() => {
-            console.log('ZIP code after timeout - checking if updated');
-          }, 100);
+          
+          Alert.alert(
+            'Location Detected',
+            `ZIP code ${detectedZip} detected successfully!`,
+            [{ text: 'OK' }]
+          );
         } else {
           console.log('No 5-digit ZIP found in postal code');
           Alert.alert(
@@ -140,7 +117,7 @@ const PharmacyLocatorScreen = () => {
           );
         }
       } else {
-        console.log('No postal code in response');
+        console.log('No postal code in result');
         Alert.alert(
           'Location Detected',
           'Could not determine ZIP code from your location. Please enter it manually.',
@@ -149,11 +126,23 @@ const PharmacyLocatorScreen = () => {
       }
     } catch (error) {
       console.error('Error detecting location:', error);
-      Alert.alert(
-        'Error',
-        'Unable to detect your location. Please check your internet connection and try again.',
-        [{ text: 'OK' }]
-      );
+      
+      // Provide more specific error messages
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
+      if (errorMessage.includes('Permission')) {
+        Alert.alert(
+          'Permission Denied',
+          'Location permission is required to detect your location. Please enable it in your device settings.',
+          [{ text: 'OK' }]
+        );
+      } else {
+        Alert.alert(
+          'Error',
+          'Unable to detect your location. Please enter your ZIP code manually.',
+          [{ text: 'OK' }]
+        );
+      }
     } finally {
       console.log('Location detection finished');
       setIsDetectingLocation(false);
@@ -178,7 +167,7 @@ const PharmacyLocatorScreen = () => {
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
         <Header />
-        <HomeBackgroundShape top={450} height={700} color="#C7E7FF" />
+        <HomeBackgroundShape top={530} height={700} color="#C7E7FF" />
 
         {/* Title Section */}
         <View style={styles.titleSection}>
@@ -196,22 +185,25 @@ const PharmacyLocatorScreen = () => {
                 value={zipCode}
                 onChangeText={handleZipChange}
                 onFocus={handleZipFocus}
+                onBlur={handleZipBlur}
                 placeholder=""
                 mode="outlined"
                 keyboardType="numeric"
                 maxLength={5}
-                onBlur={handleZipBlur}
                 style={styles.textInput}
                 outlineStyle={styles.inputOutline}
                 textColor="#41484D"
                 left={<TextInput.Icon icon="map-marker" />}
                 right={
                   zipCode.length > 0 ? (
-                    <TextInput.Icon icon="close" onPress={handleClearZip} />
+                    <TextInput.Icon
+                      icon="close"
+                      onPress={handleClearZip}
+                    />
                   ) : undefined
                 }
               />
-
+              
               {/* Dropdown with "Detect my location" option */}
               {showZipDropdown && (
                 <View style={styles.dropdownContainer}>
@@ -288,7 +280,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: '400',
+    fontWeight: '600',
     color: '#41484D',
     lineHeight: 32,
   },
@@ -314,10 +306,10 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     position: 'absolute',
-    top: 56,
+    top: 60,
     left: 0,
     right: 0,
-    backgroundColor: '#EBEEF3',
+    backgroundColor: 'white',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#C1C7CE',
