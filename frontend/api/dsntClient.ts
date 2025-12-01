@@ -8,11 +8,11 @@ import {
 
 class DsntClient {
   getPriceByNdc(q: DsntPriceRequest) {
-    return apiGet<DsntPriceResponse>('/api/price', q);
+    return apiGet<DsntPriceResponse>('/api/dsnt/price', q);
   }
 
   getPriceByNdcAndNpi(q: DsntPriceNpiRequest) {
-    return apiGet<DsntPriceNpiResponse>('/api/price-ndc-npi', q);
+    return apiGet<DsntPriceNpiResponse>('/api/dsnt/price-ndc-npi', q);
   }
 }
 

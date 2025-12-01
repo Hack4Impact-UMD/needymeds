@@ -10,7 +10,7 @@ type Props = {
   maxWidth?: number;
 };
 
-export default function HomeBackgroundShape({
+export default function MedicationLookupBackgroundShape({
   top = 50,
   maxHeight,
   color = '#226488',

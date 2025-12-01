@@ -2,15 +2,12 @@ import { searchDrugByPrice } from '@/api/drugSearch';
 import { DrugSearchResult } from '@/api/types';
 import getUserLocation from '@/api/userLocation';
 import { Colors } from '@/constants/theme';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import * as Clipboard from 'expo-clipboard';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   Image,
-  Linking,
-  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -21,19 +18,9 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { ActivityIndicator, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomNavBar from '../components/BottomNavBar';
-import { SearchBar } from '../components/SearchBar';
-
-interface MedicationLookupSelectedScreenProps {
-  medicationName: string;
-  genericName: string;
-  strength: string;
-  onClose: () => void;
-}
-
-const langOptions = [
-  { label: 'EN', value: 'EN' },
-  { label: 'SP', value: 'SP' },
-];
+import LanguageDropdown from '../components/LanguageDropdown';
+import { LookupSearchbar } from '../components/LookupSearchbar';
+import MedicationLookupResultModal from '../components/medication-lookup/MedicationLookupResultModal';
 
 const sortOptions = [
   { label: 'By price', value: 'price' },
@@ -42,9 +29,7 @@ const sortOptions = [
 
 const ZIPCODE_LENGTH = 5;
 
-const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenProps> = ({
-  medicationName,
-}) => {
+const MedicationLookupSelectedScreen = () => {
   const [form, setForm] = useState('tube');
   const [quantity, setQuantity] = useState('1');
   const [zipCode, setZipCode] = useState('');
@@ -54,7 +39,6 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
   const [genericName, setGenericName] = useState('');
   const [selectedDrugResult, setSelectedDrugResult] = useState<DrugSearchResult | null>(null);
   const [query, setQuery] = useState('');
-  const [lang, setLang] = useState('EN');
   const [zipFocused, setZipFocused] = useState(false);
   const [detectingZip, setDetectingZip] = useState(false);
   const [formOptions, setFormOptions] = useState(['tube']);
@@ -92,19 +76,9 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
     fetchDrugSearchResults();
   }, [radius, includeGeneric, zipCode]);
 
-  const copyToClipboard = async (text: string) => {
-    await Clipboard.setStringAsync(text);
-    Alert.alert('Copied', 'Copied to clipboard');
-  };
-
   const clearSearch = () => {
     setQuery('');
     inputRef.current?.focus();
-  };
-
-  const openMaps = (address: string) => {
-    const url = `https://maps.google.com/?q=${encodeURIComponent(address)}`;
-    Linking.openURL(url);
   };
 
   const detectZipFromLocation = async () => {
@@ -126,94 +100,6 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
     }
   };
 
-  const makeCall = (phone: string) => {
-    const phoneNumber = phone.replace(/[^0-9]/g, '');
-    Linking.openURL(`tel:${phoneNumber}`);
-  };
-
-  const handleLang = (item: any) => {
-    if (item && item.value) setLang(item.value);
-  };
-
-  const PharmacyDetailsModal = ({ result }: { result: DrugSearchResult }) => (
-    <Modal
-      visible={true}
-      animationType="slide"
-      transparent={true}
-      onRequestClose={() => setSelectedDrugResult(null)}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <View style={styles.dragHandleContainer}>
-            <View style={styles.dragHandle} />
-          </View>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{result.pharmacyName}</Text>
-            <TouchableOpacity onPress={() => setSelectedDrugResult(null)}>
-              <MaterialCommunityIcons name="close" size={24} color="#000" />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.modalBody}>
-            {/* Address Section */}
-            <View style={styles.infoCard}>
-              <View style={styles.infoContent}>
-                <Text style={styles.infoText}>{result.pharmacyAddress}</Text>
-                <Text style={styles.infoSubtext}>{result.distance}</Text>
-              </View>
-              <View style={styles.buttonGroup}>
-                <TouchableOpacity
-                  style={styles.iconButton}
-                  onPress={() => copyToClipboard(`${result.pharmacyAddress}`)}
-                >
-                  <MaterialCommunityIcons name="content-copy" size={20} color="#6B7280" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.iconButtonUI}
-                  onPress={() => openMaps(result.pharmacyAddress)}
-                >
-                  <MaterialCommunityIcons name="directions" size={20} color="#236488" />
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Phone Section */}
-            <View style={styles.infoCard}>
-              <Text style={styles.infoText}>{result.pharmacyPhone}</Text>
-              <View style={styles.buttonGroup}>
-                <TouchableOpacity
-                  style={styles.iconButton}
-                  onPress={() => copyToClipboard(result.pharmacyPhone)}
-                >
-                  <MaterialCommunityIcons name="content-copy" size={20} color="#6B7280" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.iconButtonUI}
-                  onPress={() => makeCall(result.pharmacyPhone)}
-                >
-                  <MaterialCommunityIcons name="phone" size={20} color="#236488" />
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Price Section */}
-            <View style={styles.priceCard}>
-              <View>
-                <Text style={styles.priceLabel}>
-                  {medicationName} {quantity} {form}
-                </Text>
-                <Text style={styles.priceAmount}>${result.price}</Text>
-              </View>
-              <TouchableOpacity style={styles.sendButtonIcon}>
-                <Image source={require('../assets/sendIcon.svg')} />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </View>
-    </Modal>
-  );
-
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.mobileWrapper}>
@@ -221,26 +107,17 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
           {/* Header with Search */}
           <View style={styles.header}>
             <View style={styles.searchContainer}>
-              <SearchBar
-                query={drugName}
-                onChangeText={setQuery}
-                onClear={clearSearch}
-                onFocus={() => router.push('/medication-lookup-autocomplete')}
-                removeFocus={true}
-              />
-              <Dropdown
-                mode="modal"
-                placeholder="EN"
-                value={lang}
-                labelField="label"
-                valueField="value"
-                data={langOptions}
-                onChange={handleLang}
-                style={styles.langDropdown}
-                placeholderStyle={styles.langText}
-                itemTextStyle={styles.langText}
-                selectedTextStyle={styles.langText}
-              />
+              <View style={{ width: '80%' }}>
+                <LookupSearchbar
+                  query={drugName}
+                  onChangeText={setQuery}
+                  onClear={clearSearch}
+                  onFocus={() => router.push('/medication-lookup-autocomplete')}
+                  removeFocus={true}
+                />
+              </View>
+
+              <LanguageDropdown />
             </View>
           </View>
 
@@ -415,7 +292,7 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
             <View style={styles.pharmacyListContainer}>
               {drugResults.length === 0 ? (
                 <View style={styles.emptyState}>
-                  <Image source={require('../assets/add_shopping_cart.svg')} />
+                  <MaterialIcons name="add-shopping-cart" size={64} color="#555" />
                   <Text style={styles.emptyStateTitle}>
                     {query.trim() !== ''
                       ? 'Looks like that’s not available here right \nnow. Try checking other zip codes or \nincreasing the search radius.'
@@ -459,8 +336,16 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
       </View>
       <BottomNavBar />
 
-      {/* Pharmacy Details Modal */}
-      {selectedDrugResult && <PharmacyDetailsModal result={selectedDrugResult} />}
+      {/* Medication Lookup Result Modal */}
+      {selectedDrugResult && (
+        <MedicationLookupResultModal
+          result={selectedDrugResult}
+          setSelectedDrugResult={setSelectedDrugResult}
+          drugName={drugName}
+          quantity={quantity}
+          form={form}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -494,9 +379,9 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     backgroundColor: Colors.default.neutrallt,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     gap: 10,
+    justifyContent: 'flex-start',
   },
   input: {
     flex: 1,
@@ -507,20 +392,6 @@ const styles = StyleSheet.create({
   clearButton: {
     padding: 4,
     marginLeft: 8,
-  },
-  langDropdown: {
-    width: 70,
-    height: 36,
-    borderColor: '#C1C7CE',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-  },
-  langText: {
-    color: '#41484D',
-    fontSize: 14,
-    fontWeight: 600,
-    fontFamily: 'Open Sans',
   },
   scrollContent: {
     flex: 1,
@@ -720,131 +591,6 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     fontFamily: 'Open Sans',
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  modalContent: {
-    backgroundColor: Colors.default.neutrallt,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingBottom: 32,
-    maxHeight: '80%',
-    width: '100%',
-    maxWidth: 412,
-    alignSelf: 'center',
-  },
-  dragHandleContainer: {
-    width: '100%',
-    alignItems: 'center',
-    paddingTop: 12,
-    paddingBottom: 8,
-  },
-  dragHandle: {
-    width: 36,
-    height: 4,
-    backgroundColor: '#D1D5DB',
-    borderRadius: 2,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    fontFamily: 'Open Sans',
-    color: '#111827',
-  },
-  modalBody: {
-    padding: 20,
-    gap: 16,
-  },
-  infoCard: {
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#C1C7CE',
-    padding: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  infoContent: {
-    flex: 1,
-  },
-  infoText: {
-    fontSize: 14,
-    color: '#374151',
-    marginBottom: 2,
-    fontFamily: 'Open Sans',
-  },
-  infoSubtext: {
-    fontSize: 13,
-    color: '#9CA3AF',
-    marginTop: 4,
-    fontFamily: 'Open Sans',
-  },
-  buttonGroup: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  iconButton: {
-    width: 40,
-    height: 40,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  iconButtonUI: {
-    width: 40,
-    height: 40,
-    backgroundColor: '#B6EBFF',
-    borderRadius: 28,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  priceCard: {
-    backgroundColor: Colors.default.neutrallt,
-    borderWidth: 1,
-    borderTopColor: '#C1C7CE',
-    borderLeftColor: Colors.default.neutrallt,
-    borderRightColor: Colors.default.neutrallt,
-    borderBottomColor: Colors.default.neutrallt,
-    marginTop: 25,
-    padding: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  priceLabel: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 4,
-    fontFamily: 'Open Sans',
-  },
-  priceAmount: {
-    fontSize: 14,
-    color: '#111827',
-    fontFamily: 'Open Sans',
-  },
-  sendButton: {
-    width: 48,
-    height: 48,
-    backgroundColor: '#3B82F6',
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   emptyState: {
     flex: 1,
     justifyContent: 'center',
@@ -866,17 +612,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 8,
     fontFamily: 'Open Sans',
-  },
-  sendButtonIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 28,
-    borderWidth: 1,
-    borderColor: '#ffffffff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#236488',
-    color: '#fff',
   },
   outlinedWrapper: {
     borderWidth: 1,
@@ -930,4 +665,5 @@ const styles = StyleSheet.create({
     gap: 4,
   },
 });
+
 export default MedicationLookupSelectedScreen;

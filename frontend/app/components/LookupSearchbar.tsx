@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { View, ViewStyle } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 
-interface SearchBarProps {
+interface LookupSearchbarProps {
   query: string;
   onChangeText: (text: string) => void;
   onClear: () => void;
@@ -12,7 +12,7 @@ interface SearchBarProps {
   removeFocus?: boolean;
 }
 
-export const SearchBar: React.FC<SearchBarProps> = ({
+export const LookupSearchbar: React.FC<LookupSearchbarProps> = ({
   query,
   onChangeText,
   onClear,
@@ -43,7 +43,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         }}
         inputStyle={{ color: '#41484D', fontFamily: 'Open Sans' }}
         style={{
-          width: 320,
           backgroundColor: '#EBEEF3',
           color: '#41484D',
           elevation: 0,

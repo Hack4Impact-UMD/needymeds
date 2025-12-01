@@ -4,21 +4,15 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { FlatList, Keyboard, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomNavBar from '../components/BottomNavBar';
-import { SearchBar } from '../components/SearchBar';
-
-const langOptions = [
-  { label: 'EN', value: 'EN' },
-  { label: 'SP', value: 'SP' },
-];
+import LanguageDropdown from '../components/LanguageDropdown';
+import { LookupSearchbar } from '../components/LookupSearchbar';
 
 const MedicationLookupAutocompleteScreen = () => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<string[]>([]);
-  const [lang, setLang] = useState('EN');
   const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
@@ -63,29 +57,17 @@ const MedicationLookupAutocompleteScreen = () => {
     inputRef.current?.focus();
   };
 
-  const handleLang = (item: any) => {
-    if (item && item.value) setLang(item.value);
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.wrapper}>
         <View style={styles.container}>
           {/* Search Bar */}
           <View style={styles.searchContainer}>
-            <SearchBar query={query} onChangeText={setQuery} onClear={clearSearch} />
-            <Dropdown
-              placeholder="EN"
-              value={lang}
-              labelField="label"
-              valueField="value"
-              data={langOptions}
-              onChange={handleLang}
-              style={styles.langDropdown}
-              placeholderStyle={styles.langText}
-              itemTextStyle={styles.langText}
-              selectedTextStyle={styles.langText}
-            />
+            <View style={{ width: '80%' }}>
+              <LookupSearchbar query={query} onChangeText={setQuery} onClear={clearSearch} />
+            </View>
+
+            <LanguageDropdown />
           </View>
 
           {/* Results or Empty State */}
@@ -160,21 +142,6 @@ const styles = StyleSheet.create({
   logoImage: {
     width: 120,
     height: 32,
-  },
-  langDropdown: {
-    width: 70,
-    height: 36,
-    borderColor: '#C1C7CE',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    backgroundColor: Colors.default.neutrallt,
-  },
-  langText: {
-    color: '#41484D',
-    fontSize: 14,
-    fontWeight: 600,
-    fontFamily: 'Open Sans',
   },
   searchContainer: {
     paddingHorizontal: 8,

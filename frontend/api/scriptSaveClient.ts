@@ -10,6 +10,7 @@ import {
   ScriptSavePriceResponse,
 } from './types';
 
+export const brandIndicator = 'G';
 export const groupID = 4295;
 export const ncpdp = 1918119;
 export const ndcOverride = true;

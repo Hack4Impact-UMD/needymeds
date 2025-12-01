@@ -3,7 +3,7 @@ import { setCacheEntry } from '../redux/drugSearchSlice';
 import { store } from '../redux/store';
 import { distanceBetweenCoordinates, zipToCoords } from './distance';
 import { dsntClient } from './dsntClient';
-import { groupID, ndcOverride, scriptSaveClient } from './scriptSaveClient';
+import { brandIndicator, groupID, ndcOverride, scriptSaveClient } from './scriptSaveClient';
 import {
   type DrugSearchResult,
   DsntPriceRequest,
@@ -55,12 +55,20 @@ async function searchDrug(
   includeGeneric: boolean,
   effectiveZip: string
 ): Promise<DrugSearchResult[]> {
+  console.log('Hello');
   const userCoords = await zipToCoords(effectiveZip);
 
   // Find the drug’s NDC
   const findDrugsResponse: ScriptSaveFindDrugsResponse = await scriptSaveClient.getDrugsByName({
     drugName,
+    brandIndicator,
     groupID: String(groupID),
+    includeDrugInfo: 'false',
+    includeDrugImage: 'false',
+    quantity: '1',
+    numPharm: '1',
+    zipCode: effectiveZip,
+    useUC: 'true',
   });
 
   if (!findDrugsResponse.Drugs?.length) {
@@ -91,6 +99,11 @@ async function searchDrug(
     dsntClient.getPriceByNdc(dsntSearchQuery),
     scriptSaveClient.getDrugPrices(scriptSaveSearchQuery),
   ]);
+
+  console.log('DSNT RESULTS:');
+  console.log(dsntDrugResults);
+  console.log('SCRIPTSAVE RESULTS:');
+  console.log(scriptSaveDrugResults);
 
   const pharmacyResultMap: Map<string, DrugSearchResult[]> = new Map();
 
