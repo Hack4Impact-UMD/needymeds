@@ -22,6 +22,11 @@ let ndc: string = '';
 let genericVersion: string | null = null;
 let availableForms: string[] = [];
 
+export interface InitializeDrugSearchResult {
+  genericVersion: string | null;
+  availableForms: string[];
+}
+
 export async function autoCompleteSearchDrug(drugPrefix: string): Promise<string[]> {
   const autoCompleteResponse: ScriptSaveAutoCompleteResponse = await scriptSaveClient.autoComplete({
     prefixText: drugPrefix,
@@ -54,19 +59,19 @@ export async function initializeDrugSearch(drugName: string) {
     includeDrugInfo: 'false',
     includeDrugImage: 'false',
     quantity: '1',
-    numPharm: '1',
+    numPharm: '10',
     zipCode: DEFAULT_ZIPCODE,
     useUC: 'true',
   });
 
-  if (!findDrugsResponse.Drugs?.length || !findDrugsResponse.Drugs?.length) {
+  if (!findDrugsResponse.Drugs?.length || !findDrugsResponse.Forms?.length) {
     throw new Error('Initializing drug search failed');
   }
 
   ndc = findDrugsResponse.Drugs[0].NDC;
   for (const nameItem of findDrugsResponse.Names) {
     if (nameItem.BrandGeneric === 'G') {
-      genericVersion = nameItem.DrugName;
+      genericVersion = nameItem.DrugName.toLowerCase();
     }
   }
 
@@ -74,6 +79,11 @@ export async function initializeDrugSearch(drugName: string) {
     const formName = form.Form.replace(/\([^)]*\)/g, '').trim(); // Remove substrings in parentheses (and the parentheses themselves)
     return formName;
   });
+
+  return {
+    genericVersion,
+    availableForms,
+  } as InitializeDrugSearchResult;
 }
 
 /**
@@ -177,7 +187,7 @@ async function searchDrug(
 
   // Process ScriptSave results
   for (const scriptSaveResult of scriptSaveDrugResults.drugs ?? []) {
-    if (!includeGeneric && !scriptSaveResult.ln.includes(drugName)) {
+    if (!includeGeneric && !scriptSaveResult.ln.includes(genericVersion)) {
       continue;
     }
 

@@ -1,4 +1,9 @@
-import { searchDrugByDistance, searchDrugByPrice } from '@/api/drugSearch';
+import {
+  initializeDrugSearch,
+  InitializeDrugSearchResult,
+  searchDrugByDistance,
+  searchDrugByPrice,
+} from '@/api/drugSearch';
 import { DrugSearchResult } from '@/api/types';
 import getUserLocation from '@/api/userLocation';
 import { Colors } from '@/constants/theme';
@@ -42,7 +47,7 @@ const MedicationLookupSelectedScreen = () => {
   const [query, setQuery] = useState('');
   const [zipFocused, setZipFocused] = useState(false);
   const [detectingZip, setDetectingZip] = useState(false);
-  const [formOptions, setFormOptions] = useState(['tube']);
+  const [formOptions, setFormOptions] = useState<string[]>([]);
   const [drugResults, setDrugResults] = useState<DrugSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -55,8 +60,15 @@ const MedicationLookupSelectedScreen = () => {
   const drugName = Array.isArray(params.drugName) ? params.drugName[0] : params.drugName || '';
 
   useEffect(() => {
-    // TODO: Get forms
-    setFormOptions([]);
+    async function initializeSearch() {
+      const { genericVersion, availableForms } = (await initializeDrugSearch(
+        drugName
+      )) as InitializeDrugSearchResult;
+      setGenericName(genericVersion || '');
+      setFormOptions(availableForms);
+    }
+
+    initializeSearch();
   }, []);
 
   useEffect(() => {
@@ -287,25 +299,27 @@ const MedicationLookupSelectedScreen = () => {
                   )}
                 />
               </View>
-              <TouchableOpacity
-                style={[styles.simpleFilterButton, includeGeneric && styles.filterButtonActive]}
-                onPress={() => setIncludeGeneric(!includeGeneric)}
-                activeOpacity={0.8}
-              >
-                {includeGeneric ? (
-                  <MaterialCommunityIcons
-                    name="check"
-                    size={18}
-                    color="#004E60"
-                    style={{ marginRight: 8 }}
-                  />
-                ) : (
-                  <View style={{ width: 18, height: 18, marginRight: 7 }} />
-                )}
-                <Text style={[styles.filterText, includeGeneric && styles.filterTextActive]}>
-                  Include generic ({genericName})
-                </Text>
-              </TouchableOpacity>
+              {genericName.length > 0 && (
+                <TouchableOpacity
+                  style={[styles.simpleFilterButton, includeGeneric && styles.filterButtonActive]}
+                  onPress={() => setIncludeGeneric(!includeGeneric)}
+                  activeOpacity={0.8}
+                >
+                  {includeGeneric ? (
+                    <MaterialCommunityIcons
+                      name="check"
+                      size={18}
+                      color="#004E60"
+                      style={{ marginRight: 8 }}
+                    />
+                  ) : (
+                    <View style={{ width: 18, height: 18, marginRight: 7 }} />
+                  )}
+                  <Text style={[styles.filterText, includeGeneric && styles.filterTextActive]}>
+                    Include generic ({genericName})
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           )}
 
