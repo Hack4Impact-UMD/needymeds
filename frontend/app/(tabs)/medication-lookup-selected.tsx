@@ -226,6 +226,7 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
                 onChangeText={setQuery}
                 onClear={clearSearch}
                 onFocus={() => router.push('/medication-lookup-autocomplete')}
+                removeFocus={true}
               />
               <Dropdown
                 mode="modal"
@@ -341,18 +342,16 @@ const MedicationLookupSelectedScreen: React.FC<MedicationLookupSelectedScreenPro
 
               {/* Radius field */}
               <View style={styles.formField}>
-                <View style={styles.radiusRow}>
-                  <TextInput
-                    mode="outlined"
-                    label="Radius"
-                    value={radius}
-                    onChangeText={setRadius}
-                    keyboardType="numeric"
-                    outlineStyle={{ borderRadius: 5 }}
-                    style={{ backgroundColor: Colors.default.neutrallt }}
-                  />
-                  <Text style={styles.radiusUnit}>miles</Text>
-                </View>
+                <TextInput
+                  mode="outlined"
+                  label="Radius"
+                  value={radius}
+                  onChangeText={setRadius}
+                  keyboardType="numeric"
+                  outlineStyle={{ borderRadius: 5 }}
+                  style={{ backgroundColor: Colors.default.neutrallt }}
+                />
+                <Text style={styles.radiusUnit}>miles</Text>
               </View>
             </View>
           </View>
@@ -593,11 +592,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: 'Open Sans',
     color: '#111827',
-  },
-  radiusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
   },
   radiusUnit: {
     position: 'absolute',

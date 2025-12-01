@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   modalFooterText: {
-    width: 500,
+    flex: 1,
     fontSize: 15,
     textAlign: 'right',
     textDecorationLine: 'underline',

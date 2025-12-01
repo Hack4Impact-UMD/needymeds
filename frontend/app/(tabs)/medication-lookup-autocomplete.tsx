@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
   resultName: {
     fontSize: 15,
     fontWeight: '500',
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
     color: '#111827',
     lineHeight: 22,
   },

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { View, ViewStyle } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 
@@ -9,6 +9,7 @@ interface SearchBarProps {
   placeholder?: string;
   containerStyle?: ViewStyle;
   onFocus?: () => void;
+  removeFocus?: boolean;
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({
@@ -18,15 +19,28 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   placeholder = 'Search',
   containerStyle,
   onFocus,
+  removeFocus = false,
 }) => {
+  const searchRef = useRef<any>(null);
+
   return (
     <View style={containerStyle}>
       <Searchbar
+        ref={searchRef}
         placeholder={placeholder}
         onChangeText={onChangeText}
-        onFocus={onFocus}
         value={query}
         onIconPress={onClear}
+        onFocus={() => {
+          if (removeFocus) {
+            setTimeout(() => {
+              searchRef.current?.blur();
+              onFocus && onFocus();
+            }, 100);
+          } else {
+            onFocus && onFocus();
+          }
+        }}
         inputStyle={{ color: '#41484D', fontFamily: 'Open Sans' }}
         style={{
           width: 320,

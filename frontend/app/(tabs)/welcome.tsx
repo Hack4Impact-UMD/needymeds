@@ -52,22 +52,27 @@ const WelcomeScreen = () => {
               </Text>
             </TouchableOpacity>
           </View>
-          <Text variant="bodySmall" style={styles.footer}>
-            Copyright © 2025 by NeedyMeds, Inc.{'\n'}
-            <Text
-              style={styles.footerLink}
-              onPress={() => Linking.openURL('https://www.needymeds.org/terms')}
-            >
-              Terms & Conditions
-            </Text>
-            {' | '}
-            <Text
-              style={styles.footerLink}
-              onPress={() => Linking.openURL('https://www.needymeds.org/privacy')}
-            >
-              Privacy Policy
-            </Text>
-          </Text>
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Copyright © 2025 by NeedyMeds, Inc.</Text>
+
+            <View style={styles.footerLinkContainer}>
+              <Text
+                style={styles.footerLink}
+                onPress={() => Linking.openURL('https://www.needymeds.org/terms')}
+              >
+                Terms & Conditions
+              </Text>
+
+              <Text style={styles.footerSeparator}> | </Text>
+
+              <Text
+                style={styles.footerLink}
+                onPress={() => Linking.openURL('https://www.needymeds.org/privacy')}
+              >
+                Privacy Policy
+              </Text>
+            </View>
+          </View>
         </View>
       </View>
     </SafeAreaView>
@@ -182,15 +187,30 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   footer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
+    paddingHorizontal: 16,
+  },
+  footerText: {
     textAlign: 'center',
     color: '#41484D',
     lineHeight: 18,
     fontSize: 11,
-    marginTop: 16,
-    paddingHorizontal: 16,
+    marginBottom: 4,
+  },
+  footerLinkContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footerSeparator: {
+    color: '#41484D',
+    fontSize: 11,
   },
   footerLink: {
     color: '#41484D',
     textDecorationLine: 'underline',
+    fontSize: 11,
   },
 });
