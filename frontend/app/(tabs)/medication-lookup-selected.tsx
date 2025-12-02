@@ -121,7 +121,7 @@ const MedicationLookupSelectedScreen = () => {
     };
 
     fetchDrugSearchResults();
-  }, [sortBy, radius, includeGeneric, zipCode]);
+  }, [sortBy, form, radius, includeGeneric, zipCode]);
 
   const clearSearch = () => {
     setQuery('');

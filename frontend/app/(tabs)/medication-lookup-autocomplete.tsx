@@ -118,9 +118,9 @@ const MedicationLookupAutocompleteScreen = () => {
               />
             )}
           </View>
-          <BottomNavBar />
         </View>
       </View>
+      <BottomNavBar />
     </SafeAreaView>
   );
 };
@@ -156,9 +156,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#F6FAFE',
   },
   emptyState: {
+    maxWidth: '100%',
     flex: 1,
     alignItems: 'center',
-    paddingTop: 60,
+    paddingTop: 40,
+    paddingHorizontal: 20,
   },
   emptyText: {
     color: '#181C20',

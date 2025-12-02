@@ -45,9 +45,7 @@ const DDC = () => {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* header area */}
-        <View style={styles.headerRow}>
-          <DefaultHeader />
-        </View>
+        <DefaultHeader />
         <View style={styles.pageBody}>
           {showFAQ ? (
             <DDCFaqScreen onClose={() => setShowFAQ(false)} />

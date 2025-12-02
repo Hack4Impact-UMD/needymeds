@@ -25,7 +25,7 @@ const fallbackPharmacy: Pharmacy = {
   phoneNumber: '(301) 445-8159',
 };
 
-export default function PharmacyDetailSheet({ pharmacy, isOpen, onClose }: Props) {
+export default function PharmacyDetailModal({ pharmacy, isOpen, onClose }: Props) {
   const { t } = useTranslation();
 
   const data = pharmacy ?? fallbackPharmacy;

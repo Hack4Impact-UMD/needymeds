@@ -11,6 +11,7 @@ import { Pharmacy } from '../../api/types';
 import BottomNavBar from '../components/BottomNavBar';
 import DefaultHeader from '../components/DefaultHeader';
 import MedicationLookupBackgroundShape from '../components/medication-lookup/MedicationLookupBackgroundShape';
+import PharmacyDetailModal from '../components/PharmacyDetailModal';
 import SearchResult from '../components/SearchResult';
 
 const PharmacyLocatorScreen = () => {
@@ -27,6 +28,7 @@ const PharmacyLocatorScreen = () => {
   const [showZipDropdown, setShowZipDropdown] = useState(false);
   const [isZipFocused, setIsZipFocused] = useState(false);
   const [filterText, setFilterText] = useState('');
+  const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(null);
 
   // change this WHEN TESTING FOR ACTUAL RESULTS ON SEARCH PAGE
   const [emptyResults, setEmptyResults] = useState(true);
@@ -295,8 +297,6 @@ const PharmacyLocatorScreen = () => {
             />
           </View>
 
-          {/* put a placeholder for the route to the Pharmacy Detail page / component */}
-          {/* also picked a random attribute for pharmacy ID */}
           <ScrollView contentContainerStyle={{ flexGrow: 0, paddingTop: 0 }}>
             {loading ? (
               <Text style={{ textAlign: 'center', marginTop: 20 }}>Searching...</Text>
@@ -318,20 +318,7 @@ const PharmacyLocatorScreen = () => {
                     name={pharmacy.pharmacyName}
                     address={`${pharmacy.pharmacyStreet1}, ${pharmacy.pharmacyCity}`}
                     distance={pharmacy.distance ? `${pharmacy.distance.toFixed(1)} mi` : ''}
-                    // onPress={() => router.push({
-                    //   pathname: '/pharmacy-detail',
-                    //   params: {
-                    //     pharmacyId: pharmacy.phoneNumber || index,
-                    //     pharmacyName: pharmacy.pharmacyName,
-                    //     address: pharmacy.pharmacyStreet1,
-                    //     city: pharmacy.pharmacyCity,
-                    //     state: pharmacy.pharmacyState,
-                    //     zip: pharmacy.pharmacyZipCode,
-                    //     phone: pharmacy.phoneNumber || '',
-                    //     distance: pharmacy.distance || 0,
-                    //   }
-                    // })}
-                    onPress={() => console.log(`Pressed pharmacy: ${pharmacy.pharmacyName}`)}
+                    onPress={() => setSelectedPharmacy(pharmacy)}
                   />
                 ))
             )}
@@ -339,6 +326,15 @@ const PharmacyLocatorScreen = () => {
         </View>
       </View>
       <BottomNavBar />
+
+      {/* Medication Lookup Result Modal */}
+      {selectedPharmacy && (
+        <PharmacyDetailModal
+          pharmacy={selectedPharmacy}
+          isOpen={!!selectedPharmacy}
+          onClose={() => setSelectedPharmacy(null)}
+        />
+      )}
     </SafeAreaView>
   );
 };
