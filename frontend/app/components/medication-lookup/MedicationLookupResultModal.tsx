@@ -21,6 +21,8 @@ interface MedicationLookupResultModalProps {
   form: string;
 }
 
+const PHONE_NUMBER_LENGTH = 10;
+
 const MedicationLookupResultModal = ({
   result,
   setSelectedDrugResult,
@@ -28,7 +30,11 @@ const MedicationLookupResultModal = ({
   form,
 }: MedicationLookupResultModalProps) => {
   const formatPhoneNumber = (phone: string) => {
-    return `(${phone.slice(0, 3)}) ${phone.slice(3, 6)}-${phone.slice(6, 9)}`;
+    if (phone.length === PHONE_NUMBER_LENGTH) {
+      return `(${phone.slice(0, 3)}) ${phone.slice(3, 6)}-${phone.slice(6, 9)}`;
+    } else {
+      return phone;
+    }
   };
 
   const copyToClipboard = async (text: string) => {

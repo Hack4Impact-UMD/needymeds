@@ -33,7 +33,7 @@ export default function PharmacyDetailModal({ pharmacy, isOpen, onClose }: Props
   const addressLine = [data.pharmacyStreet1, data.pharmacyStreet2].filter(Boolean).join(' ');
   const cityState = [data.pharmacyCity, data.pharmacyState].filter(Boolean).join(', ');
   const cityStateZip = [cityState, data.pharmacyZipCode].filter(Boolean).join(' ');
-  const distanceLabel = data.distance ? `${data.distance}mi` : '';
+  const distanceLabel = data.distance ? `${Number(data.distance).toFixed(2)}mi` : '';
 
   const handleCopyAddress = async () => {
     const fullAddress = [addressLine, cityStateZip].filter(Boolean).join(', ');

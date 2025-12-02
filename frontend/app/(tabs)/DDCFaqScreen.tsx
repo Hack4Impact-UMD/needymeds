@@ -3,44 +3,44 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-const { t } = useTranslation();
-
-const faq_data = [
-  {
-    q: t('Text6'),
-    a: t('Accordion1'),
-  },
-  {
-    q: t('Text7'),
-    a: t('Accordion2'),
-  },
-  {
-    q: t('Text8'),
-    a: t('Accordion3'),
-  },
-  {
-    q: t('CardCostQuestion'),
-    a: t('Accordion4'),
-  },
-  {
-    q: t('Text9'),
-    a: t('Accordion5'),
-  },
-  {
-    q: t('Text10'),
-    a: t('Accordion6'),
-  },
-  {
-    q: t('Text11'),
-    a: t('Accordion7'),
-  },
-  {
-    q: t('Text12'),
-    a: t('Accordion8'),
-  },
-];
-
 export default function DDCFaqScreen({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation();
+
+  const faq_data = [
+    {
+      q: t('Text6'),
+      a: t('Accordion1'),
+    },
+    {
+      q: t('Text7'),
+      a: t('Accordion2'),
+    },
+    {
+      q: t('Text8'),
+      a: t('Accordion3'),
+    },
+    {
+      q: t('CardCostQuestion'),
+      a: t('Accordion4'),
+    },
+    {
+      q: t('Text9'),
+      a: t('Accordion5'),
+    },
+    {
+      q: t('Text10'),
+      a: t('Accordion6'),
+    },
+    {
+      q: t('Text11'),
+      a: t('Accordion7'),
+    },
+    {
+      q: t('Text12'),
+      a: t('Accordion8'),
+    },
+  ];
+
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggle = (index: number) => {

@@ -1,23 +1,42 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Colors } from '@/constants/theme';
+import getUserLocation from '../../api/userLocation';
 import BottomNavBar from '../components/BottomNavBar';
 import DefaultHeader from '../components/DefaultHeader';
 import MedicationLookupBackgroundShape from '../components/medication-lookup/MedicationLookupBackgroundShape';
 
+const ZIPCODE_LENGTH = 5;
+
 const PharmacyLocatorScreen = () => {
   const { t } = useTranslation();
 
-  const [zipCode, setZipCode] = useState('');
-  const [radius, setRadius] = useState('5');
+  const params = useLocalSearchParams();
+  const zipParam = Array.isArray(params.zipCode) ? params.zipCode[0] : (params.zipCode ?? '');
+  const radiusParam = Array.isArray(params.radius) ? params.radius[0] : (params.radius ?? '5');
+
+  useEffect(() => {
+    if (zipParam) setZipCode(zipParam);
+    if (radiusParam) setRadius(radiusParam);
+  }, [zipParam, radiusParam]);
+
+  const [zipCode, setZipCode] = useState(zipParam);
+  const [radius, setRadius] = useState(radiusParam);
   const [isSearchEnabled, setIsSearchEnabled] = useState(false);
-  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
-  const [showZipDropdown, setShowZipDropdown] = useState(false);
-  const [isZipFocused, setIsZipFocused] = useState(false);
+  const [zipFocused, setZipFocused] = useState(false);
+  const [detectingZip, setDetectingZip] = useState(false);
 
   // Validate inputs and enable/disable search button
   useEffect(() => {
@@ -26,15 +45,6 @@ const PharmacyLocatorScreen = () => {
     setIsSearchEnabled(isZipValid && isRadiusValid);
   }, [zipCode, radius]);
 
-  // Show/hide dropdown based on focus state
-  useEffect(() => {
-    if (isZipFocused) {
-      setShowZipDropdown(true);
-    } else {
-      setShowZipDropdown(false);
-    }
-  }, [isZipFocused]);
-
   // Handle ZIP code input - restrict to 5 digits only
   const handleZipChange = (text: string) => {
     // Only allow digits and max 5 characters
@@ -42,25 +52,6 @@ const PharmacyLocatorScreen = () => {
     if (numericText.length <= 5) {
       setZipCode(numericText);
     }
-    // Dropdown stays visible while typing
-  };
-
-  // Show dropdown when ZIP field is focused
-  const handleZipFocus = () => {
-    setIsZipFocused(true);
-  };
-
-  // Hide dropdown when ZIP field loses focus
-  const handleZipBlur = () => {
-    // Small delay to allow dropdown click to register
-    setTimeout(() => {
-      setIsZipFocused(false);
-    }, 200);
-  };
-
-  // Handle detect location from dropdown
-  const handleDetectFromDropdown = () => {
-    handleDetectLocation();
   };
 
   // Handle radius input - only positive numbers
@@ -75,35 +66,22 @@ const PharmacyLocatorScreen = () => {
     setZipCode('');
   };
 
-  const handleDetectLocation = async () => {
-    setIsDetectingLocation(true);
+  const detectZipFromLocation = async () => {
+    if (detectingZip) return;
 
+    setDetectingZip(true);
     try {
-      const { default: getUserLocation } = await import('../../api/userLocation');
-      const result = await getUserLocation();
-
-      const zipMatch = result.userZipCode.match(/\d{5}/);
-
-      const detectedZip = zipMatch![0];
-      setZipCode(detectedZip);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-
-      if (errorMessage.includes('Permission')) {
-        Alert.alert(
-          'Permission Denied',
-          'Location permission is required to detect your location. Please enable it in your device settings.',
-          [{ text: 'OK' }]
-        );
+      const userLocationResult = await getUserLocation();
+      if (userLocationResult?.userZipCode) {
+        setZipCode(userLocationResult.userZipCode);
       } else {
-        Alert.alert(
-          'Error',
-          'Unable to detect your location. Please enter your ZIP code manually.',
-          [{ text: 'OK' }]
-        );
+        Alert.alert('Location', 'Could not detect ZIP code.');
       }
+    } catch (err) {
+      Alert.alert('Location', 'Error detecting location');
     } finally {
-      setIsDetectingLocation(false);
+      setDetectingZip(false);
+      setZipFocused(false);
     }
   };
 
@@ -124,7 +102,7 @@ const PharmacyLocatorScreen = () => {
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
         <DefaultHeader />
-        <MedicationLookupBackgroundShape top={530} maxHeight={700} color="#C7E7FF" />
+        <MedicationLookupBackgroundShape top={580} maxHeight={700} color="#C7E7FF" />
 
         {/* Title Section */}
         <View style={styles.titleSection}>
@@ -141,14 +119,15 @@ const PharmacyLocatorScreen = () => {
                 label={t('ZipInputLabel')}
                 value={zipCode}
                 onChangeText={handleZipChange}
-                onFocus={handleZipFocus}
-                onBlur={handleZipBlur}
+                onFocus={() => setZipFocused(true)}
+                onBlur={() => setZipFocused(false)}
                 placeholder=""
                 mode="outlined"
                 keyboardType="numeric"
                 maxLength={5}
                 style={styles.textInput}
                 outlineStyle={styles.inputOutline}
+                activeOutlineColor="#236488"
                 textColor="#41484D"
                 left={<TextInput.Icon icon="map-marker" />}
                 right={
@@ -159,18 +138,19 @@ const PharmacyLocatorScreen = () => {
               />
 
               {/* Dropdown with "Detect my location" option */}
-              {showZipDropdown && (
-                <View style={styles.dropdownContainer}>
-                  <TouchableOpacity
-                    style={styles.dropdownItem}
-                    onPress={handleDetectFromDropdown}
-                    disabled={isDetectingLocation}
-                  >
-                    <Text style={styles.dropdownText}>
-                      {isDetectingLocation ? 'Detecting...' : t('ZipDetectOpt')}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+              {zipFocused && zipCode.length !== ZIPCODE_LENGTH && (
+                <TouchableOpacity
+                  style={styles.detectLocationButton}
+                  onPress={() => detectZipFromLocation()}
+                  disabled={detectingZip}
+                >
+                  {detectingZip && (
+                    <ActivityIndicator size="small" color="#3B82F6" style={{ marginRight: 6 }} />
+                  )}
+                  <Text style={styles.detectLocationText}>
+                    {detectingZip ? 'Detecting...' : 'Detect my location'}
+                  </Text>
+                </TouchableOpacity>
               )}
             </View>
 
@@ -186,6 +166,7 @@ const PharmacyLocatorScreen = () => {
                 style={styles.textInput}
                 outlineStyle={styles.inputOutline}
                 textColor="#41484D"
+                activeOutlineColor="#236488"
                 right={
                   <TextInput.Affix text={t('RadiusInputSuffix')} textStyle={{ color: '#41484D' }} />
                 }
@@ -218,7 +199,7 @@ export default PharmacyLocatorScreen;
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.default.neutrallt,
   },
   container: {
     flex: 1,
@@ -231,14 +212,15 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#1F1F1F',
     marginBottom: 8,
+    fontFamily: 'Open Sans',
   },
   title: {
     fontSize: 24,
-    fontWeight: '600',
-    color: '#41484D',
+    color: '#1F1F1F',
     lineHeight: 32,
+    fontFamily: 'Nunito',
   },
   inputsContainer: {
     gap: 60,
@@ -252,45 +234,40 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   textInput: {
-    backgroundColor: 'white',
+    backgroundColor: Colors.default.neutrallt,
     fontSize: 16,
   },
   inputOutline: {
-    borderColor: '#41484D',
-    borderWidth: 1,
     borderRadius: 8,
   },
-  dropdownContainer: {
+  detectLocationButton: {
     position: 'absolute',
-    top: 60,
-    left: 0,
-    right: 0,
-    backgroundColor: 'white',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#C1C7CE',
-    zIndex: 1000,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3.84,
+    top: 56,
+    flexDirection: 'row',
+    width: 170,
+    borderRadius: 5,
+    alignItems: 'center',
+    paddingVertical: 15,
+    paddingHorizontal: 8,
+    zIndex: 100,
+    backgroundColor: '#EBEEF3',
+    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.30), 0 2px 6px 2px rgba(0, 0, 0, 0.15)',
   },
-  dropdownItem: {
-    padding: 14,
-  },
-  dropdownText: {
-    fontSize: 15,
-    color: '#41484D',
+  detectLocationText: {
+    color: '#181C20',
+    fontSize: 16,
+    marginLeft: 6,
+    fontFamily: 'Open Sans',
   },
   searchButton: {
-    borderRadius: 8,
+    borderRadius: 100,
   },
   searchButtonContent: {
     height: 48,
   },
   searchButtonLabel: {
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: 'Open Sans',
+    fontWeight: '400',
   },
 });

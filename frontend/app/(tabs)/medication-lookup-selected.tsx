@@ -54,7 +54,6 @@ const MedicationLookupSelectedScreen = () => {
   const [drugResults, setDrugResults] = useState<DrugSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
 
   type PaperInputRef = React.ComponentRef<typeof TextInput>;
   const inputRef = useRef<PaperInputRef>(null);
@@ -109,12 +108,10 @@ const MedicationLookupSelectedScreen = () => {
           );
         }
         setDrugResults(drugSearchResults);
-        setHasSearched(true);
       } catch (error) {
         console.error('Error fetching drug results:', error);
         setHasError(true);
         setDrugResults([]);
-        setHasSearched(true);
       } finally {
         setIsLoading(false);
       }
@@ -192,6 +189,7 @@ const MedicationLookupSelectedScreen = () => {
                     />
                   )}
                   outlineStyle={{ borderRadius: 5 }}
+                  activeOutlineColor="#236488"
                   style={{ backgroundColor: Colors.default.neutrallt }}
                 />
               </View>
@@ -205,6 +203,7 @@ const MedicationLookupSelectedScreen = () => {
                   onChangeText={setQuantity}
                   keyboardType="numeric"
                   outlineStyle={{ borderRadius: 5 }}
+                  activeOutlineColor="#236488"
                   style={{ backgroundColor: Colors.default.neutrallt }}
                 />
               </View>
@@ -220,6 +219,7 @@ const MedicationLookupSelectedScreen = () => {
                   onChangeText={setZipCode}
                   keyboardType="numeric"
                   outlineStyle={{ borderRadius: 5 }}
+                  activeOutlineColor="#236488"
                   style={{ backgroundColor: Colors.default.neutrallt }}
                   maxLength={5}
                   left={
@@ -248,22 +248,30 @@ const MedicationLookupSelectedScreen = () => {
                     ) : null
                   }
                   onFocus={() => setZipFocused(true)}
+                  onBlur={() => setZipFocused(false)}
                 />
 
-                {zipFocused && drugResults.length === 0 && includeGeneric && (
-                  <TouchableOpacity
-                    style={styles.detectLocationButton}
-                    onPress={() => detectZipFromLocation()}
-                    disabled={detectingZip}
-                  >
-                    {detectingZip && (
-                      <ActivityIndicator size="small" color="#3B82F6" style={{ marginRight: 6 }} />
-                    )}
-                    <Text style={styles.detectLocationText}>
-                      {detectingZip ? 'Detecting...' : 'Detect my location'}
-                    </Text>
-                  </TouchableOpacity>
-                )}
+                {zipFocused &&
+                  zipCode.length !== ZIPCODE_LENGTH &&
+                  drugResults.length === 0 &&
+                  includeGeneric && (
+                    <TouchableOpacity
+                      style={styles.detectLocationButton}
+                      onPress={() => detectZipFromLocation()}
+                      disabled={detectingZip}
+                    >
+                      {detectingZip && (
+                        <ActivityIndicator
+                          size="small"
+                          color="#3B82F6"
+                          style={{ marginRight: 6 }}
+                        />
+                      )}
+                      <Text style={styles.detectLocationText}>
+                        {detectingZip ? 'Detecting...' : 'Detect my location'}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
               </View>
 
               {/* Radius field */}
@@ -275,6 +283,7 @@ const MedicationLookupSelectedScreen = () => {
                   onChangeText={setRadius}
                   keyboardType="numeric"
                   outlineStyle={{ borderRadius: 5 }}
+                  activeOutlineColor="#236488"
                   style={{ backgroundColor: Colors.default.neutrallt }}
                 />
                 <Text style={styles.radiusUnit}>miles</Text>
@@ -377,7 +386,7 @@ const MedicationLookupSelectedScreen = () => {
                           <Text style={styles.pharmacyName}>{result.pharmacyName}</Text>
                         </View>
                         <Text style={styles.pharmacyPrice}>
-                          ${Number(result.price) * Number(quantity)}
+                          ${(Number(result.price) * Number(quantity)).toFixed(2)}
                         </Text>
                       </View>
                     </View>
@@ -501,8 +510,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     paddingVertical: 15,
-    zIndex: 100,
     paddingHorizontal: 8,
+    zIndex: 100,
     backgroundColor: '#EBEEF3',
     boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.30), 0 2px 6px 2px rgba(0, 0, 0, 0.15)',
   },
