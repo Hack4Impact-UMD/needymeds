@@ -1,13 +1,17 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 import BottomNavBar from '../components/BottomNavBar';
 import Header from '../components/Header';
 import MedicationLookupBackgroundShape from '../components/medication-lookup/MedicationLookupBackgroundShape';
 
 const PharmacyLocatorScreen = () => {
+  const { t } = useTranslation();
+
   const [zipCode, setZipCode] = useState('');
   const [radius, setRadius] = useState('5');
   const [isSearchEnabled, setIsSearchEnabled] = useState(false);
@@ -67,58 +71,22 @@ const PharmacyLocatorScreen = () => {
     }
   };
 
-  // Clear ZIP code
   const handleClearZip = () => {
     setZipCode('');
-    // Keep dropdown visible since field is still focused
   };
 
-  // Detect user location and convert to ZIP code
   const handleDetectLocation = async () => {
     setIsDetectingLocation(true);
-    console.log('Starting location detection...');
 
     try {
-      // Use the existing getUserLocation function from your API
       const { default: getUserLocation } = await import('../../api/userLocation');
       const result = await getUserLocation();
 
-      console.log('Location result:', result);
+      const zipMatch = result.userZipCode.match(/\d{5}/);
 
-      if (result.userZipCode) {
-        // Extract 5-digit ZIP if it exists
-        const zipMatch = result.userZipCode.match(/\d{5}/);
-        console.log('ZIP match result:', zipMatch);
-
-        if (zipMatch) {
-          const detectedZip = zipMatch[0];
-          console.log('Setting ZIP code to:', detectedZip);
-          setZipCode(detectedZip);
-          console.log('ZIP code set successfully');
-
-          Alert.alert('Location Detected', `ZIP code ${detectedZip} detected successfully!`, [
-            { text: 'OK' },
-          ]);
-        } else {
-          console.log('No 5-digit ZIP found in postal code');
-          Alert.alert(
-            'Location Detected',
-            'Could not determine ZIP code from your location. Please enter it manually.',
-            [{ text: 'OK' }]
-          );
-        }
-      } else {
-        console.log('No postal code in result');
-        Alert.alert(
-          'Location Detected',
-          'Could not determine ZIP code from your location. Please enter it manually.',
-          [{ text: 'OK' }]
-        );
-      }
+      const detectedZip = zipMatch![0];
+      setZipCode(detectedZip);
     } catch (error) {
-      console.error('Error detecting location:', error);
-
-      // Provide more specific error messages
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
 
       if (errorMessage.includes('Permission')) {
@@ -135,7 +103,6 @@ const PharmacyLocatorScreen = () => {
         );
       }
     } finally {
-      console.log('Location detection finished');
       setIsDetectingLocation(false);
     }
   };
@@ -143,7 +110,6 @@ const PharmacyLocatorScreen = () => {
   // Handle search submission
   const handleSearch = () => {
     if (isSearchEnabled) {
-      // Navigate to results page with parameters
       router.push({
         pathname: '/pharmacy-lookup-search',
         params: {
@@ -162,8 +128,8 @@ const PharmacyLocatorScreen = () => {
 
         {/* Title Section */}
         <View style={styles.titleSection}>
-          <Text style={styles.subtitle}>Savings at 65,000+ pharmacies</Text>
-          <Text style={styles.title}>Find participating pharmacies near you.</Text>
+          <Text style={styles.subtitle}>{t('HeroOverline')}</Text>
+          <Text style={styles.title}>{t('HeroHeader')}</Text>
         </View>
 
         {/* Input Fields */}
@@ -172,7 +138,7 @@ const PharmacyLocatorScreen = () => {
             {/* ZIP Code Input */}
             <View style={styles.inputWrapper}>
               <TextInput
-                label="ZIP Code"
+                label={t('ZipInputLabel')}
                 value={zipCode}
                 onChangeText={handleZipChange}
                 onFocus={handleZipFocus}
@@ -201,7 +167,7 @@ const PharmacyLocatorScreen = () => {
                     disabled={isDetectingLocation}
                   >
                     <Text style={styles.dropdownText}>
-                      {isDetectingLocation ? 'Detecting...' : 'Detect my location'}
+                      {isDetectingLocation ? 'Detecting...' : t('ZipDetectOpt')}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -211,7 +177,7 @@ const PharmacyLocatorScreen = () => {
             {/* Radius Input */}
             <View style={styles.inputWrapper}>
               <TextInput
-                label="Radius"
+                label={t('RadiusInputLabel')}
                 value={radius}
                 onChangeText={handleRadiusChange}
                 placeholder=""
@@ -220,7 +186,9 @@ const PharmacyLocatorScreen = () => {
                 style={styles.textInput}
                 outlineStyle={styles.inputOutline}
                 textColor="#41484D"
-                right={<TextInput.Affix text="miles" textStyle={{ color: '#41484D' }} />}
+                right={
+                  <TextInput.Affix text={t('RadiusInputSuffix')} textStyle={{ color: '#41484D' }} />
+                }
               />
             </View>
           </View>
@@ -236,7 +204,7 @@ const PharmacyLocatorScreen = () => {
             labelStyle={styles.searchButtonLabel}
             icon="magnify"
           >
-            Search
+            {t('SearchBtnLabel')}
           </Button>
         </View>
       </View>

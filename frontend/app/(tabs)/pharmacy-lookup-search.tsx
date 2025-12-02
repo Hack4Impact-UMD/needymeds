@@ -1,17 +1,21 @@
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { searchPharmacies } from '../../api/pharmacySearch';
 import { Pharmacy } from '../../api/types';
+
 import BottomNavBar from '../components/BottomNavBar';
 import Header from '../components/Header';
 import MedicationLookupBackgroundShape from '../components/medication-lookup/MedicationLookupBackgroundShape';
 import SearchResult from '../components/SearchResult';
 
 const PharmacyLocatorScreen = () => {
+  const { t } = useTranslation();
+
   const params = useLocalSearchParams();
   const zipParam = Array.isArray(params.zipCode) ? params.zipCode[0] : (params.zipCode ?? '');
   const radiusParam = Array.isArray(params.radius) ? params.radius[0] : (params.radius ?? '5');
@@ -49,7 +53,6 @@ const PharmacyLocatorScreen = () => {
         const results = await searchPharmacies(Number(zipCode), Number(radius));
         setPharmacies(results);
         setEmptyResults(results.length === 0);
-        console.log('Search results:', results);
       } catch (error) {
         console.error('Error fetching pharmacies: ', error);
         setPharmacies([]);
@@ -114,19 +117,15 @@ const PharmacyLocatorScreen = () => {
   // Detect user location and convert to ZIP code
   const handleDetectLocation = async () => {
     setIsDetectingLocation(true);
-    console.log('Starting location detection...');
 
     try {
       // Use the existing getUserLocation function from your API
       const { default: getUserLocation } = await import('../../api/userLocation');
       const result = await getUserLocation();
 
-      console.log('Location result:', result);
-
       if (result.userZipCode) {
         // Extract 5-digit ZIP if it exists
         const zipMatch = result.userZipCode.match(/\d{5}/);
-        console.log('ZIP match result:', zipMatch);
 
         if (zipMatch) {
           const detectedZip = zipMatch[0];
@@ -210,7 +209,7 @@ const PharmacyLocatorScreen = () => {
             <TouchableOpacity onPress={() => goBack()}>
               <Ionicons name="arrow-back" size={16} color="#41484D" />
             </TouchableOpacity>
-            Participating Pharmacies
+            {t('Breadcrumb')}
           </Text>
         </View>
 
@@ -220,7 +219,7 @@ const PharmacyLocatorScreen = () => {
             {/* ZIP Code Input */}
             <View style={styles.inputWrapper}>
               <TextInput
-                label="ZIP Code"
+                label={t('ZipInputLabel2')}
                 value={zipCode}
                 onChangeText={handleZipChange}
                 onFocus={handleZipFocus}
@@ -259,7 +258,7 @@ const PharmacyLocatorScreen = () => {
             {/* Radius Input */}
             <View style={styles.inputWrapper}>
               <TextInput
-                label="Radius"
+                label={t('RadiusInputLabel')}
                 value={radius}
                 onChangeText={handleRadiusChange}
                 placeholder=""
@@ -268,7 +267,9 @@ const PharmacyLocatorScreen = () => {
                 style={styles.textInput}
                 outlineStyle={styles.inputOutline}
                 textColor="#41484D"
-                right={<TextInput.Affix text="miles" textStyle={{ color: '#41484D' }} />}
+                right={
+                  <TextInput.Affix text={t('RadiusInputSuffix')} textStyle={{ color: '#41484D' }} />
+                }
               />
             </View>
           </View>
@@ -276,7 +277,7 @@ const PharmacyLocatorScreen = () => {
           {/* Filter Input */}
           <View style={styles.inputWrapper}>
             <TextInput
-              label="Filter by name"
+              label={t('FilterNameInputLabel')}
               value={filterText}
               onChangeText={setFilterText}
               placeholder=""
@@ -302,11 +303,7 @@ const PharmacyLocatorScreen = () => {
             ) : emptyResults ? (
               <View style={styles.emptyContainer}>
                 <MaterialIcons name="add-business" size={41} color="#41484D" />
-                <Text style={styles.emptyMessage}>
-                  {' '}
-                  We are sorry there are no matching pharmacies in our network yet. Try checking
-                  other ZIP Codes or increasing search radius.
-                </Text>
+                <Text style={styles.emptyMessage}>{t('EmptyMsg2')}</Text>
               </View>
             ) : (
               pharmacies

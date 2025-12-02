@@ -1,9 +1,12 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router, usePathname } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Surface, Text } from 'react-native-paper';
 
 function BottomNavBar() {
+  const { t } = useTranslation();
+
   const pathname = usePathname();
   const isMedicationLookupActive = pathname.includes('medication-lookup') || pathname === '/(tabs)';
   const isPharmacyLookupActive = pathname.includes('pharmacy-lookup') || pathname === '/(tabs)';
@@ -38,7 +41,7 @@ function BottomNavBar() {
             variant="labelMedium"
             style={[styles.navLabel, isMedicationLookupActive && styles.navLabelActive]}
           >
-            Drug Prices
+            {t('DrugPricesTab')}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -63,7 +66,7 @@ function BottomNavBar() {
             />
           </View>
           <Text variant="labelMedium" style={styles.navLabel}>
-            Pharmacies
+            {t('PharmaciesTab')}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -92,7 +95,7 @@ function BottomNavBar() {
             variant="labelMedium"
             style={[styles.navLabel, isEducationalResourcesActive && styles.navLabelActive]}
           >
-            Resources
+            {t('ResourcesTab')}
           </Text>
         </TouchableOpacity>
       </Surface>

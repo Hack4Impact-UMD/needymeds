@@ -1,5 +1,6 @@
 import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import {
   Modal,
   Platform,
@@ -19,6 +20,8 @@ const EligibilityModal = ({
   showEligibilityModal,
   setShowEligibilityModal,
 }: EligibilityModalProps) => {
+  const { t } = useTranslation();
+
   return (
     <Modal
       visible={showEligibilityModal}
@@ -37,7 +40,7 @@ const EligibilityModal = ({
             <View style={styles.modalHandle} />
 
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Save on</Text>
+              <Text style={styles.modalTitle}>{t('Header')}</Text>
               <TouchableOpacity
                 onPress={() => setShowEligibilityModal(false)}
                 style={styles.modalCloseButton}
@@ -48,12 +51,12 @@ const EligibilityModal = ({
 
             <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
               {[
-                'Prescription drugs.',
-                'Over-the-counter medicines if written on a prescription blank.',
-                'Medical supplies if written on a prescription blank.',
-                'Medical equipment (canes, crutches, splints, incontinence supplies, etc).',
-                'Diabetic supplies (glucose meters, test strips, lancets, diabetic shoes).',
-                'Pet prescription medicines.',
+                t('ListItem1'),
+                t('ListItem2'),
+                t('ListItem3'),
+                t('ListItem4'),
+                t('ListItem5'),
+                t('ListItem6'),
               ].map((text, idx) => (
                 <View key={idx} style={styles.modalItem}>
                   <MaterialCommunityIcons name="check" size={20} color="#111827" />
@@ -63,7 +66,7 @@ const EligibilityModal = ({
             </ScrollView>
 
             <TouchableOpacity style={styles.modalFooter}>
-              <Text style={styles.modalFooterText}>Learn more</Text>
+              <Text style={styles.modalFooterText}>{t('FooterLink')}</Text>
               <MaterialCommunityIcons name="open-in-new" size={18} color="#181C20" />
             </TouchableOpacity>
           </View>

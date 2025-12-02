@@ -1,56 +1,48 @@
-import { useState } from 'react';
-import { View, Text, TouchableOpacity, Pressable, ScrollView, StyleSheet } from 'react-native';
-import { Icon } from 'react-native-paper';
-
 import { router } from 'expo-router';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Icon } from 'react-native-paper';
 
 import BottomNavBar from '../components/BottomNavBar';
 import Header from '../components/Header';
 
-const DATA = [
-  {
-    title: '1. Check for savings programs.',
-    body: [
-      'Look up:',
-      'NeedyMeds Drug Discount Card (DDC) - Save up to 80% at participating pharmacies nationwide.',
-      'Patient Assistance Programs (PAPs) - Offered by manufacturers to provide free or low-cost medications to eligible patients.',
-      'Coupons & Rebates - May lower your out-of-pocket cost at the pharmacy.',
-      'Direct-to-Consumer (DTC) Pricing - See which pharmacies offer transparent, discounted cash prices.',
-    ],
-  },
-  {
-    title: '2. Shop around — pharmacy prices can vary!',
-    body: [
-      'Even with the NeedyMeds Drug Discount Card, different pharmacies may offer different prices. Use our free tool to compare prices before you fill your prescription.',
-    ],
-  },
-  {
-    title: '3. Ask your doctor if a generic is available.',
-    body: [
-      'Generics have the same active ingredients and work the same way as brand-name drugs—often at a fraction of the cost.',
-    ],
-  },
-  {
-    title: '4. Ask about alternate medications.',
-    body: [
-      'Sometimes there’s a different drug that treats the same condition but costs less. Your doctor or pharmacist can help you compare options.',
-    ],
-  },
-  {
-    title: '5. Check if a 90-day supply costs less than a 30-day refill.',
-    body: [
-      'Many insurance plans and pharmacies offer lower per-dose prices when you fill a 90-day supply.',
-    ],
-  },
-  {
-    title: '6. Watch out for combination medications.',
-    body: [
-      'A single pill that combines two drugs may be more expensive than buying each medication separately. Ask your doctor or pharmacist if taking the components individually could save you money.',
-    ],
-  },
-];
-
 export default function Tips() {
+  const { t } = useTranslation();
+
+  const DATA = [
+    {
+      title: `1. ${t('AccordionHeader1')}`,
+      body: [
+        t('AccordionAnswer1A'),
+        t('AccordionAnswer1B'),
+        t('AccordionAnswer1C'),
+        t('AccordionAnswer1D'),
+        t('AccordionAnswer1E'),
+      ],
+    },
+    {
+      title: `2. ${t('AccordionHeader2')}`,
+      body: [t('AccordionAnswer2')],
+    },
+    {
+      title: `3. ${t('AccordionHeader3')}`,
+      body: [t('AccordionAnswer3')],
+    },
+    {
+      title: `4. ${t('AccordionHeader4')}`,
+      body: [t('AccordionAnswer4')],
+    },
+    {
+      title: `5. ${t('AccordionHeader5')}`,
+      body: [t('AccordionAnswer5')],
+    },
+    {
+      title: `6. ${t('AccordionHeader6')}`,
+      body: [t('AccordionAnswer6')],
+    },
+  ];
+
   const [open, setOpen] = useState<number | null>(null);
 
   return (
@@ -61,20 +53,17 @@ export default function Tips() {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.heading}>
           <TouchableOpacity
-            onPress={() => router.push('/(tabs)/education')}
+            onPress={() => router.push('/(tabs)/educational-resources')}
             style={styles.backButton}
           >
             <Icon source="arrow-left" size={28} color="#41484D" />
           </TouchableOpacity>
-          <Text style={styles.title}>Prescription{'\n'}Savings Tips</Text>
+          <Text style={styles.title}>{t('Header3')}</Text>
         </View>
 
         <View style={styles.introRow}>
           <Icon source="medical-cotton-swab" color="#41484D" size={30} />
-          <Text style={styles.intro}>
-            Saving money on prescriptions is possible! Try these steps to make sure you’re getting
-            the best price for your medications:
-          </Text>
+          <Text style={styles.intro}>{t('Text14')}</Text>
         </View>
 
         {DATA.map((item, idx) => {

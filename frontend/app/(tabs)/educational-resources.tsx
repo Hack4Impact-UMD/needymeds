@@ -4,11 +4,14 @@ import { Image, Linking, ScrollView, StyleSheet, Text, View } from 'react-native
 import { Card, Divider, Icon, IconButton } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useTranslation } from 'react-i18next';
 import BottomNavBar from '../components/BottomNavBar';
 import Header from '../components/Header';
 const v_logo = require('../assets/vertical_logo.png');
 
 const EducationScreen = () => {
+  const { t } = useTranslation();
+
   const general_faq_url = 'https://needymeds.org/faq';
   const coupon_faq_url = 'https://www.needymeds.org/copay-cards-faqs';
   const nm_url = 'https://needymeds.org/';
@@ -24,23 +27,20 @@ const EducationScreen = () => {
         <Header />
 
         {/* TITLE */}
-        <Text style={styles.title}>Educational{'\n'}Resources</Text>
+        <Text style={styles.title}>{t('Header2')}</Text>
 
         {/* description + left icon */}
         <View style={styles.subtitle}>
           <Icon source="book-open-page-variant-outline" color="#41484D" size={30} />
-          <Text style={styles.description}>
-            Learn more about frequently asked questions, prescription savings tips, and more
-            information.
-          </Text>
+          <Text style={styles.description}>{t('Text13')}</Text>
         </View>
 
         {/* saving tips card */}
         <Card style={styles.cards}>
           <Card.Title
-            title="Prescription Saving Tips"
+            title={t('Header3')}
             subtitle={
-              <Text onPress={() => router.push('/(tabs)/tips')}>Click here to learn more!</Text>
+              <Text onPress={() => router.push('/(tabs)/tips')}>{t('CardSecondaryLine1')}</Text>
             }
             left={() => <Icon source="piggy-bank-outline" color="#41484D" size={40} />}
             style={styles.title_cards}
@@ -52,8 +52,8 @@ const EducationScreen = () => {
         {/* FAQ cards */}
         <Card style={styles.cards}>
           <Card.Title
-            title="Frequently Asked Questions"
-            subtitle="Find answers quickly:"
+            title={t('FAQ')}
+            subtitle={t('CardSecondaryLine2')}
             left={() => <Icon source="help-circle-outline" color="#41484D" size={40} />}
             style={styles.grouped_cards}
             titleStyle={{ marginBottom: -2 }}
@@ -61,8 +61,8 @@ const EducationScreen = () => {
           />
           <Divider style={{ marginHorizontal: 16 }} />
           <Card.Title
-            title="General FAQ"
-            subtitle="Click arrow to learn more!"
+            title={t('Card')}
+            subtitle={t('CardSecondaryLine3')}
             left={() => <Icon source="forum-outline" color="#41484D" size={40} />}
             right={() => (
               <IconButton
@@ -78,8 +78,8 @@ const EducationScreen = () => {
           />
           <Divider style={{ marginHorizontal: 16 }} />
           <Card.Title
-            title="Manufacturer Coupon FAQ"
-            subtitle="Click arrow to learn more!"
+            title={t('Card2')}
+            subtitle={t('CardSecondaryLine3')}
             left={() => <Icon source="currency-usd-off" color="#41484D" size={40} />}
             right={() => (
               <IconButton
@@ -98,7 +98,7 @@ const EducationScreen = () => {
         {/* NeedyMeds website card */}
         <Card style={styles.cards} onPress={() => handleLink(nm_url)}>
           <Card.Title
-            title="Visit the NeedyMeds' website for more information"
+            title={t('Card3')}
             subtitle="https://needymeds.org/"
             left={() => <Image source={v_logo} style={{ width: 40 }} resizeMode="contain" />}
             style={styles.title_cards}

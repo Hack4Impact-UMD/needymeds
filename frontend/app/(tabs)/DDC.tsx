@@ -2,6 +2,7 @@ import { Colors } from '@/constants/theme';
 import { MaterialIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import { Text } from 'react-native-paper';
@@ -26,6 +27,8 @@ const langOptions = [
 ];
 
 const DDC = () => {
+  const { t } = useTranslation();
+
   const params = useLocalSearchParams();
 
   const result: DrugSearchResult = {
@@ -81,7 +84,7 @@ const DDC = () => {
                   </Pressable>
                 </View>
                 <Text variant="headlineLarge" style={styles.title}>
-                  Drug Discount Card
+                  {t('CardHeader')}
                 </Text>
               </View>
 
@@ -91,7 +94,7 @@ const DDC = () => {
 
               <View style={styles.cardSection}>
                 <Text variant="titleMedium" style={styles.sectionLabel}>
-                  Front of Card:
+                  {t('ImageHeader1')}
                 </Text>
                 <View style={styles.cardImageWrapper}>
                   <Image
@@ -106,7 +109,7 @@ const DDC = () => {
 
               <View style={styles.cardSection}>
                 <Text variant="titleMedium" style={styles.sectionLabel}>
-                  Back of Card:
+                  {t('ImageHeader2')}
                 </Text>
                 <View style={styles.cardImageWrapper}>
                   <Image
@@ -132,19 +135,19 @@ const DDC = () => {
                   }}
                 >
                   <Image source={expandIcon} style={styles.actionIcon} resizeMode="contain" />
-                  <Text style={styles.buttonText}>Expand</Text>
+                  <Text style={styles.buttonText}>{t('ButtonLabel1')}</Text>
                 </Pressable>
 
                 <Pressable style={styles.actionButton} onPress={() => setShowShare(true)}>
                   <Image source={shareIcon} style={styles.actionIcon} resizeMode="contain" />
-                  <Text style={styles.buttonText}>Share</Text>
+                  <Text style={styles.buttonText}>{t('ButtonLabel2')}</Text>
                 </Pressable>
               </View>
 
               <View style={styles.footerNote}>
                 <Pressable onPress={() => setShowFAQ(true)}>
                   <Text style={styles.footerQuestion}>
-                    Have questions? Learn more about the Drug Discount Card here!
+                    {t('HelpLink1')} {t('HelpLink2')}
                   </Text>
                 </Pressable>
               </View>

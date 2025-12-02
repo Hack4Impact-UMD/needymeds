@@ -10,6 +10,7 @@ import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Alert,
   Image,
@@ -28,14 +29,16 @@ import LanguageDropdown from '../components/LanguageDropdown';
 import { LookupSearchbar } from '../components/LookupSearchbar';
 import MedicationLookupResultModal from '../components/medication-lookup/MedicationLookupResultModal';
 
-const sortOptions = [
-  { label: 'By price', value: 'price' },
-  { label: 'By distance', value: 'distance' },
-];
-
 const ZIPCODE_LENGTH = 5;
 
 const MedicationLookupSelectedScreen = () => {
+  const { t } = useTranslation();
+
+  const sortOptions = [
+    { label: t('FilterChipSortPrice'), value: 'price' },
+    { label: t('FilterChipSortDist'), value: 'distance' },
+  ];
+
   const [form, setForm] = useState('');
   const [quantity, setQuantity] = useState('1');
   const [zipCode, setZipCode] = useState('');
@@ -76,7 +79,7 @@ const MedicationLookupSelectedScreen = () => {
     }
 
     initializeSearch();
-  }, []);
+  }, [drugName]);
 
   useEffect(() => {
     if (!quantity || !radius || !zipCode || zipCode.length !== ZIPCODE_LENGTH) {
@@ -123,6 +126,7 @@ const MedicationLookupSelectedScreen = () => {
   const clearSearch = () => {
     setQuery('');
     inputRef.current?.focus();
+    router.push('/medication-lookup-autocomplete');
   };
 
   const detectZipFromLocation = async () => {
@@ -171,7 +175,7 @@ const MedicationLookupSelectedScreen = () => {
                 {/* Form field */}
                 <TextInput
                   mode="outlined"
-                  label="Form"
+                  label={t('FormInputLabel')}
                   value={form}
                   render={() => (
                     <Dropdown
@@ -196,7 +200,7 @@ const MedicationLookupSelectedScreen = () => {
               <View style={styles.formField}>
                 <TextInput
                   mode="outlined"
-                  label="How much?"
+                  label={t('QtyInputLabel')}
                   value={quantity}
                   onChangeText={setQuantity}
                   keyboardType="numeric"
@@ -211,7 +215,7 @@ const MedicationLookupSelectedScreen = () => {
               <View style={styles.formField}>
                 <TextInput
                   mode="outlined"
-                  label="ZIP Code"
+                  label={t('ZipInputLabel')}
                   value={zipCode}
                   onChangeText={setZipCode}
                   keyboardType="numeric"
@@ -266,7 +270,7 @@ const MedicationLookupSelectedScreen = () => {
               <View style={styles.formField}>
                 <TextInput
                   mode="outlined"
-                  label="Radius"
+                  label={t('RadiusInputLabel')}
                   value={radius}
                   onChangeText={setRadius}
                   keyboardType="numeric"
@@ -323,7 +327,7 @@ const MedicationLookupSelectedScreen = () => {
                     <View style={{ width: 18, height: 18, marginRight: 7 }} />
                   )}
                   <Text style={[styles.filterText, includeGeneric && styles.filterTextActive]}>
-                    Include generic ({genericName})
+                    {t('FilterChipGenericPrefix')} ({genericName})
                   </Text>
                 </TouchableOpacity>
               )}
@@ -350,9 +354,7 @@ const MedicationLookupSelectedScreen = () => {
                 // Show initial empty state (before search)
                 <View style={styles.emptyState}>
                   <MaterialIcons name="add-shopping-cart" size={64} color="#555" />
-                  <Text style={styles.emptyStateTitle}>
-                    Tell us how much you're looking for,{'\n'}and where you can pick it up.
-                  </Text>
+                  <Text style={styles.emptyStateTitle}>{t('EmptyPristineMsg')}</Text>
                 </View>
               ) : (
                 // Show results list

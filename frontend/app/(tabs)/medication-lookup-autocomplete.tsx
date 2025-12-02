@@ -3,6 +3,7 @@ import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FlatList, Keyboard, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,6 +13,8 @@ import LanguageDropdown from '../components/LanguageDropdown';
 import { LookupSearchbar } from '../components/LookupSearchbar';
 
 const MedicationLookupAutocompleteScreen = () => {
+  const { t } = useTranslation();
+
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -84,9 +87,7 @@ const MedicationLookupAutocompleteScreen = () => {
             {query.length === 0 ? (
               // Show placeholder message when no search
               <View style={styles.emptyState}>
-                <Text style={styles.emptyText}>
-                  Type the first three letters to start searching.
-                </Text>
+                <Text style={styles.emptyText}>{t('EmptyMsg')}</Text>
               </View>
             ) : isLoading ? (
               // Show loading error state

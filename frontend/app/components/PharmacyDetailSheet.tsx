@@ -1,4 +1,5 @@
 import * as Clipboard from 'expo-clipboard';
+import { useTranslation } from 'react-i18next';
 import { Image, Linking, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Pharmacy } from '../../api/types';
 
@@ -25,6 +26,8 @@ const fallbackPharmacy: Pharmacy = {
 };
 
 export default function PharmacyDetailSheet({ pharmacy, isOpen, onClose }: Props) {
+  const { t } = useTranslation();
+
   const data = pharmacy ?? fallbackPharmacy;
 
   const addressLine = [data.pharmacyStreet1, data.pharmacyStreet2].filter(Boolean).join(' ');
@@ -69,7 +72,7 @@ export default function PharmacyDetailSheet({ pharmacy, isOpen, onClose }: Props
 
           <View style={styles.header}>
             <Text style={styles.title}>{data.pharmacyName}</Text>
-            <TouchableOpacity onPress={onClose} accessibilityLabel="Close pharmacy details">
+            <TouchableOpacity onPress={onClose} accessibilityLabel={t('closeIcon4')}>
               <Image source={closeIcon} style={styles.closeIcon} resizeMode="contain" />
             </TouchableOpacity>
           </View>
@@ -84,14 +87,14 @@ export default function PharmacyDetailSheet({ pharmacy, isOpen, onClose }: Props
               <TouchableOpacity
                 style={styles.copyButton}
                 onPress={handleCopyAddress}
-                accessibilityLabel="Copy address"
+                accessibilityLabel={t('content_copyIcon')}
               >
                 <Image source={copyIcon} style={styles.icon} resizeMode="contain" />
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.copyButton, styles.primaryAction]}
                 onPress={handleDirections}
-                accessibilityLabel="Get directions"
+                accessibilityLabel={t('directionsIconButton')}
               >
                 <Image source={directionsIcon} style={styles.primaryIcon} resizeMode="contain" />
               </TouchableOpacity>
@@ -108,14 +111,14 @@ export default function PharmacyDetailSheet({ pharmacy, isOpen, onClose }: Props
               <TouchableOpacity
                 style={styles.copyButton}
                 onPress={handleCopyPhone}
-                accessibilityLabel="Copy phone number"
+                accessibilityLabel={t('content_copyIcon')}
               >
                 <Image source={copyIcon} style={styles.icon} resizeMode="contain" />
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.copyButton, styles.primaryAction]}
                 onPress={handleCall}
-                accessibilityLabel="Call pharmacy"
+                accessibilityLabel={t('phoneIconButton')}
               >
                 <Image source={phoneIcon} style={styles.primaryIcon} resizeMode="contain" />
               </TouchableOpacity>
