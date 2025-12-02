@@ -13,6 +13,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { Provider } from 'react-redux';
+import '../i18n';
 import { store } from '../redux/store';
 
 // Keep the splash screen visible while we fetch resources

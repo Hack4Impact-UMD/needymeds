@@ -1,18 +1,22 @@
 import { Colors } from '@/constants/theme';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 
 const LanguageDropdown = () => {
+  const { i18n } = useTranslation();
+
   const [lang, setLang] = useState('EN');
   const langOptions = [
-    { label: 'EN', value: 'EN' },
-    { label: 'SP', value: 'SP' },
+    { label: 'EN', value: 'en' },
+    { label: 'SP', value: 'es' },
   ];
 
   function handleChangeLanguage(item: any) {
     if (item && item.value) {
       setLang(item.value);
+      i18n.changeLanguage(item.value);
     }
   }
 
