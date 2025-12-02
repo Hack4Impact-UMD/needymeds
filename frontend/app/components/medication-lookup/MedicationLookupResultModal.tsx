@@ -17,7 +17,6 @@ import {
 interface MedicationLookupResultModalProps {
   result: DrugSearchResult;
   setSelectedDrugResult: React.Dispatch<React.SetStateAction<DrugSearchResult | null>>;
-  drugName: string;
   quantity: string;
   form: string;
 }
@@ -25,10 +24,13 @@ interface MedicationLookupResultModalProps {
 const MedicationLookupResultModal = ({
   result,
   setSelectedDrugResult,
-  drugName,
   quantity,
   form,
 }: MedicationLookupResultModalProps) => {
+  const formatPhoneNumber = (phone: string) => {
+    return `(${phone.slice(0, 3)}) ${phone.slice(3, 6)}-${phone.slice(6, 9)}`;
+  };
+
   const copyToClipboard = async (text: string) => {
     await Clipboard.setStringAsync(text);
     Alert.alert('Copied', 'Copied to clipboard');
@@ -87,7 +89,7 @@ const MedicationLookupResultModal = ({
             <View style={styles.infoCard}>
               <View style={styles.infoContent}>
                 <Text style={styles.infoText}>{result.pharmacyAddress}</Text>
-                <Text style={styles.infoSubtext}>{Number(result.distance).toFixed(2)}</Text>
+                <Text style={styles.infoSubtext}>{Number(result.distance).toFixed(2)}mi</Text>
               </View>
               <View style={styles.buttonGroup}>
                 <TouchableOpacity
@@ -107,11 +109,11 @@ const MedicationLookupResultModal = ({
 
             {/* Phone Section */}
             <View style={styles.infoCard}>
-              <Text style={styles.infoText}>{result.pharmacyPhone}</Text>
+              <Text style={styles.infoText}>{formatPhoneNumber(result.pharmacyPhone)}</Text>
               <View style={styles.buttonGroup}>
                 <TouchableOpacity
                   style={styles.iconButton}
-                  onPress={() => copyToClipboard(result.pharmacyPhone)}
+                  onPress={() => copyToClipboard(formatPhoneNumber(result.pharmacyPhone))}
                 >
                   <MaterialCommunityIcons name="content-copy" size={20} color="#6B7280" />
                 </TouchableOpacity>
@@ -126,12 +128,10 @@ const MedicationLookupResultModal = ({
 
             {/* Price Section */}
             <View style={styles.priceCard}>
-              <View>
-                <Text style={styles.priceLabel}>
-                  {drugName} {quantity} {form}
-                </Text>
-                <Text style={styles.priceAmount}>${Number(result.price) * Number(quantity)}</Text>
-              </View>
+              <Text style={styles.priceLabel}>
+                {result.labelName} {quantity} {form}
+              </Text>
+              <Text style={styles.priceAmount}>${Number(result.price) * Number(quantity)}</Text>
               <TouchableOpacity style={styles.sendButtonIcon} onPress={openDDC}>
                 <Image source={require('../../assets/sendIcon.png')} />
               </TouchableOpacity>
@@ -187,13 +187,13 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 14,
-    color: '#374151',
+    color: '#181C20',
     marginBottom: 2,
     fontFamily: 'Open Sans',
   },
   infoSubtext: {
     fontSize: 13,
-    color: '#9CA3AF',
+    color: '#181C20',
     marginTop: 4,
     fontFamily: 'Open Sans',
   },
@@ -218,7 +218,6 @@ const styles = StyleSheet.create({
   iconButton: {
     width: 40,
     height: 40,
-    backgroundColor: '#fff',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
@@ -252,21 +251,18 @@ const styles = StyleSheet.create({
   },
   priceLabel: {
     fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 4,
-    fontFamily: 'Open Sans',
+    color: '#181C20',
+    fontFamily: 'OpenSans-SemiBold',
   },
   priceAmount: {
     fontSize: 14,
-    color: '#111827',
-    fontFamily: 'Open Sans',
+    color: '#181C20',
+    fontFamily: 'OpenSans-SemiBold',
   },
   sendButtonIcon: {
     width: 40,
     height: 40,
     borderRadius: 28,
-    borderWidth: 1,
-    borderColor: '#ffffffff',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#236488',

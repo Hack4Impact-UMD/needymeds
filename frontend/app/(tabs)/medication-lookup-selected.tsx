@@ -383,9 +383,9 @@ const MedicationLookupSelectedScreen = () => {
                     </View>
                     <View style={styles.pharmacyRight}>
                       <Text style={styles.pharmacyDistance}>
-                        {Number(result.distance).toFixed(2)}
+                        {`${Number(result.distance).toFixed(2)}mi`}
                       </Text>
-                      <MaterialCommunityIcons name="chevron-right" size={20} color="#9CA3AF" />
+                      <MaterialCommunityIcons name="chevron-right" size={20} color="#41484D" />
                     </View>
                   </TouchableOpacity>
                 ))
@@ -401,7 +401,6 @@ const MedicationLookupSelectedScreen = () => {
         <MedicationLookupResultModal
           result={selectedDrugResult}
           setSelectedDrugResult={setSelectedDrugResult}
-          drugName={drugName}
           quantity={quantity}
           form={form}
         />
@@ -595,7 +594,6 @@ const styles = StyleSheet.create({
   pharmacyIcon: {
     width: 44,
     height: 44,
-    backgroundColor: '#F3F4F6',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
@@ -629,14 +627,13 @@ const styles = StyleSheet.create({
   },
   pharmacyPrice: {
     fontSize: 16,
-    fontWeight: '700',
-    color: '#111827',
+    color: '#41484D',
     marginBottom: 2,
-    fontFamily: 'Open Sans',
+    fontFamily: 'Roboto',
   },
   pharmacyLabel: {
     fontSize: 12,
-    color: '#6B7280',
+    color: '#181C20',
     fontFamily: 'Open Sans',
   },
   pharmacyRight: {
@@ -647,8 +644,8 @@ const styles = StyleSheet.create({
   },
   pharmacyDistance: {
     fontSize: 13,
-    color: '#6B7280',
-    fontFamily: 'Open Sans',
+    color: '#41484D',
+    fontFamily: 'Roboto',
   },
   emptyState: {
     flex: 1,
