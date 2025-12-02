@@ -1,12 +1,12 @@
+import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useRef, useState } from 'react';
-import { Animated, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 
 const DST_DDCCardFront = require('../assets/DST_DDCDetailsFront.png');
 const DST_DDCCardBack = require('../assets/DST_DDCBackDetails.png');
 const ScriptSave_DDCCardFront = require('../assets/ScriptSave_DDCDetailsFront.png');
 const ScriptSave_DDCCardBack = require('../assets/ScriptSave_DDCBackDetails.png');
-const backArrow = require('../assets/arrow_back.png');
 
 const DDCExpand = () => {
   const params = useLocalSearchParams();
@@ -41,11 +41,17 @@ const DDCExpand = () => {
       <Pressable style={styles.overlay_expand} />
 
       <View style={styles.headerRow}>
-        <Pressable
+        <Ionicons
+          name="arrow-back"
+          size={25}
+          color="#181C20"
           onPress={() => {
             router.push({
               pathname: '/DDC',
               params: {
+                drugName: params.drugName,
+                quantity: params.quantity,
+                form: params.form,
                 adjudicator: params.adjudicator,
                 pharmacyName: params.pharmacyName,
                 pharmacyAddress: params.pharmacyAddress,
@@ -59,14 +65,11 @@ const DDCExpand = () => {
               },
             });
           }}
-          style={styles.backButton}
-        >
-          <Image source={backArrow} style={styles.backIcon} resizeMode="contain" />
-        </Pressable>
+        />
       </View>
 
       <View style={styles.cardWrapper}>
-        <Text style={styles.flipHint}>Tap card to flip: </Text>
+        <Text style={styles.flipHint}>Tap card to flip:</Text>
 
         <Pressable onPress={flipCard} style={styles.flipContainer}>
           <Animated.Image
@@ -98,7 +101,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingVertical: 50,
     backgroundColor: '#E7EDF5',
   },
   overlay_expand: {
@@ -110,10 +113,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.3)',
   },
   flipContainer: {
-    width: 400,
-    height: 200,
+    width: '100%',
+    aspectRatio: 2,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 5,
   },
   flipImage: {
     width: '100%',
@@ -125,31 +129,26 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     color: '#000000',
     fontSize: 18,
+    paddingHorizontal: 20,
+    textAlign: 'left',
+    alignSelf: 'flex-start',
   },
   cardWrapper: {
+    paddingHorizontal: 20,
     justifyContent: 'center',
     marginTop: 20,
+    width: '100%',
+    alignItems: 'center',
   },
   headerRow: {
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingHorizontal: 30,
+    paddingTop: 100,
     position: 'absolute',
     top: 0,
     left: 0,
     zIndex: 3,
-  },
-  backButton: {
-    width: 36,
-    height: 36,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  backIcon: {
-    width: 24,
-    height: 24,
   },
 });

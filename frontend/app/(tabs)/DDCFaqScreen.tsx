@@ -1,3 +1,4 @@
+import { Colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -77,7 +78,7 @@ export default function DDCFaqScreen({ onClose }: { onClose: () => void }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#E7EDF5',
+    backgroundColor: Colors.default.neutrallt,
   },
   header: {
     alignItems: 'center',

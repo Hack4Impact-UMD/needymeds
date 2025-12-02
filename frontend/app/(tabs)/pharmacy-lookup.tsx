@@ -1,15 +1,16 @@
+import { Colors } from '@/constants/theme';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ActivityIndicator, Button, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { Colors } from '@/constants/theme';
 import getUserLocation from '../../api/userLocation';
+
 import BottomNavBar from '../components/BottomNavBar';
+import CustomBackgroundShape from '../components/CustomBackgroundShape';
 import DefaultHeader from '../components/DefaultHeader';
-import MedicationLookupBackgroundShape from '../components/medication-lookup/MedicationLookupBackgroundShape';
 
 const ZIPCODE_LENGTH = 5;
 
@@ -95,7 +96,7 @@ const PharmacyLocatorScreen = () => {
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
         <DefaultHeader />
-        <MedicationLookupBackgroundShape top={580} maxHeight={700} color="#C7E7FF" />
+        <CustomBackgroundShape top={590} maxHeight={700} maxWidth={650} color="#C7E7FF" />
 
         {/* Title Section */}
         <View style={styles.titleSection}>
@@ -121,8 +122,14 @@ const PharmacyLocatorScreen = () => {
                 style={styles.textInput}
                 outlineStyle={styles.inputOutline}
                 activeOutlineColor="#236488"
-                textColor="#41484D"
-                left={<TextInput.Icon icon="map-marker" />}
+                textColor="#181C20"
+                left={
+                  <TextInput.Icon
+                    icon={() => (
+                      <MaterialCommunityIcons name="map-marker-outline" size={22} color="#41484D" />
+                    )}
+                  />
+                }
                 right={
                   zipCode.length > 0 ? (
                     <TextInput.Icon icon="close" onPress={handleClearZip} />
@@ -141,7 +148,7 @@ const PharmacyLocatorScreen = () => {
                     <ActivityIndicator size="small" color="#3B82F6" style={{ marginRight: 6 }} />
                   )}
                   <Text style={styles.detectLocationText}>
-                    {detectingZip ? 'Detecting...' : 'Detect my location'}
+                    {detectingZip ? 'Detecting...' : t('ZipDetectOpt')}
                   </Text>
                 </TouchableOpacity>
               )}
@@ -158,8 +165,9 @@ const PharmacyLocatorScreen = () => {
                 keyboardType="decimal-pad"
                 style={styles.textInput}
                 outlineStyle={styles.inputOutline}
-                textColor="#41484D"
+                textColor="#181C20"
                 activeOutlineColor="#236488"
+                maxLength={4}
                 right={
                   <TextInput.Affix text={t('RadiusInputSuffix')} textStyle={{ color: '#41484D' }} />
                 }

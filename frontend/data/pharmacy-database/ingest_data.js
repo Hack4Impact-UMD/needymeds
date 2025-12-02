@@ -91,7 +91,8 @@ function formatData(records) {
     return Number.isNaN(parsed) ? null : parsed;
   };
 
-  return records.map((row) => ({
+  // Map CSV to objects
+  const mapped = records.map((row) => ({
     pharm_id: parseOptionalInt(row['Pharmacy ID']),
     npi_id: parseOptionalInt(row['Pharmacy NPI ID']),
     name: cleanString(row['Pharmacy Name']),
@@ -110,6 +111,18 @@ function formatData(records) {
     latitude: parseOptionalFloat(row['Pharmacy Latitude']),
     longitude: parseOptionalFloat(row['Pharmacy Longitude']),
   }));
+
+  // Remove duplicates based on name + address (address_line1 + city + state + zipcode)
+  const seen = new Set();
+  const deduped = mapped.filter((pharm) => {
+    const key = `${pharm.name}|${pharm.address_line1}|${pharm.city}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  console.log(`Deduplicated records: ${deduped.length} (from ${records.length})`);
+  return deduped;
 }
 
 async function loadData(db, pharmacies) {

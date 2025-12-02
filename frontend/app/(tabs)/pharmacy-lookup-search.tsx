@@ -1,3 +1,5 @@
+import { Colors } from '@/constants/theme';
+import { useSearchPharmacies } from '@/hooks/use-search-pharmacies';
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -5,15 +7,13 @@ import { useTranslation } from 'react-i18next';
 import { Alert, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ActivityIndicator, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { searchPharmacies } from '../../api/pharmacySearch';
 import { Pharmacy } from '../../api/types';
-
-import { Colors } from '@/constants/theme';
 import getUserLocation from '../../api/userLocation';
+
 import BottomNavBar from '../components/BottomNavBar';
 import DefaultHeader from '../components/DefaultHeader';
-import PharmacyDetailModal from '../components/PharmacyDetailModal';
-import SearchResult from '../components/SearchResult';
+import PharmacyDetailModal from '../components/pharmacy-lookup/PharmacyDetailModal';
+import PharmacySearchResult from '../components/pharmacy-lookup/PharmacySearchResult';
 
 const ZIPCODE_LENGTH = 5;
 
@@ -37,34 +37,7 @@ const PharmacyLocatorScreen = () => {
   const [filterTextFocused, setFilterTextFocused] = useState(false);
   const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(null);
 
-  const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  // Validate inputs and enable/disable search button
-  useEffect(() => {
-    const isZipValid = zipCode.length === 5 && /^\d{5}$/.test(zipCode);
-    const isRadiusValid = radius.length > 0 && parseFloat(radius) > 0;
-
-    const fetchPharmacies = async () => {
-      if (!isZipValid || !isRadiusValid) {
-        setPharmacies([]);
-        return;
-      }
-
-      setLoading(true);
-      try {
-        const results = await searchPharmacies(Number(zipCode), Number(radius));
-        setPharmacies(results);
-      } catch (error) {
-        console.error('Error fetching pharmacies: ', error);
-        setPharmacies([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPharmacies();
-  }, [zipCode, radius]);
+  const { pharmacies, loading, error } = useSearchPharmacies(zipCode, parseFloat(radius));
 
   // Handle ZIP code input - restrict to 5 digits only
   const handleZipChange = (text: string) => {
@@ -147,8 +120,14 @@ const PharmacyLocatorScreen = () => {
                 style={styles.textInput}
                 outlineStyle={styles.inputOutline}
                 activeOutlineColor="#236488"
-                textColor="#41484D"
-                left={<TextInput.Icon icon="map-marker" />}
+                textColor="#181C20"
+                left={
+                  <TextInput.Icon
+                    icon={() => (
+                      <MaterialCommunityIcons name="map-marker-outline" size={22} color="#41484D" />
+                    )}
+                  />
+                }
                 right={
                   zipCode.length > 0 ? (
                     <TextInput.Icon icon="close" onPress={handleClearZip} />
@@ -167,7 +146,7 @@ const PharmacyLocatorScreen = () => {
                     <ActivityIndicator size="small" color="#3B82F6" style={{ marginRight: 6 }} />
                   )}
                   <Text style={styles.detectLocationText}>
-                    {detectingZip ? 'Detecting...' : 'Detect my location'}
+                    {detectingZip ? 'Detecting...' : t('ZipDetectOpt')}
                   </Text>
                 </TouchableOpacity>
               )}
@@ -184,8 +163,9 @@ const PharmacyLocatorScreen = () => {
                 keyboardType="decimal-pad"
                 style={styles.textInput}
                 outlineStyle={styles.inputOutline}
-                textColor="#41484D"
+                textColor="#181C20"
                 activeOutlineColor="#236488"
+                maxLength={4}
                 right={
                   <TextInput.Affix text={t('RadiusInputSuffix')} textStyle={{ color: '#41484D' }} />
                 }
@@ -203,8 +183,9 @@ const PharmacyLocatorScreen = () => {
               mode="outlined"
               style={styles.textInput}
               outlineStyle={styles.inputOutline}
-              textColor="#41484D"
+              textColor="#181C20"
               activeOutlineColor="#236488"
+              maxLength={20}
               right={
                 filterTextFocused ? (
                   <TextInput.Icon
@@ -224,10 +205,7 @@ const PharmacyLocatorScreen = () => {
             />
           </View>
 
-          <ScrollView
-            contentContainerStyle={{ paddingTop: 0, paddingBottom: 0 }}
-            keyboardShouldPersistTaps="handled"
-          >
+          <ScrollView keyboardShouldPersistTaps="handled">
             {loading ? (
               <ActivityIndicator size="large" style={{ marginTop: 200 }} color="#236488" />
             ) : pharmacies.length === 0 ? (
@@ -242,9 +220,9 @@ const PharmacyLocatorScreen = () => {
                   if (!filterText) return true;
                   return pharmacy.pharmacyName.toLowerCase().includes(filterText.toLowerCase());
                 })
-                .map((pharmacy, index) => (
-                  <SearchResult
-                    key={pharmacy.phoneNumber || index}
+                .map((pharmacy) => (
+                  <PharmacySearchResult
+                    key={`${pharmacy.pharmacyName}, ${pharmacy.pharmacyStreet1}, ${pharmacy.pharmacyCity}`}
                     name={pharmacy.pharmacyName}
                     address={`${pharmacy.pharmacyStreet1}, ${pharmacy.pharmacyCity}`}
                     distance={pharmacy.distance!}
@@ -258,13 +236,11 @@ const PharmacyLocatorScreen = () => {
       <BottomNavBar />
 
       {/* Medication Lookup Result Modal */}
-      {selectedPharmacy && (
-        <PharmacyDetailModal
-          pharmacy={selectedPharmacy}
-          isOpen={!!selectedPharmacy}
-          onClose={() => setSelectedPharmacy(null)}
-        />
-      )}
+      <PharmacyDetailModal
+        pharmacy={selectedPharmacy}
+        isOpen={!!selectedPharmacy}
+        onClose={() => setSelectedPharmacy(null)}
+      />
     </SafeAreaView>
   );
 };
@@ -278,8 +254,10 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 20,
-    paddingBottom: Platform.OS === 'ios' ? 84 : 68,
+    paddingTop: 20,
+    paddingRight: 20,
+    paddingBottom: (Platform.OS === 'ios' ? 84 : 68) + 236, // bottom navbar height + extra
+    paddingLeft: 20,
   },
   titleSection: {
     display: 'flex',

@@ -9,7 +9,7 @@ import getUserLocation from '@/api/userLocation';
 import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Alert,
@@ -23,13 +23,15 @@ import {
 import { Dropdown } from 'react-native-element-dropdown';
 import { ActivityIndicator, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 import BottomNavBar from '../components/BottomNavBar';
-import ErrorState from '../components/errorMessage';
+import ErrorState from '../components/ErrorState';
 import LanguageDropdown from '../components/LanguageDropdown';
-import { LookupSearchbar } from '../components/LookupSearchbar';
-import MedicationLookupResultModal from '../components/medication-lookup/MedicationLookupResultModal';
+import MedicationDetailModal from '../components/medication-lookup/MedicationDetailModal';
+import MedicationSearchbar from '../components/medication-lookup/MedicationSearchbar';
 
 const ZIPCODE_LENGTH = 5;
+const GENERIC_NAME_TRUNCATE_CUTOFF = 7;
 
 const MedicationLookupSelectedScreen = () => {
   const { t } = useTranslation();
@@ -39,6 +41,14 @@ const MedicationLookupSelectedScreen = () => {
     { label: t('FilterChipSortDist'), value: 'distance' },
   ];
 
+  const params = useLocalSearchParams<{ drugName: string }>();
+  const drugNameParam = Array.isArray(params.drugName) ? params.drugName[0] : params.drugName || '';
+
+  useEffect(() => {
+    setDrugName(drugNameParam);
+  }, [drugNameParam]);
+
+  const [drugName, setDrugName] = useState(drugNameParam);
   const [form, setForm] = useState('');
   const [quantity, setQuantity] = useState('1');
   const [zipCode, setZipCode] = useState('');
@@ -47,7 +57,6 @@ const MedicationLookupSelectedScreen = () => {
   const [includeGeneric, setIncludeGeneric] = useState(true);
   const [genericName, setGenericName] = useState('');
   const [selectedDrugResult, setSelectedDrugResult] = useState<DrugSearchResult | null>(null);
-  const [query, setQuery] = useState('');
   const [zipFocused, setZipFocused] = useState(false);
   const [detectingZip, setDetectingZip] = useState(false);
   const [formOptions, setFormOptions] = useState<{ label: string; value: string }[]>([]);
@@ -55,18 +64,20 @@ const MedicationLookupSelectedScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
 
-  type PaperInputRef = React.ComponentRef<typeof TextInput>;
-  const inputRef = useRef<PaperInputRef>(null);
-
-  const params = useLocalSearchParams<{ drugName: string }>();
-  const drugName = Array.isArray(params.drugName) ? params.drugName[0] : params.drugName || '';
-
   useEffect(() => {
     async function initializeSearch() {
       const { genericVersion, availableForms } = (await initializeDrugSearch(
         drugName
       )) as InitializeDrugSearchResult;
-      setGenericName(genericVersion || '');
+      if (!genericVersion) {
+        setGenericName('');
+      } else {
+        setGenericName(
+          genericVersion.length >= GENERIC_NAME_TRUNCATE_CUTOFF
+            ? `${genericVersion.slice(0, GENERIC_NAME_TRUNCATE_CUTOFF - 1)}..`
+            : genericVersion
+        );
+      }
 
       const mappedForms = (availableForms || []).map((f) => ({
         label: f,
@@ -121,9 +132,12 @@ const MedicationLookupSelectedScreen = () => {
   }, [sortBy, form, radius, includeGeneric, zipCode]);
 
   const clearSearch = () => {
-    setQuery('');
-    inputRef.current?.focus();
-    router.push('/medication-lookup-autocomplete');
+    router.push({
+      pathname: '/medication-lookup-autocomplete',
+      params: {
+        drugName: '',
+      },
+    });
   };
 
   const detectZipFromLocation = async () => {
@@ -153,11 +167,18 @@ const MedicationLookupSelectedScreen = () => {
           <View style={styles.header}>
             <View style={styles.searchContainer}>
               <View style={{ width: '80%' }}>
-                <LookupSearchbar
+                <MedicationSearchbar
                   query={drugName}
-                  onChangeText={setQuery}
+                  onChangeText={setDrugName}
                   onClear={clearSearch}
-                  onFocus={() => router.push('/medication-lookup-autocomplete')}
+                  onFocus={() =>
+                    router.push({
+                      pathname: '/medication-lookup-autocomplete',
+                      params: {
+                        drugName,
+                      },
+                    })
+                  }
                   removeFocus={true}
                 />
               </View>
@@ -190,6 +211,7 @@ const MedicationLookupSelectedScreen = () => {
                   )}
                   outlineStyle={{ borderRadius: 5 }}
                   activeOutlineColor="#236488"
+                  textColor="#181C20"
                   style={{ backgroundColor: Colors.default.neutrallt }}
                 />
               </View>
@@ -204,6 +226,8 @@ const MedicationLookupSelectedScreen = () => {
                   keyboardType="numeric"
                   outlineStyle={{ borderRadius: 5 }}
                   activeOutlineColor="#236488"
+                  textColor="#181C20"
+                  maxLength={3}
                   style={{ backgroundColor: Colors.default.neutrallt }}
                 />
               </View>
@@ -220,6 +244,7 @@ const MedicationLookupSelectedScreen = () => {
                   keyboardType="numeric"
                   outlineStyle={{ borderRadius: 5 }}
                   activeOutlineColor="#236488"
+                  textColor="#181C20"
                   style={{ backgroundColor: Colors.default.neutrallt }}
                   maxLength={5}
                   left={
@@ -284,6 +309,8 @@ const MedicationLookupSelectedScreen = () => {
                   keyboardType="numeric"
                   outlineStyle={{ borderRadius: 5 }}
                   activeOutlineColor="#236488"
+                  textColor="#181C20"
+                  maxLength={4}
                   style={{ backgroundColor: Colors.default.neutrallt }}
                 />
                 <Text style={styles.radiusUnit}>miles</Text>
@@ -392,7 +419,7 @@ const MedicationLookupSelectedScreen = () => {
                     </View>
                     <View style={styles.pharmacyRight}>
                       <Text style={styles.pharmacyDistance}>
-                        {`${Number(result.distance).toFixed(2)}mi`}
+                        {`${Number(result.distance).toFixed(1)}mi`}
                       </Text>
                       <MaterialCommunityIcons name="chevron-right" size={20} color="#41484D" />
                     </View>
@@ -406,14 +433,14 @@ const MedicationLookupSelectedScreen = () => {
       <BottomNavBar />
 
       {/* Medication Lookup Result Modal */}
-      {selectedDrugResult && (
-        <MedicationLookupResultModal
-          result={selectedDrugResult}
-          setSelectedDrugResult={setSelectedDrugResult}
-          quantity={quantity}
-          form={form}
-        />
-      )}
+      <MedicationDetailModal
+        drugName={drugName}
+        result={selectedDrugResult}
+        quantity={quantity}
+        form={form}
+        isOpen={!!selectedDrugResult}
+        onClose={() => setSelectedDrugResult(null)}
+      />
     </SafeAreaView>
   );
 };
@@ -693,7 +720,7 @@ const styles = StyleSheet.create({
   },
   dropdownText: {
     fontSize: 15,
-    color: '#111827',
+    color: '#181C20',
     fontFamily: 'Open Sans',
   },
   dropdownContainer: {

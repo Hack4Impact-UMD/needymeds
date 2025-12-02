@@ -10,5 +10,3 @@ export default function TabLayout() {
     />
   );
 }
-
-// <Tabs></Tabs> to show bottom tabs

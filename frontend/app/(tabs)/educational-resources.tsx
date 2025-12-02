@@ -1,12 +1,14 @@
 import { router } from 'expo-router';
 
+import { useTranslation } from 'react-i18next';
 import { Image, Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Card, Divider, Icon, IconButton } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useTranslation } from 'react-i18next';
+import { Colors } from '@/constants/theme';
 import BottomNavBar from '../components/BottomNavBar';
 import DefaultHeader from '../components/DefaultHeader';
+
 const v_logo = require('../assets/vertical_logo.png');
 
 const EducationScreen = () => {
@@ -40,7 +42,9 @@ const EducationScreen = () => {
           <Card.Title
             title={t('Header3')}
             subtitle={
-              <Text onPress={() => router.push('/(tabs)/tips')}>{t('CardSecondaryLine1')}</Text>
+              <Text onPress={() => router.push('/(tabs)/prescription-savings-tips')}>
+                {t('CardSecondaryLine1')}
+              </Text>
             }
             left={() => <Icon source="piggy-bank-outline" color="#41484D" size={40} />}
             style={styles.title_cards}
@@ -115,26 +119,19 @@ const EducationScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F6FAFE',
+    backgroundColor: Colors.default.neutrallt,
   },
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-  },
-  header: {
-    width: 340,
-    height: 85,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    padding: 20,
   },
   title: {
+    paddingHorizontal: 40,
     textAlign: 'center',
     fontSize: 32,
     fontWeight: 300,
     color: '#181C20',
-    margin: 10,
+    marginBottom: 20,
   },
   subtitle: {
     flexDirection: 'row',

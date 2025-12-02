@@ -7,9 +7,9 @@ import { Text, TouchableRipple } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BottomNavBar from '../components/BottomNavBar';
+import CustomBackgroundShape from '../components/CustomBackgroundShape';
 import DefaultHeader from '../components/DefaultHeader';
 import EligibilityModal from '../components/medication-lookup/EligibilityModal';
-import MedicationLookupBackgroundShape from '../components/medication-lookup/MedicationLookupBackgroundShape';
 
 const MedicationLookupScreen = () => {
   const { t } = useTranslation();
@@ -49,12 +49,7 @@ const MedicationLookupScreen = () => {
           </TouchableOpacity>
 
           {/* Blue Background */}
-          <MedicationLookupBackgroundShape
-            top={280}
-            color="#236488"
-            maxWidth={700}
-            maxHeight={1500}
-          />
+          <CustomBackgroundShape top={280} color="#236488" maxWidth={700} maxHeight={1500} />
           {/* Eligible Link */}
           <TouchableRipple
             onPress={() => setShowEligibilityModal(true)}

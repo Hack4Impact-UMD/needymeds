@@ -22,10 +22,10 @@ export interface Pharmacy {
   pharmacyCity: string;
   pharmacyState: string;
   pharmacyZipCode: string;
-  latitude?: number;
-  longitude?: number;
+  latitude: number;
+  longitude: number;
   distance?: number;
-  phoneNumber?: string;
+  phoneNumber: string;
 }
 
 /* Requests */

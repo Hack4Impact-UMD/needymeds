@@ -1,21 +1,29 @@
 import { autoCompleteSearchDrug } from '@/api/drugSearch';
 import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Keyboard, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { ActivityIndicator, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 import BottomNavBar from '../components/BottomNavBar';
-import ErrorState from '../components/errorMessage';
+import ErrorState from '../components/ErrorState';
 import LanguageDropdown from '../components/LanguageDropdown';
-import { LookupSearchbar } from '../components/LookupSearchbar';
+import MedicationSearchbar from '../components/medication-lookup/MedicationSearchbar';
 
 const MedicationLookupAutocompleteScreen = () => {
   const { t } = useTranslation();
 
-  const [query, setQuery] = useState('');
+  const params = useLocalSearchParams<{ drugName: string }>();
+  const drugNameParam = Array.isArray(params.drugName) ? params.drugName[0] : params.drugName || '';
+
+  useEffect(() => {
+    setQuery(drugNameParam);
+  }, [drugNameParam]);
+
+  const [query, setQuery] = useState(drugNameParam);
   const [results, setResults] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
@@ -76,7 +84,7 @@ const MedicationLookupAutocompleteScreen = () => {
           {/* Search Bar */}
           <View style={styles.searchContainer}>
             <View style={{ width: '80%' }}>
-              <LookupSearchbar query={query} onChangeText={setQuery} onClear={clearSearch} />
+              <MedicationSearchbar query={query} onChangeText={setQuery} onClear={clearSearch} />
             </View>
 
             <LanguageDropdown />
@@ -153,7 +161,7 @@ const styles = StyleSheet.create({
   },
   resultsContainer: {
     flex: 1,
-    backgroundColor: '#F6FAFE',
+    backgroundColor: Colors.default.neutrallt,
   },
   emptyState: {
     maxWidth: '100%',
@@ -165,7 +173,7 @@ const styles = StyleSheet.create({
   emptyText: {
     color: '#181C20',
     textAlign: 'left',
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
     lineHeight: 22,
     fontSize: 16,
     borderBottomWidth: 1,
@@ -192,10 +200,10 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   resultName: {
-    fontSize: 15,
-    fontWeight: '500',
-    fontFamily: 'Nunito Sans',
-    color: '#111827',
+    fontSize: 16,
+    fontWeight: '400',
+    fontFamily: 'Open Sans',
+    color: '#181C20',
     lineHeight: 22,
   },
 });

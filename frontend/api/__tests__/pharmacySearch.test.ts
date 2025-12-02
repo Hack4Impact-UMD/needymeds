@@ -23,10 +23,10 @@ jest.mock('../distance', () => ({
   zipToCoords: jest.fn(),
 }));
 
+import { searchPharmacies } from '../../hooks/use-search-pharmacies';
 import { setCacheEntry } from '../../redux/pharmacySearchSlice';
 import { store } from '../../redux/store';
 import { distanceBetweenCoordinates, zipToCoords } from '../distance';
-import { searchPharmacies } from '../pharmacySearch';
 import { Pharmacy } from '../types';
 
 // -------------------------------

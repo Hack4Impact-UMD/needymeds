@@ -1,15 +1,9 @@
 import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Modal,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Modal from 'react-native-modal';
 
 interface EligibilityModalProps {
   showEligibilityModal: boolean;
@@ -22,12 +16,36 @@ const EligibilityModal = ({
 }: EligibilityModalProps) => {
   const { t } = useTranslation();
 
+  const [showContent, setShowContent] = useState(false);
+
+  useEffect(() => {
+    if (showEligibilityModal) {
+      // small delay to allow modal animation to start
+      const timeout = setTimeout(() => setShowContent(true), 100);
+      return () => clearTimeout(timeout);
+    } else {
+      setShowContent(false);
+    }
+  }, [showEligibilityModal]);
+
+  if (!showContent) return null;
+
   return (
     <Modal
-      visible={showEligibilityModal}
-      transparent
-      animationType="slide"
-      onRequestClose={() => setShowEligibilityModal(false)}
+      isVisible={showEligibilityModal}
+      onSwipeComplete={() => setShowEligibilityModal(false)}
+      swipeDirection={['down']}
+      style={{ margin: 0, justifyContent: 'flex-end' }}
+      backdropColor="black"
+      backdropOpacity={0.7}
+      backdropTransitionInTiming={300}
+      backdropTransitionOutTiming={300}
+      onBackdropPress={() => setShowEligibilityModal(false)}
+      useNativeDriver={false}
+      animationIn="slideInUp"
+      animationOut="slideOutDown"
+      animationInTiming={300}
+      animationOutTiming={300}
     >
       <View style={styles.modalOverlay}>
         <TouchableOpacity
@@ -80,7 +98,6 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalBackdrop: {
     position: 'absolute',
