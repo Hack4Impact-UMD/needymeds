@@ -2,10 +2,10 @@ import * as Clipboard from 'expo-clipboard';
 import { Image, Linking, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Pharmacy } from '../../api/types';
 
-const copyIcon = require('../../assets/copy.svg');
-const directionsIcon = require('../../assets/directions.svg');
-const phoneIcon = require('../../assets/phone.svg');
-const closeIcon = require('../../assets/close.svg');
+const copyIcon = require('../assets/copy.png');
+const directionsIcon = require('../assets/directions.png');
+const phoneIcon = require('../assets/phone.png');
+const closeIcon = require('../assets/close.png');
 
 type Props = {
   pharmacy?: Pharmacy | null;

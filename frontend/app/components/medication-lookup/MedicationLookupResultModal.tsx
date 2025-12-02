@@ -130,7 +130,7 @@ const MedicationLookupResultModal = ({
                 <Text style={styles.priceLabel}>
                   {drugName} {quantity} {form}
                 </Text>
-                <Text style={styles.priceAmount}>${result.price}</Text>
+                <Text style={styles.priceAmount}>${Number(result.price) * Number(quantity)}</Text>
               </View>
               <TouchableOpacity style={styles.sendButtonIcon} onPress={openDDC}>
                 <Image source={require('../../assets/sendIcon.png')} />

@@ -36,7 +36,7 @@ const sortOptions = [
 const ZIPCODE_LENGTH = 5;
 
 const MedicationLookupSelectedScreen = () => {
-  const [form, setForm] = useState('tube');
+  const [form, setForm] = useState('');
   const [quantity, setQuantity] = useState('1');
   const [zipCode, setZipCode] = useState('');
   const [radius, setRadius] = useState('5');
@@ -71,6 +71,7 @@ const MedicationLookupSelectedScreen = () => {
         value: f,
       }));
 
+      setForm(mappedForms[0].value);
       setFormOptions(mappedForms);
     }
 
@@ -78,7 +79,7 @@ const MedicationLookupSelectedScreen = () => {
   }, []);
 
   useEffect(() => {
-    if (!quantity || !radius || !includeGeneric || !zipCode || zipCode.length !== ZIPCODE_LENGTH) {
+    if (!quantity || !radius || !zipCode || zipCode.length !== ZIPCODE_LENGTH) {
       return;
     }
 
@@ -245,7 +246,7 @@ const MedicationLookupSelectedScreen = () => {
                   onFocus={() => setZipFocused(true)}
                 />
 
-                {zipFocused && drugResults.length === 0 && (
+                {zipFocused && drugResults.length === 0 && includeGeneric && (
                   <TouchableOpacity
                     style={styles.detectLocationButton}
                     onPress={() => detectZipFromLocation()}
@@ -278,7 +279,7 @@ const MedicationLookupSelectedScreen = () => {
           </View>
 
           {/* Filter Options */}
-          {drugResults.length > 0 && !isLoading && (
+          {(drugResults.length > 0 || !includeGeneric) && !isLoading && (
             <View style={styles.filterContainer}>
               <View style={{ marginRight: 8 }}>
                 <Dropdown
@@ -373,7 +374,9 @@ const MedicationLookupSelectedScreen = () => {
                           <Text style={styles.pharmacyLabel}>{result.labelName}</Text>
                           <Text style={styles.pharmacyName}>{result.pharmacyName}</Text>
                         </View>
-                        <Text style={styles.pharmacyPrice}>${result.price}</Text>
+                        <Text style={styles.pharmacyPrice}>
+                          ${Number(result.price) * Number(quantity)}
+                        </Text>
                       </View>
                     </View>
                     <View style={styles.pharmacyRight}>
