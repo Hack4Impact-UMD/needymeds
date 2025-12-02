@@ -9,7 +9,7 @@ import { searchPharmacies } from '../../api/pharmacySearch';
 import { Pharmacy } from '../../api/types';
 
 import BottomNavBar from '../components/BottomNavBar';
-import Header from '../components/Header';
+import DefaultHeader from '../components/DefaultHeader';
 import MedicationLookupBackgroundShape from '../components/medication-lookup/MedicationLookupBackgroundShape';
 import SearchResult from '../components/SearchResult';
 
@@ -200,7 +200,7 @@ const PharmacyLocatorScreen = () => {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
-        <Header />
+        <DefaultHeader />
         <MedicationLookupBackgroundShape top={450} maxHeight={700} color="#C7E7FF" />
 
         {/* Title Section */}

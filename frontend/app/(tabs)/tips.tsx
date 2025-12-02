@@ -5,7 +5,7 @@ import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 
 import { Icon } from 'react-native-paper';
 
 import BottomNavBar from '../components/BottomNavBar';
-import Header from '../components/Header';
+import DefaultHeader from '../components/DefaultHeader';
 
 export default function Tips() {
   const { t } = useTranslation();
@@ -47,7 +47,7 @@ export default function Tips() {
 
   return (
     <View style={styles.container}>
-      <Header />
+      <DefaultHeader />
       <BottomNavBar />
 
       <ScrollView contentContainerStyle={styles.content}>

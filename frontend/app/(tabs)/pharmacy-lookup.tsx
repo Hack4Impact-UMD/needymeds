@@ -6,7 +6,7 @@ import { Button, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BottomNavBar from '../components/BottomNavBar';
-import Header from '../components/Header';
+import DefaultHeader from '../components/DefaultHeader';
 import MedicationLookupBackgroundShape from '../components/medication-lookup/MedicationLookupBackgroundShape';
 
 const PharmacyLocatorScreen = () => {
@@ -123,7 +123,7 @@ const PharmacyLocatorScreen = () => {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
-        <Header />
+        <DefaultHeader />
         <MedicationLookupBackgroundShape top={530} maxHeight={700} color="#C7E7FF" />
 
         {/* Title Section */}

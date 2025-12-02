@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   },
   title: {
     textAlign: 'center',
-    width: '40%',
+    maxWidth: '100%',
     fontWeight: 400,
     color: '#181C20',
     fontSize: 28,
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto',
     textAlign: 'center',
     lineHeight: 20,
-    width: '35%',
+    maxWidth: '100%',
     color: '#181C20',
     fontSize: 14,
     paddingHorizontal: 8,

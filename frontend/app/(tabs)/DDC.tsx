@@ -4,14 +4,13 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Adjudicator, DrugSearchResult } from '../../api/types';
 import DDCMedInfoRow from '../components/DDCMedInfoRow';
+import DefaultHeader from '../components/DefaultHeader';
 import DDCFaqScreen from './DDCFaqScreen';
 
-const logo = require('../assets/horizontal_logo.png');
 const backArrow = require('../assets/arrow_back.png');
 const expandIcon = require('../assets/aspect_ratio.png');
 const shareIcon = require('../assets/share.png');
@@ -20,11 +19,6 @@ const DST_DDCCardFront = require('../assets/DST_DDCDetailsFront.png');
 const DST_DDCCardBack = require('../assets/DST_DDCBackDetails.png');
 const ScriptSave_DDCCardFront = require('../assets/ScriptSave_DDCDetailsFront.png');
 const ScriptSave_DDCCardBack = require('../assets/ScriptSave_DDCBackDetails.png');
-
-const langOptions = [
-  { label: 'EN', value: 'EN' },
-  { label: 'SP', value: 'SP' },
-];
 
 const DDC = () => {
   const { t } = useTranslation();
@@ -44,33 +38,15 @@ const DDC = () => {
     distance: params.distance as string,
   };
 
-  const [lang, setLang] = useState('EN');
   const [showFAQ, setShowFAQ] = useState(false);
   const [showShare, setShowShare] = useState(false);
-
-  function handleButton(item: any): void {
-    if (item && item.value) setLang(item.value);
-  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* header area */}
         <View style={styles.headerRow}>
-          <View>
-            <Image source={logo} style={styles.logoImage} resizeMode="contain" />
-          </View>
-          <Dropdown
-            placeholder="EN"
-            value={lang}
-            labelField="label"
-            valueField="value"
-            data={langOptions}
-            onChange={handleButton}
-            style={styles.dropdown}
-            placeholderStyle={{ color: '#41484D' }}
-            itemTextStyle={{ color: '#41484D' }}
-          />
+          <DefaultHeader />
         </View>
         <View style={styles.pageBody}>
           {showFAQ ? (

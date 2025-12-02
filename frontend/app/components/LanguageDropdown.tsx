@@ -7,7 +7,7 @@ const LanguageDropdown = () => {
 
   const langOptions = [
     { label: 'EN', value: 'en' },
-    { label: 'SP', value: 'es' },
+    { label: 'ES', value: 'es' },
   ];
 
   function handleChangeLanguage(item: any) {

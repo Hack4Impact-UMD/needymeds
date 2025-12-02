@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useTranslation } from 'react-i18next';
 import BottomNavBar from '../components/BottomNavBar';
-import Header from '../components/Header';
+import DefaultHeader from '../components/DefaultHeader';
 const v_logo = require('../assets/vertical_logo.png');
 
 const EducationScreen = () => {
@@ -24,7 +24,7 @@ const EducationScreen = () => {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
         {/* HEADER */}
-        <Header />
+        <DefaultHeader />
 
         {/* TITLE */}
         <Text style={styles.title}>{t('Header2')}</Text>
