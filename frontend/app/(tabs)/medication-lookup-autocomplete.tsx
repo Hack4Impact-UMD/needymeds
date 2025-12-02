@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Keyboard, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import { Text } from 'react-native-paper';
+import { ActivityIndicator, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomNavBar from '../components/BottomNavBar';
 import ErrorState from '../components/errorMessage';
@@ -90,8 +90,8 @@ const MedicationLookupAutocompleteScreen = () => {
                 <Text style={styles.emptyText}>{t('EmptyMsg')}</Text>
               </View>
             ) : isLoading ? (
-              // Show loading error state
-              <ErrorState type="loading" />
+              // Show loading state
+              <ActivityIndicator size="large" style={{ marginTop: 200 }} color="#236488" />
             ) : results.length === 0 && hasSearched ? (
               // Show not found error state
               <ErrorState type="notFound" query={query} />

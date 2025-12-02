@@ -352,7 +352,7 @@ const MedicationLookupSelectedScreen = () => {
             <View style={styles.pharmacyListContainer}>
               {isLoading ? (
                 // Show loading state
-                <ErrorState type="loading" />
+                <ActivityIndicator size="large" style={{ marginTop: 200 }} color="#236488" />
               ) : hasError ? (
                 // Show error state
                 <ErrorState

@@ -2,16 +2,8 @@ import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-ic
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  ActivityIndicator,
-  Alert,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import { Text, TextInput } from 'react-native-paper';
+import { Alert, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { searchPharmacies } from '../../api/pharmacySearch';
 import { Pharmacy } from '../../api/types';
@@ -237,7 +229,7 @@ const PharmacyLocatorScreen = () => {
             keyboardShouldPersistTaps="handled"
           >
             {loading ? (
-              <Text style={{ textAlign: 'center', marginTop: 20 }}>Searching...</Text>
+              <ActivityIndicator size="large" style={{ marginTop: 200 }} color="#236488" />
             ) : pharmacies.length === 0 ? (
               <View style={styles.emptyContainer}>
                 <MaterialIcons name="add-business" size={41} color="#41484D" />
