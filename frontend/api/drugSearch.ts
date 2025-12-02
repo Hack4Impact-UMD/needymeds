@@ -136,18 +136,19 @@ async function searchDrug(
 
   // Process DSNT results
   for (const dsntResult of dsntDrugResults.DrugPricing ?? []) {
-    console.log(dsntResult.labelName.toLowerCase());
-    console.log(genericVersion);
-    if (!includeGeneric && !dsntResult.labelName.includes(genericVersion)) {
+    if (!includeGeneric && dsntResult.labelName.toLowerCase().includes(genericVersion)) {
       continue;
     }
 
-    if (!dsntResult.labelName.includes(form)) {
-      for (const availableForm of availableForms) {
-        if (dsntResult.labelName.toLowerCase().includes(availableForm.toLowerCase())) {
-          continue;
-        }
-      }
+    const lowerLabelName = dsntResult.labelName.toLowerCase();
+    const lowerForm = form.toLowerCase();
+
+    if (
+      lowerLabelName !== '' &&
+      !lowerLabelName.includes(lowerForm) &&
+      availableForms.some((af) => lowerLabelName.includes(af.toLowerCase()))
+    ) {
+      continue;
     }
 
     const dsntZipCode: string =
@@ -189,17 +190,17 @@ async function searchDrug(
 
   // Process ScriptSave results
   for (const scriptSaveResult of scriptSaveDrugResults.drugs ?? []) {
-    console.log(scriptSaveResult.ln.toLowerCase());
-    if (!includeGeneric && !scriptSaveResult.ln.toLowerCase().includes(genericVersion)) {
+    if (!includeGeneric && scriptSaveResult.ln.toLowerCase().includes(genericVersion)) {
       continue;
     }
 
-    if (!scriptSaveResult.ln.includes(form)) {
-      for (const availableForm of availableForms) {
-        if (scriptSaveResult.ln.toLowerCase().includes(availableForm.toLowerCase())) {
-          continue;
-        }
-      }
+    const lowerLn = scriptSaveResult.ln.toLowerCase();
+    if (
+      lowerLn !== '' &&
+      !lowerLn.includes(form.toLowerCase()) &&
+      availableForms.some((af) => lowerLn.includes(af.toLowerCase()))
+    ) {
+      continue;
     }
 
     const distance = distanceBetweenCoordinates(

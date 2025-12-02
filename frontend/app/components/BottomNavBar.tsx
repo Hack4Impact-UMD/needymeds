@@ -1,12 +1,12 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router, usePathname } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Surface, Text } from 'react-native-paper';
 
-const resourcesIcon = require('../assets/Icon.png');
-const cardIcon = require('../assets/confirmation_number.png');
+function BottomNavBar() {
+  const { t } = useTranslation();
 
-const BottomNavBar = () => {
   const pathname = usePathname();
   const isMedicationLookupActive = pathname.includes('medication-lookup') || pathname === '/(tabs)';
   const isPharmacyLookupActive = pathname.includes('pharmacy-lookup') || pathname === '/(tabs)';
@@ -41,7 +41,7 @@ const BottomNavBar = () => {
             variant="labelMedium"
             style={[styles.navLabel, isMedicationLookupActive && styles.navLabelActive]}
           >
-            Drug Prices
+            {t('DrugPricesTab')}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -66,7 +66,7 @@ const BottomNavBar = () => {
             />
           </View>
           <Text variant="labelMedium" style={styles.navLabel}>
-            Pharmacies
+            {t('PharmaciesTab')}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -89,15 +89,19 @@ const BottomNavBar = () => {
               size={24}
               color="#004E60"
             />
-            <Text variant="labelMedium" style={styles.navLabel}>
-              Resources
-            </Text>
           </View>
+
+          <Text
+            variant="labelMedium"
+            style={[styles.navLabel, isEducationalResourcesActive && styles.navLabelActive]}
+          >
+            {t('ResourcesTab')}
+          </Text>
         </TouchableOpacity>
       </Surface>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   bottomNav: {

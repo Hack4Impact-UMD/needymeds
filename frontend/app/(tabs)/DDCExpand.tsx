@@ -1,14 +1,14 @@
-import { useRef, useState } from 'react';
-import { Animated, Pressable, View, StyleSheet, Image, Text } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { useRef, useState } from 'react';
+import { Animated, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
-const DST_DDCCardFront = require('../assets/DST_DDCDetailsFront.svg');
-const DST_DDCCardBack = require('../assets/DST_DDCBackDetails.svg');
-const ScriptSave_DDCCardFront = require('../assets/ScriptSave_DDCDetailsFront.svg');
-const ScriptSave_DDCCardBack = require('../assets/ScriptSave_DDCBackDetails.svg');
-const backArrow = require('../assets/arrow_back.svg');
+const DST_DDCCardFront = require('../assets/DST_DDCDetailsFront.png');
+const DST_DDCCardBack = require('../assets/DST_DDCBackDetails.png');
+const ScriptSave_DDCCardFront = require('../assets/ScriptSave_DDCDetailsFront.png');
+const ScriptSave_DDCCardBack = require('../assets/ScriptSave_DDCBackDetails.png');
+const backArrow = require('../assets/arrow_back.png');
 
-const Expand = () => {
+const DDCExpand = () => {
   const params = useLocalSearchParams();
   const adjudicator = params.adjudicator as string;
 
@@ -91,7 +91,7 @@ const Expand = () => {
   );
 };
 
-export default Expand;
+export default DDCExpand;
 
 const styles = StyleSheet.create({
   expandContainer: {

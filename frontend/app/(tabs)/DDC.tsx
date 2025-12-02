@@ -2,43 +2,27 @@ import { Colors } from '@/constants/theme';
 import { MaterialIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Adjudicator, DrugSearchResult } from '../../api/types';
 import DDCMedInfoRow from '../components/DDCMedInfoRow';
+import DefaultHeader from '../components/DefaultHeader';
 import DDCFaqScreen from './DDCFaqScreen';
-const logo = require('../assets/horizontal_logo.png');
-const backArrow = require('../assets/arrow_back.svg');
-const expandIcon = require('../assets/aspect_ratio.svg');
-const shareIcon = require('../assets/share.svg');
 
-const DST_DDCCardFront = require('../assets/DST_DDCDetailsFront.svg');
-const DST_DDCCardBack = require('../assets/DST_DDCBackDetails.svg');
-const ScriptSave_DDCCardFront = require('../assets/ScriptSave_DDCDetailsFront.svg');
-const ScriptSave_DDCCardBack = require('../assets/ScriptSave_DDCBackDetails.svg');
+const backArrow = require('../assets/arrow_back.png');
+const expandIcon = require('../assets/aspect_ratio.png');
+const shareIcon = require('../assets/share.png');
 
-//pass in from DrugSearchResult
-const sampleResult: DrugSearchResult = {
-  adjudicator: 'DSNT',
-  pharmacyName: 'CVS Pharmacy',
-  pharmacyAddress: '123 Main St, Rockville, MD 20850',
-  pharmacyPhone: '(301) 555-1293',
-  ndc: '00781-1506-01',
-  labelName: 'Amoxicillin 500mg Capsule',
-  price: '$8.42',
-  latitude: '39.0840',
-  longitude: '-77.1528',
-  distance: '1.2',
-};
+const DST_DDCCardFront = require('../assets/DST_DDCDetailsFront.png');
+const DST_DDCCardBack = require('../assets/DST_DDCBackDetails.png');
+const ScriptSave_DDCCardFront = require('../assets/ScriptSave_DDCDetailsFront.png');
+const ScriptSave_DDCCardBack = require('../assets/ScriptSave_DDCBackDetails.png');
 
-const langOptions = [
-  { label: 'EN', value: 'EN' },
-  { label: 'SP', value: 'SP' },
-];
+const DDC = () => {
+  const { t } = useTranslation();
 
-const DST = () => {
   const params = useLocalSearchParams();
 
   const result: DrugSearchResult = {
@@ -54,34 +38,14 @@ const DST = () => {
     distance: params.distance as string,
   };
 
-  const [lang, setLang] = useState('EN');
   const [showFAQ, setShowFAQ] = useState(false);
   const [showShare, setShowShare] = useState(false);
-
-  function handleButton(item: any): void {
-    if (item && item.value) setLang(item.value);
-  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* header area */}
-        <View style={styles.headerRow}>
-          <View>
-            <Image source={logo} style={styles.logoImage} resizeMode="contain" />
-          </View>
-          <Dropdown
-            placeholder="EN"
-            value={lang}
-            labelField="label"
-            valueField="value"
-            data={langOptions}
-            onChange={handleButton}
-            style={styles.dropdown}
-            placeholderStyle={{ color: '#41484D' }}
-            itemTextStyle={{ color: '#41484D' }}
-          />
-        </View>
+        <DefaultHeader />
         <View style={styles.pageBody}>
           {showFAQ ? (
             <DDCFaqScreen onClose={() => setShowFAQ(false)} />
@@ -89,23 +53,22 @@ const DST = () => {
             <>
               <View style={styles.pageHeader}>
                 <View style={styles.backButton}>
-                  <Pressable onPress={() => router.navigate('/selected')}>
+                  <Pressable onPress={() => router.push('/medication-lookup')}>
                     <Image source={backArrow} style={styles.backIcon} resizeMode="contain" />
                   </Pressable>
                 </View>
                 <Text variant="headlineLarge" style={styles.title}>
-                  Drug Discount Card
+                  {t('CardHeader')}
                 </Text>
               </View>
 
               <View style={styles.medInfoWrapper}>
-                {/* hardcoded to match figma but chaneg later */}
-                <DDCMedInfoRow result={sampleResult} />
+                <DDCMedInfoRow result={result} />
               </View>
 
               <View style={styles.cardSection}>
                 <Text variant="titleMedium" style={styles.sectionLabel}>
-                  Front of Card:
+                  {t('ImageHeader1')}
                 </Text>
                 <View style={styles.cardImageWrapper}>
                   <Image
@@ -120,7 +83,7 @@ const DST = () => {
 
               <View style={styles.cardSection}>
                 <Text variant="titleMedium" style={styles.sectionLabel}>
-                  Back of Card:
+                  {t('ImageHeader2')}
                 </Text>
                 <View style={styles.cardImageWrapper}>
                   <Image
@@ -138,7 +101,7 @@ const DST = () => {
                   style={styles.actionButton}
                   onPress={() => {
                     router.push({
-                      pathname: '/expand',
+                      pathname: '/DDCExpand',
                       params: {
                         adjudicator: result.adjudicator,
                       },
@@ -146,19 +109,19 @@ const DST = () => {
                   }}
                 >
                   <Image source={expandIcon} style={styles.actionIcon} resizeMode="contain" />
-                  <Text style={styles.buttonText}>Expand</Text>
+                  <Text style={styles.buttonText}>{t('ButtonLabel1')}</Text>
                 </Pressable>
 
                 <Pressable style={styles.actionButton} onPress={() => setShowShare(true)}>
                   <Image source={shareIcon} style={styles.actionIcon} resizeMode="contain" />
-                  <Text style={styles.buttonText}>Share</Text>
+                  <Text style={styles.buttonText}>{t('ButtonLabel2')}</Text>
                 </Pressable>
               </View>
 
               <View style={styles.footerNote}>
                 <Pressable onPress={() => setShowFAQ(true)}>
                   <Text style={styles.footerQuestion}>
-                    Have questions? Learn more about the Drug Discount Card here!
+                    {t('HelpLink1')} {t('HelpLink2')}
                   </Text>
                 </Pressable>
               </View>
@@ -216,7 +179,7 @@ const DST = () => {
   );
 };
 
-export default DST;
+export default DDC;
 
 const styles = StyleSheet.create({
   safeArea: {

@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text, TouchableRipple } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,6 +12,8 @@ import EligibilityModal from '../components/medication-lookup/EligibilityModal';
 import MedicationLookupBackgroundShape from '../components/medication-lookup/MedicationLookupBackgroundShape';
 
 const MedicationLookupScreen = () => {
+  const { t } = useTranslation();
+
   const [showEligibilityModal, setShowEligibilityModal] = useState(false);
 
   // Navigate to full-page autocomplete when input is focused
@@ -27,8 +30,8 @@ const MedicationLookupScreen = () => {
 
           {/* promo area */}
           <View style={styles.promoWrap}>
-            <Text style={styles.promoTitle}>Upto 80% off</Text>
-            <Text style={styles.promoSubtitle}>on your prescription</Text>
+            <Text style={styles.promoTitle}>{t('HeroTxtEmphasisLine')}</Text>
+            <Text style={styles.promoSubtitle}>{t('HeroTxtSecondaryLine')}</Text>
           </View>
 
           {/* Search Bar - Touchable to open full page */}
@@ -38,7 +41,7 @@ const MedicationLookupScreen = () => {
             activeOpacity={0.8}
           >
             <View style={styles.inputWrap}>
-              <Text style={styles.inputPlaceholder}>Search for a drug</Text>
+              <Text style={styles.inputPlaceholder}>{t('SearchPlaceholder')}</Text>
               <View style={styles.searchIcon}>
                 <MaterialCommunityIcons name="magnify" size={20} color="#41484D" />
               </View>
@@ -64,7 +67,7 @@ const MedicationLookupScreen = () => {
               <View style={styles.eligibleIconCircle}>
                 <MaterialCommunityIcons name="information-outline" size={17} color="white" />
               </View>
-              <Text style={styles.eligibleText}>What is eligible?</Text>
+              <Text style={styles.eligibleText}>{t('InfoLink')}</Text>
             </View>
           </TouchableRipple>
 

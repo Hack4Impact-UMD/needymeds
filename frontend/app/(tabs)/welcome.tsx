@@ -1,10 +1,13 @@
 import { Colors } from '@/constants/theme';
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Image, Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const WelcomeScreen = () => {
+  const { t, i18n } = useTranslation();
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -18,14 +21,9 @@ const WelcomeScreen = () => {
           </View>
           <View style={styles.content}>
             <Text variant="headlineMedium" style={styles.title}>
-              Welcome to the{'\n'}NeedyMeds App!
+              {t('WelcomeHeader')}
             </Text>
-            <Text style={styles.description}>
-              We are a dedicated nonprofit{'\n'}
-              organization committed to improving{'\n'}
-              access to affordable healthcare for{'\n'}
-              individuals in need.
-            </Text>
+            <Text style={styles.description}>{t('InfoBody')}</Text>
           </View>
         </View>
         <View style={styles.whiteSection}>
@@ -40,36 +38,38 @@ const WelcomeScreen = () => {
                 contentStyle={styles.primaryButtonContent}
                 labelStyle={styles.primaryButtonLabel}
               >
-                Continue Anonymously
+                {t('PrimaryCtaBtnLabel')}
               </Button>
             </View>
             <Text variant="bodySmall" style={styles.secondaryMessage}>
-              No sign-up or personal information needed.
+              {t('SecondaryTxt')}
             </Text>
             <TouchableOpacity activeOpacity={0.7}>
               <Text variant="bodySmall" style={styles.languageSwitcher}>
-                English <Text style={styles.languageDivider}>|</Text> Español
+                <Text onPress={() => i18n.changeLanguage('en')}>{t('LangControlEN')}</Text>
+                <Text style={styles.languageDivider}> | </Text>
+                <Text onPress={() => i18n.changeLanguage('es')}>{t('LangControlES')}</Text>
               </Text>
             </TouchableOpacity>
           </View>
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Copyright © 2025 by NeedyMeds, Inc.</Text>
+            <Text style={styles.footerText}>{t('FooterLinkCopyright')}</Text>
 
             <View style={styles.footerLinkContainer}>
               <Text
                 style={styles.footerLink}
-                onPress={() => Linking.openURL('https://www.needymeds.org/terms')}
+                onPress={() => Linking.openURL('https://www.needymeds.org/terms-and-conditions')}
               >
-                Terms & Conditions
+                {t('FooterLinkTnC')}
               </Text>
 
               <Text style={styles.footerSeparator}> | </Text>
 
               <Text
                 style={styles.footerLink}
-                onPress={() => Linking.openURL('https://www.needymeds.org/privacy')}
+                onPress={() => Linking.openURL('https://www.needymeds.org/privacy-policy')}
               >
-                Privacy Policy
+                {t('FooterLinkPrivacy')}
               </Text>
             </View>
           </View>
@@ -114,6 +114,7 @@ const styles = StyleSheet.create({
   },
   title: {
     textAlign: 'center',
+    maxWidth: '100%',
     fontWeight: 400,
     color: '#181C20',
     fontSize: 28,
@@ -124,7 +125,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto',
     textAlign: 'center',
     lineHeight: 20,
-    maxWidth: 412,
+    maxWidth: '100%',
     color: '#181C20',
     fontSize: 14,
     paddingHorizontal: 8,
@@ -145,8 +146,6 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   primaryButtonWrapper: {
-    width: '100%',
-    maxWidth: 220,
     alignSelf: 'center',
   },
   primaryButton: {

@@ -30,7 +30,7 @@ export const LookupSearchbar: React.FC<LookupSearchbarProps> = ({
         placeholder={placeholder}
         onChangeText={onChangeText}
         value={query}
-        onIconPress={onClear}
+        onClearIconPress={onClear}
         onFocus={() => {
           if (removeFocus) {
             setTimeout(() => {

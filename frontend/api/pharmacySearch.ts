@@ -1,14 +1,9 @@
-let SQLite: any;
-try {
-  SQLite = require('expo-sqlite');
-} catch {
-  SQLite = { openDatabaseAsync: () => Promise.reject(new Error('expo-sqlite not available')) };
-}
-
 import { setCacheEntry } from '../redux/pharmacySearchSlice';
 import { store } from '../redux/store';
 import { distanceBetweenCoordinates, zipToCoords } from './distance';
 import { Pharmacy } from './types';
+
+import * as SQLite from 'expo-sqlite';
 
 interface PharmacyRow {
   name: string;
@@ -23,7 +18,7 @@ interface PharmacyRow {
 }
 
 async function openDatabase(): Promise<any> {
-  return await SQLite.openDatabaseAsync('pharmacy.db');
+  return SQLite.openDatabaseSync('pharmacy.db');
 }
 
 async function queryAllPharmacies(db: any): Promise<Pharmacy[]> {

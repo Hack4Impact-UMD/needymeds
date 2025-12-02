@@ -10,6 +10,7 @@ import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Alert,
   Image,
@@ -28,15 +29,17 @@ import LanguageDropdown from '../components/LanguageDropdown';
 import { LookupSearchbar } from '../components/LookupSearchbar';
 import MedicationLookupResultModal from '../components/medication-lookup/MedicationLookupResultModal';
 
-const sortOptions = [
-  { label: 'By price', value: 'price' },
-  { label: 'By distance', value: 'distance' },
-];
-
 const ZIPCODE_LENGTH = 5;
 
 const MedicationLookupSelectedScreen = () => {
-  const [form, setForm] = useState('tube');
+  const { t } = useTranslation();
+
+  const sortOptions = [
+    { label: t('FilterChipSortPrice'), value: 'price' },
+    { label: t('FilterChipSortDist'), value: 'distance' },
+  ];
+
+  const [form, setForm] = useState('');
   const [quantity, setQuantity] = useState('1');
   const [zipCode, setZipCode] = useState('');
   const [radius, setRadius] = useState('5');
@@ -47,7 +50,7 @@ const MedicationLookupSelectedScreen = () => {
   const [query, setQuery] = useState('');
   const [zipFocused, setZipFocused] = useState(false);
   const [detectingZip, setDetectingZip] = useState(false);
-  const [formOptions, setFormOptions] = useState<string[]>([]);
+  const [formOptions, setFormOptions] = useState<{ label: string; value: string }[]>([]);
   const [drugResults, setDrugResults] = useState<DrugSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -65,20 +68,26 @@ const MedicationLookupSelectedScreen = () => {
         drugName
       )) as InitializeDrugSearchResult;
       setGenericName(genericVersion || '');
-      setFormOptions(availableForms);
+
+      const mappedForms = (availableForms || []).map((f) => ({
+        label: f,
+        value: f,
+      }));
+
+      setForm(mappedForms[0].value);
+      setFormOptions(mappedForms);
     }
 
     initializeSearch();
-  }, []);
+  }, [drugName]);
 
   useEffect(() => {
-    if (!quantity || !radius || !includeGeneric || !zipCode || zipCode.length !== ZIPCODE_LENGTH) {
+    if (!quantity || !radius || !zipCode || zipCode.length !== ZIPCODE_LENGTH) {
       return;
     }
 
     const fetchDrugSearchResults = async () => {
       try {
-        // TODO: Add generic form to DrugSearchResult
         setIsLoading(true);
         setHasError(false);
         let drugSearchResults: DrugSearchResult[];
@@ -112,11 +121,12 @@ const MedicationLookupSelectedScreen = () => {
     };
 
     fetchDrugSearchResults();
-  }, [sortBy, radius, includeGeneric, zipCode]);
+  }, [sortBy, form, radius, includeGeneric, zipCode]);
 
   const clearSearch = () => {
     setQuery('');
     inputRef.current?.focus();
+    router.push('/medication-lookup-autocomplete');
   };
 
   const detectZipFromLocation = async () => {
@@ -165,11 +175,12 @@ const MedicationLookupSelectedScreen = () => {
                 {/* Form field */}
                 <TextInput
                   mode="outlined"
-                  label="Form"
+                  label={t('FormInputLabel')}
                   value={form}
                   render={() => (
                     <Dropdown
                       data={formOptions}
+                      placeholder={formOptions.length > 0 ? formOptions[0].label : ''}
                       labelField="label"
                       valueField="value"
                       value={form}
@@ -189,7 +200,7 @@ const MedicationLookupSelectedScreen = () => {
               <View style={styles.formField}>
                 <TextInput
                   mode="outlined"
-                  label="How much?"
+                  label={t('QtyInputLabel')}
                   value={quantity}
                   onChangeText={setQuantity}
                   keyboardType="numeric"
@@ -204,7 +215,7 @@ const MedicationLookupSelectedScreen = () => {
               <View style={styles.formField}>
                 <TextInput
                   mode="outlined"
-                  label="ZIP Code"
+                  label={t('ZipInputLabel')}
                   value={zipCode}
                   onChangeText={setZipCode}
                   keyboardType="numeric"
@@ -239,7 +250,7 @@ const MedicationLookupSelectedScreen = () => {
                   onFocus={() => setZipFocused(true)}
                 />
 
-                {zipFocused && (
+                {zipFocused && drugResults.length === 0 && includeGeneric && (
                   <TouchableOpacity
                     style={styles.detectLocationButton}
                     onPress={() => detectZipFromLocation()}
@@ -259,7 +270,7 @@ const MedicationLookupSelectedScreen = () => {
               <View style={styles.formField}>
                 <TextInput
                   mode="outlined"
-                  label="Radius"
+                  label={t('RadiusInputLabel')}
                   value={radius}
                   onChangeText={setRadius}
                   keyboardType="numeric"
@@ -272,7 +283,7 @@ const MedicationLookupSelectedScreen = () => {
           </View>
 
           {/* Filter Options */}
-          {drugResults.length > 0 && !isLoading && (
+          {(drugResults.length > 0 || !includeGeneric) && !isLoading && (
             <View style={styles.filterContainer}>
               <View style={{ marginRight: 8 }}>
                 <Dropdown
@@ -316,7 +327,7 @@ const MedicationLookupSelectedScreen = () => {
                     <View style={{ width: 18, height: 18, marginRight: 7 }} />
                   )}
                   <Text style={[styles.filterText, includeGeneric && styles.filterTextActive]}>
-                    Include generic ({genericName})
+                    {t('FilterChipGenericPrefix')} ({genericName})
                   </Text>
                 </TouchableOpacity>
               )}
@@ -343,9 +354,7 @@ const MedicationLookupSelectedScreen = () => {
                 // Show initial empty state (before search)
                 <View style={styles.emptyState}>
                   <MaterialIcons name="add-shopping-cart" size={64} color="#555" />
-                  <Text style={styles.emptyStateTitle}>
-                    Tell us how much you're looking for,{'\n'}and where you can pick it up.
-                  </Text>
+                  <Text style={styles.emptyStateTitle}>{t('EmptyPristineMsg')}</Text>
                 </View>
               ) : (
                 // Show results list
@@ -367,14 +376,16 @@ const MedicationLookupSelectedScreen = () => {
                           <Text style={styles.pharmacyLabel}>{result.labelName}</Text>
                           <Text style={styles.pharmacyName}>{result.pharmacyName}</Text>
                         </View>
-                        <Text style={styles.pharmacyPrice}>${result.price}</Text>
+                        <Text style={styles.pharmacyPrice}>
+                          ${Number(result.price) * Number(quantity)}
+                        </Text>
                       </View>
                     </View>
                     <View style={styles.pharmacyRight}>
                       <Text style={styles.pharmacyDistance}>
-                        {Number(result.distance).toFixed(2)}
+                        {`${Number(result.distance).toFixed(2)}mi`}
                       </Text>
-                      <MaterialCommunityIcons name="chevron-right" size={20} color="#9CA3AF" />
+                      <MaterialCommunityIcons name="chevron-right" size={20} color="#41484D" />
                     </View>
                   </TouchableOpacity>
                 ))
@@ -390,7 +401,6 @@ const MedicationLookupSelectedScreen = () => {
         <MedicationLookupResultModal
           result={selectedDrugResult}
           setSelectedDrugResult={setSelectedDrugResult}
-          drugName={drugName}
           quantity={quantity}
           form={form}
         />
@@ -524,14 +534,13 @@ const styles = StyleSheet.create({
   filterContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
-    paddingHorizontal: 16,
+    paddingHorizontal: 10,
     paddingVertical: 14,
   },
   filterButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 4,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 8,
@@ -585,7 +594,6 @@ const styles = StyleSheet.create({
   pharmacyIcon: {
     width: 44,
     height: 44,
-    backgroundColor: '#F3F4F6',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
@@ -619,14 +627,13 @@ const styles = StyleSheet.create({
   },
   pharmacyPrice: {
     fontSize: 16,
-    fontWeight: '700',
-    color: '#111827',
+    color: '#41484D',
     marginBottom: 2,
-    fontFamily: 'Open Sans',
+    fontFamily: 'Roboto',
   },
   pharmacyLabel: {
     fontSize: 12,
-    color: '#6B7280',
+    color: '#181C20',
     fontFamily: 'Open Sans',
   },
   pharmacyRight: {
@@ -637,8 +644,8 @@ const styles = StyleSheet.create({
   },
   pharmacyDistance: {
     fontSize: 13,
-    color: '#6B7280',
-    fontFamily: 'Open Sans',
+    color: '#41484D',
+    fontFamily: 'Roboto',
   },
   emptyState: {
     flex: 1,

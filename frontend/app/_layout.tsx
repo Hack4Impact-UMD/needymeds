@@ -3,7 +3,7 @@ import {
   NunitoSans_600SemiBold,
   NunitoSans_700Bold,
 } from '@expo-google-fonts/nunito-sans';
-import { OpenSans_400Regular } from '@expo-google-fonts/open-sans';
+import { OpenSans_400Regular, OpenSans_600SemiBold } from '@expo-google-fonts/open-sans';
 import { Roboto_400Regular } from '@expo-google-fonts/roboto';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
@@ -13,6 +13,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { Provider } from 'react-redux';
+import '../i18n';
 import { store } from '../redux/store';
 
 // Keep the splash screen visible while we fetch resources
@@ -29,6 +30,7 @@ export default function RootLayout() {
     'NunitoSans-SemiBold': NunitoSans_600SemiBold,
     'NunitoSans-Bold': NunitoSans_700Bold,
     'Open Sans': OpenSans_400Regular,
+    'OpenSans-SemiBold': OpenSans_600SemiBold,
     Roboto: Roboto_400Regular,
   });
 

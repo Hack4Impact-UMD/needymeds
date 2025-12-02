@@ -1,0 +1,164 @@
+import { router } from 'expo-router';
+
+import { Image, Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Card, Divider, Icon, IconButton } from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { useTranslation } from 'react-i18next';
+import BottomNavBar from '../components/BottomNavBar';
+import DefaultHeader from '../components/DefaultHeader';
+const v_logo = require('../assets/vertical_logo.png');
+
+const EducationScreen = () => {
+  const { t } = useTranslation();
+
+  const general_faq_url = 'https://needymeds.org/faq';
+  const coupon_faq_url = 'https://www.needymeds.org/copay-cards-faqs';
+  const nm_url = 'https://needymeds.org/';
+
+  const handleLink = (url: string) => {
+    Linking.openURL(url);
+  };
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* HEADER */}
+        <DefaultHeader />
+
+        {/* TITLE */}
+        <Text style={styles.title}>{t('Header2')}</Text>
+
+        {/* description + left icon */}
+        <View style={styles.subtitle}>
+          <Icon source="book-open-page-variant-outline" color="#41484D" size={30} />
+          <Text style={styles.description}>{t('Text13')}</Text>
+        </View>
+
+        {/* saving tips card */}
+        <Card style={styles.cards}>
+          <Card.Title
+            title={t('Header3')}
+            subtitle={
+              <Text onPress={() => router.push('/(tabs)/tips')}>{t('CardSecondaryLine1')}</Text>
+            }
+            left={() => <Icon source="piggy-bank-outline" color="#41484D" size={40} />}
+            style={styles.title_cards}
+            titleStyle={{ marginBottom: -2 }}
+            subtitleStyle={{ letterSpacing: 0.5 }}
+          />
+        </Card>
+
+        {/* FAQ cards */}
+        <Card style={styles.cards}>
+          <Card.Title
+            title={t('FAQ')}
+            subtitle={t('CardSecondaryLine2')}
+            left={() => <Icon source="help-circle-outline" color="#41484D" size={40} />}
+            style={styles.grouped_cards}
+            titleStyle={{ marginBottom: -2 }}
+            subtitleStyle={{ letterSpacing: 0.5 }}
+          />
+          <Divider style={{ marginHorizontal: 16 }} />
+          <Card.Title
+            title={t('Card')}
+            subtitle={t('CardSecondaryLine3')}
+            left={() => <Icon source="forum-outline" color="#41484D" size={40} />}
+            right={() => (
+              <IconButton
+                icon="menu-right"
+                iconColor="#181C20"
+                size={25}
+                onPress={() => handleLink(general_faq_url)}
+              />
+            )}
+            style={styles.grouped_cards}
+            titleStyle={{ marginBottom: -2 }}
+            subtitleStyle={{ letterSpacing: 0.5 }}
+          />
+          <Divider style={{ marginHorizontal: 16 }} />
+          <Card.Title
+            title={t('Card2')}
+            subtitle={t('CardSecondaryLine3')}
+            left={() => <Icon source="currency-usd-off" color="#41484D" size={40} />}
+            right={() => (
+              <IconButton
+                icon="menu-right"
+                iconColor="#181C20"
+                size={25}
+                onPress={() => handleLink(coupon_faq_url)}
+              />
+            )}
+            style={styles.grouped_cards}
+            titleStyle={{ marginBottom: -2 }}
+            subtitleStyle={{ letterSpacing: 0.5 }}
+          />
+        </Card>
+
+        {/* NeedyMeds website card */}
+        <Card style={styles.cards} onPress={() => handleLink(nm_url)}>
+          <Card.Title
+            title={t('Card3')}
+            subtitle="https://needymeds.org/"
+            left={() => <Image source={v_logo} style={{ width: 40 }} resizeMode="contain" />}
+            style={styles.title_cards}
+            titleNumberOfLines={2}
+            subtitleStyle={{ textDecorationLine: 'underline', letterSpacing: 0.5 }}
+          />
+        </Card>
+      </ScrollView>
+      <BottomNavBar />
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#F6FAFE',
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  header: {
+    width: 340,
+    height: 85,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  title: {
+    textAlign: 'center',
+    fontSize: 32,
+    fontWeight: 300,
+    color: '#181C20',
+    margin: 10,
+  },
+  subtitle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: 12,
+    paddingBottom: 20,
+  },
+  description: {
+    fontSize: 14,
+    color: '#181C20',
+    paddingLeft: 15,
+  },
+  cards: {
+    marginVertical: 8,
+    width: '100%',
+    backgroundColor: '#F1F4F9',
+  },
+  title_cards: {
+    height: 100,
+  },
+  grouped_cards: {
+    paddingVertical: 12,
+  },
+});
+
+export default EducationScreen;

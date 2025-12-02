@@ -1,25 +1,25 @@
-import { Colors } from '@/constants/theme';
-import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 
 const LanguageDropdown = () => {
-  const [lang, setLang] = useState('EN');
+  const { i18n } = useTranslation();
+
   const langOptions = [
-    { label: 'EN', value: 'EN' },
-    { label: 'SP', value: 'SP' },
+    { label: 'EN', value: 'en' },
+    { label: 'ES', value: 'es' },
   ];
 
   function handleChangeLanguage(item: any) {
     if (item && item.value) {
-      setLang(item.value);
+      i18n.changeLanguage(item.value);
     }
   }
 
   return (
     <Dropdown
-      placeholder="EN"
-      value={lang}
+      placeholder={i18n.language}
+      value={i18n.language}
       labelField="label"
       valueField="value"
       data={langOptions}
@@ -40,7 +40,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 8,
-    backgroundColor: Colors.default.neutrallt,
   },
   langPlaceholder: {
     color: '#41484D',
