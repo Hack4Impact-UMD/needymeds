@@ -47,7 +47,7 @@ const MedicationLookupSelectedScreen = () => {
   const [query, setQuery] = useState('');
   const [zipFocused, setZipFocused] = useState(false);
   const [detectingZip, setDetectingZip] = useState(false);
-  const [formOptions, setFormOptions] = useState<string[]>([]);
+  const [formOptions, setFormOptions] = useState<{ label: string; value: string }[]>([]);
   const [drugResults, setDrugResults] = useState<DrugSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -65,7 +65,13 @@ const MedicationLookupSelectedScreen = () => {
         drugName
       )) as InitializeDrugSearchResult;
       setGenericName(genericVersion || '');
-      setFormOptions(availableForms);
+
+      const mappedForms = (availableForms || []).map((f) => ({
+        label: f,
+        value: f,
+      }));
+
+      setFormOptions(mappedForms);
     }
 
     initializeSearch();
@@ -169,6 +175,7 @@ const MedicationLookupSelectedScreen = () => {
                   render={() => (
                     <Dropdown
                       data={formOptions}
+                      placeholder={formOptions.length > 0 ? formOptions[0].label : ''}
                       labelField="label"
                       valueField="value"
                       value={form}
@@ -238,7 +245,7 @@ const MedicationLookupSelectedScreen = () => {
                   onFocus={() => setZipFocused(true)}
                 />
 
-                {zipFocused && (
+                {zipFocused && drugResults.length === 0 && (
                   <TouchableOpacity
                     style={styles.detectLocationButton}
                     onPress={() => detectZipFromLocation()}
@@ -523,14 +530,13 @@ const styles = StyleSheet.create({
   filterContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
-    paddingHorizontal: 16,
+    paddingHorizontal: 10,
     paddingVertical: 14,
   },
   filterButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 4,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 8,

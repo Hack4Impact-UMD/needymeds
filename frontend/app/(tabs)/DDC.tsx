@@ -76,7 +76,7 @@ const DDC = () => {
             <>
               <View style={styles.pageHeader}>
                 <View style={styles.backButton}>
-                  <Pressable onPress={() => router.navigate('/selected')}>
+                  <Pressable onPress={() => router.push('/medication-lookup')}>
                     <Image source={backArrow} style={styles.backIcon} resizeMode="contain" />
                   </Pressable>
                 </View>

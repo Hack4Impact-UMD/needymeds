@@ -87,7 +87,7 @@ const MedicationLookupResultModal = ({
             <View style={styles.infoCard}>
               <View style={styles.infoContent}>
                 <Text style={styles.infoText}>{result.pharmacyAddress}</Text>
-                <Text style={styles.infoSubtext}>{result.distance}</Text>
+                <Text style={styles.infoSubtext}>{Number(result.distance).toFixed(2)}</Text>
               </View>
               <View style={styles.buttonGroup}>
                 <TouchableOpacity
