@@ -1,7 +1,5 @@
-import React from 'react';
-import { View, StyleSheet, Image } from 'react-native';
-import { Text, Divider } from 'react-native-paper';
-import { IconButton } from 'react-native-paper';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Divider, IconButton, Text } from 'react-native-paper';
 const card = require('../assets/confirmation_number.png');
 const arrow = require('../assets/arrow_right.png');
 
@@ -36,14 +34,14 @@ export default function PharmacyRow({
         />
 
         {/* Main text block */}
-        <View style={styles.middle} onTouchEnd={onPress}>
+        <Pressable style={styles.middle} onPress={onPress}>
           <Text variant="titleMedium" style={styles.name}>
             {name}
           </Text>
           <Text variant="titleMedium" style={styles.price}>
             {price}
           </Text>
-        </View>
+        </Pressable>
 
         {/* Distance */}
         <Text style={styles.distance}>{distance}</Text>
