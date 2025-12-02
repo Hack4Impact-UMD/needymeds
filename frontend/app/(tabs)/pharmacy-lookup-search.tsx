@@ -1,25 +1,65 @@
-import { router } from 'expo-router';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Button, Text, TextInput } from 'react-native-paper';
+import { Alert, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { searchPharmacies } from '../../api/pharmacySearch';
+import { Pharmacy } from '../../api/types';
 import BottomNavBar from '../components/BottomNavBar';
 import Header from '../components/Header';
 import MedicationLookupBackgroundShape from '../components/medication-lookup/MedicationLookupBackgroundShape';
+import SearchResult from '../components/SearchResult';
 
 const PharmacyLocatorScreen = () => {
-  const [zipCode, setZipCode] = useState('');
-  const [radius, setRadius] = useState('5');
+  const params = useLocalSearchParams();
+  const zipParam = Array.isArray(params.zipCode) ? params.zipCode[0] : (params.zipCode ?? '');
+  const radiusParam = Array.isArray(params.radius) ? params.radius[0] : (params.radius ?? '5');
+
+  const [zipCode, setZipCode] = useState(zipParam);
+  const [radius, setRadius] = useState(radiusParam);
   const [isSearchEnabled, setIsSearchEnabled] = useState(false);
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [showZipDropdown, setShowZipDropdown] = useState(false);
   const [isZipFocused, setIsZipFocused] = useState(false);
+  const [filterText, setFilterText] = useState('');
+
+  // change this WHEN TESTING FOR ACTUAL RESULTS ON SEARCH PAGE
+  const [emptyResults, setEmptyResults] = useState(true);
+  // ^^^^^
+
+  const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
+  const [loading, setLoading] = useState(false);
 
   // Validate inputs and enable/disable search button
   useEffect(() => {
     const isZipValid = zipCode.length === 5 && /^\d{5}$/.test(zipCode);
     const isRadiusValid = radius.length > 0 && parseFloat(radius) > 0;
     setIsSearchEnabled(isZipValid && isRadiusValid);
+
+    const fetchPharmacies = async () => {
+      if (!isZipValid || !isRadiusValid) {
+        setPharmacies([]);
+        setEmptyResults(true);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const results = await searchPharmacies(Number(zipCode), Number(radius));
+        setPharmacies(results);
+        setEmptyResults(results.length === 0);
+        console.log('Search results:', results);
+      } catch (error) {
+        console.error('Error fetching pharmacies: ', error);
+        setPharmacies([]);
+        setEmptyResults(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPharmacies();
   }, [zipCode, radius]);
 
   // Show/hide dropdown based on focus state
@@ -33,12 +73,10 @@ const PharmacyLocatorScreen = () => {
 
   // Handle ZIP code input - restrict to 5 digits only
   const handleZipChange = (text: string) => {
-    // Only allow digits and max 5 characters
     const numericText = text.replace(/[^0-9]/g, '');
     if (numericText.length <= 5) {
       setZipCode(numericText);
     }
-    // Dropdown stays visible while typing
   };
 
   // Show dropdown when ZIP field is focused
@@ -145,7 +183,7 @@ const PharmacyLocatorScreen = () => {
     if (isSearchEnabled) {
       // Navigate to results page with parameters
       router.push({
-        pathname: '/pharmacy_search',
+        pathname: '/pharmacy-lookup-search',
         params: {
           zipCode,
           radius,
@@ -154,16 +192,26 @@ const PharmacyLocatorScreen = () => {
     }
   };
 
+  const goBack = () => {
+    router.push({
+      pathname: '/pharmacy-lookup',
+    });
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
         <Header />
-        <MedicationLookupBackgroundShape top={530} maxHeight={700} color="#C7E7FF" />
+        <MedicationLookupBackgroundShape top={450} maxHeight={700} color="#C7E7FF" />
 
         {/* Title Section */}
         <View style={styles.titleSection}>
-          <Text style={styles.subtitle}>Savings at 65,000+ pharmacies</Text>
-          <Text style={styles.title}>Find participating pharmacies near you.</Text>
+          <Text style={styles.subtitle}>
+            <TouchableOpacity onPress={() => goBack()}>
+              <Ionicons name="arrow-back" size={16} color="#41484D" />
+            </TouchableOpacity>
+            Participating Pharmacies
+          </Text>
         </View>
 
         {/* Input Fields */}
@@ -225,19 +273,72 @@ const PharmacyLocatorScreen = () => {
             </View>
           </View>
 
-          {/* Search Button */}
-          <Button
-            mode="contained"
-            onPress={handleSearch}
-            disabled={!isSearchEnabled}
-            buttonColor="#226488"
-            style={styles.searchButton}
-            contentStyle={styles.searchButtonContent}
-            labelStyle={styles.searchButtonLabel}
-            icon="magnify"
-          >
-            Search
-          </Button>
+          {/* Filter Input */}
+          <View style={styles.inputWrapper}>
+            <TextInput
+              label="Filter by name"
+              value={filterText}
+              onChangeText={setFilterText}
+              placeholder=""
+              mode="outlined"
+              style={styles.textInput}
+              outlineStyle={styles.inputOutline}
+              textColor="#41484D"
+              activeOutlineColor="#246387" // outline color when focused (blue)
+              right={
+                <TextInput.Icon
+                  icon={() => <Ionicons name="close-circle" size={20} color="#41484D" />}
+                  onPress={() => setFilterText('')}
+                />
+              }
+            />
+          </View>
+
+          {/* put a placeholder for the route to the Pharmacy Detail page / component */}
+          {/* also picked a random attribute for pharmacy ID */}
+          <ScrollView contentContainerStyle={{ flexGrow: 0, paddingTop: 0 }}>
+            {loading ? (
+              <Text style={{ textAlign: 'center', marginTop: 20 }}>Searching...</Text>
+            ) : emptyResults ? (
+              <View style={styles.emptyContainer}>
+                <MaterialIcons name="add-business" size={41} color="#41484D" />
+                <Text style={styles.emptyMessage}>
+                  {' '}
+                  We are sorry there are no matching pharmacies in our network yet. Try checking
+                  other ZIP Codes or increasing search radius.
+                </Text>
+              </View>
+            ) : (
+              pharmacies
+                .filter((pharmacy) => {
+                  // Filter by name if filterText is provided
+                  if (!filterText) return true;
+                  return pharmacy.pharmacyName.toLowerCase().includes(filterText.toLowerCase());
+                })
+                .map((pharmacy, index) => (
+                  <SearchResult
+                    key={pharmacy.phoneNumber || index}
+                    name={pharmacy.pharmacyName}
+                    address={`${pharmacy.pharmacyStreet1}, ${pharmacy.pharmacyCity}`}
+                    distance={pharmacy.distance ? `${pharmacy.distance.toFixed(1)} mi` : ''}
+                    // onPress={() => router.push({
+                    //   pathname: '/pharmacy-detail',
+                    //   params: {
+                    //     pharmacyId: pharmacy.phoneNumber || index,
+                    //     pharmacyName: pharmacy.pharmacyName,
+                    //     address: pharmacy.pharmacyStreet1,
+                    //     city: pharmacy.pharmacyCity,
+                    //     state: pharmacy.pharmacyState,
+                    //     zip: pharmacy.pharmacyZipCode,
+                    //     phone: pharmacy.phoneNumber || '',
+                    //     distance: pharmacy.distance || 0,
+                    //   }
+                    // })}
+                    onPress={() => console.log(`Pressed pharmacy: ${pharmacy.pharmacyName}`)}
+                  />
+                ))
+            )}
+          </ScrollView>
         </View>
       </View>
       <BottomNavBar />
@@ -268,12 +369,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: '400',
     color: '#41484D',
     lineHeight: 32,
   },
   inputsContainer: {
-    gap: 60,
+    gap: 20,
+    flex: 1,
   },
   inputRow: {
     flexDirection: 'row',
@@ -315,14 +417,16 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#41484D',
   },
-  searchButton: {
-    borderRadius: 8,
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 0,
   },
-  searchButtonContent: {
-    height: 48,
-  },
-  searchButtonLabel: {
+  emptyMessage: {
     fontSize: 16,
-    fontWeight: '600',
+    color: '#41484D',
+    textAlign: 'center',
+    lineHeight: 22,
   },
 });
