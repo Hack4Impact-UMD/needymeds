@@ -78,7 +78,6 @@ const MedicationLookupSelectedScreen = () => {
 
     const fetchDrugSearchResults = async () => {
       try {
-        // TODO: Add generic form to DrugSearchResult
         setIsLoading(true);
         setHasError(false);
         let drugSearchResults: DrugSearchResult[];

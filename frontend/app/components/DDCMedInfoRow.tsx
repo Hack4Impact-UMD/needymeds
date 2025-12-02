@@ -2,7 +2,7 @@ import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Divider, Text } from 'react-native-paper';
 import { DrugSearchResult } from '../../api/types';
 
-const medIcon = require('../assets/healing.svg');
+const medIcon = require('../assets/healing.png');
 
 type Props = {
   result: DrugSearchResult;

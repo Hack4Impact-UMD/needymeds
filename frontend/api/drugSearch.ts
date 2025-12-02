@@ -136,8 +136,6 @@ async function searchDrug(
 
   // Process DSNT results
   for (const dsntResult of dsntDrugResults.DrugPricing ?? []) {
-    console.log(dsntResult.labelName.toLowerCase());
-    console.log(genericVersion);
     if (!includeGeneric && !dsntResult.labelName.includes(genericVersion)) {
       continue;
     }
@@ -189,7 +187,6 @@ async function searchDrug(
 
   // Process ScriptSave results
   for (const scriptSaveResult of scriptSaveDrugResults.drugs ?? []) {
-    console.log(scriptSaveResult.ln.toLowerCase());
     if (!includeGeneric && !scriptSaveResult.ln.toLowerCase().includes(genericVersion)) {
       continue;
     }

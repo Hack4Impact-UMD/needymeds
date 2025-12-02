@@ -9,36 +9,23 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Adjudicator, DrugSearchResult } from '../../api/types';
 import DDCMedInfoRow from '../components/DDCMedInfoRow';
 import DDCFaqScreen from './DDCFaqScreen';
+
 const logo = require('../assets/horizontal_logo.png');
-const backArrow = require('../assets/arrow_back.svg');
-const expandIcon = require('../assets/aspect_ratio.svg');
-const shareIcon = require('../assets/share.svg');
+const backArrow = require('../assets/arrow_back.png');
+const expandIcon = require('../assets/aspect_ratio.png');
+const shareIcon = require('../assets/share.png');
 
-const DST_DDCCardFront = require('../assets/DST_DDCDetailsFront.svg');
-const DST_DDCCardBack = require('../assets/DST_DDCBackDetails.svg');
-const ScriptSave_DDCCardFront = require('../assets/ScriptSave_DDCDetailsFront.svg');
-const ScriptSave_DDCCardBack = require('../assets/ScriptSave_DDCBackDetails.svg');
-
-//pass in from DrugSearchResult
-const sampleResult: DrugSearchResult = {
-  adjudicator: 'DSNT',
-  pharmacyName: 'CVS Pharmacy',
-  pharmacyAddress: '123 Main St, Rockville, MD 20850',
-  pharmacyPhone: '(301) 555-1293',
-  ndc: '00781-1506-01',
-  labelName: 'Amoxicillin 500mg Capsule',
-  price: '$8.42',
-  latitude: '39.0840',
-  longitude: '-77.1528',
-  distance: '1.2',
-};
+const DST_DDCCardFront = require('../assets/DST_DDCDetailsFront.png');
+const DST_DDCCardBack = require('../assets/DST_DDCBackDetails.png');
+const ScriptSave_DDCCardFront = require('../assets/ScriptSave_DDCDetailsFront.png');
+const ScriptSave_DDCCardBack = require('../assets/ScriptSave_DDCBackDetails.png');
 
 const langOptions = [
   { label: 'EN', value: 'EN' },
   { label: 'SP', value: 'SP' },
 ];
 
-const DST = () => {
+const DDC = () => {
   const params = useLocalSearchParams();
 
   const result: DrugSearchResult = {
@@ -99,8 +86,7 @@ const DST = () => {
               </View>
 
               <View style={styles.medInfoWrapper}>
-                {/* hardcoded to match figma but chaneg later */}
-                <DDCMedInfoRow result={sampleResult} />
+                <DDCMedInfoRow result={result} />
               </View>
 
               <View style={styles.cardSection}>
@@ -138,7 +124,7 @@ const DST = () => {
                   style={styles.actionButton}
                   onPress={() => {
                     router.push({
-                      pathname: '/expand',
+                      pathname: '/DDCExpand',
                       params: {
                         adjudicator: result.adjudicator,
                       },
@@ -216,7 +202,7 @@ const DST = () => {
   );
 };
 
-export default DST;
+export default DDC;
 
 const styles = StyleSheet.create({
   safeArea: {

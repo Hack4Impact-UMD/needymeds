@@ -1,7 +1,8 @@
-import { DrugSearchResult } from '@/api/types';
+import { Adjudicator, DrugSearchResult } from '@/api/types';
 import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
+import { router } from 'expo-router';
 import {
   Alert,
   Image,
@@ -41,6 +42,25 @@ const MedicationLookupResultModal = ({
   const makeCall = (phone: string) => {
     const phoneNumber = phone.replace(/[^0-9]/g, '');
     Linking.openURL(`tel:${phoneNumber}`);
+  };
+
+  const openDDC = () => {
+    setSelectedDrugResult(null);
+    router.push({
+      pathname: '/DDC',
+      params: {
+        adjudicator: result.adjudicator as Adjudicator,
+        pharmacyName: result.pharmacyName as string,
+        pharmacyAddress: result.pharmacyAddress as string,
+        pharmacyPhone: result.pharmacyPhone as string,
+        ndc: result.ndc as string,
+        labelName: result.labelName as string,
+        price: result.price as string,
+        latitude: result.latitude as string,
+        longitude: result.longitude as string,
+        distance: result.distance as string,
+      },
+    });
   };
 
   return (
@@ -112,8 +132,8 @@ const MedicationLookupResultModal = ({
                 </Text>
                 <Text style={styles.priceAmount}>${result.price}</Text>
               </View>
-              <TouchableOpacity style={styles.sendButtonIcon}>
-                <Image source={require('../../assets/sendIcon.svg')} />
+              <TouchableOpacity style={styles.sendButtonIcon} onPress={openDDC}>
+                <Image source={require('../../assets/sendIcon.png')} />
               </TouchableOpacity>
             </View>
           </View>
