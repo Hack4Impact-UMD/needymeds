@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "NeedyMeds",
-    "slug": "needymeds-ddc",
+    "slug": "frontend",
     "scheme": "needymeds",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -18,7 +18,8 @@
       "bundleIdentifier": "org.needymeds.ddcapp",
       "buildNumber": "1.0.0",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Location data helps identify nearby assistance programs."
+        "NSLocationWhenInUseUsageDescription": "Location data helps identify nearby assistance programs.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -40,7 +41,8 @@
       "router": {},
       "eas": {
         "projectId": "8f383cc3-4987-4ea9-820f-d3f841ebc13f"
-      }
+      },
+      "API_BASE": "http://needymeds-alb-2117627631.us-east-2.elb.amazonaws.com"
     },
     "updates": {
       "url": "https://u.expo.dev/8f383cc3-4987-4ea9-820f-d3f841ebc13f"
@@ -53,8 +55,13 @@
       [
         "expo-build-properties",
         {
-          "ios": { "useFrameworks": "static" },
-          "android": { "compileSdkVersion": 34, "targetSdkVersion": 34 }
+          "ios": {
+            "useFrameworks": "static"
+          },
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34
+          }
         }
       ]
     ]
