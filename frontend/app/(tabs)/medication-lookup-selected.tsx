@@ -13,7 +13,6 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Alert,
-  Image,
   Keyboard,
   Platform,
   ScrollView,
@@ -409,10 +408,7 @@ const MedicationLookupSelectedScreen = () => {
                   >
                     <View style={styles.pharmacyLeft}>
                       <View style={styles.pharmacyIcon}>
-                        <Image
-                          source={require('../assets/confirmation_number.png')}
-                          style={{ width: 24, height: 24 }}
-                        />
+                        <MaterialIcons name="confirmation-number" size={24} color="#41484D" />
                       </View>
                       <View style={styles.pharmacyInfo}>
                         <View style={[styles.pharmacyHeader, styles.pharmacyHeaderColumn]}>

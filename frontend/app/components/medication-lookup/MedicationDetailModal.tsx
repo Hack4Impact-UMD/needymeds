@@ -1,10 +1,10 @@
 import { Adjudicator, DrugSearchResult } from '@/api/types';
 import { Colors } from '@/constants/theme';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Image, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
 
 interface MedicationDetailModalProps {
@@ -70,7 +70,7 @@ const MedicationDetailModal = ({
   const openDDC = () => {
     onClose();
     router.push({
-      pathname: '/DDC',
+      pathname: '/ddc',
       params: {
         drugName,
         quantity,
@@ -167,7 +167,7 @@ const MedicationDetailModal = ({
               </Text>
               <Text style={styles.priceAmount}>${Number(result.price) * Number(quantity)}</Text>
               <TouchableOpacity style={styles.sendButtonIcon} onPress={openDDC}>
-                <Image source={require('../../assets/sendIcon.png')} />
+                <MaterialIcons name="confirmation-number" size={22} color="white" />
               </TouchableOpacity>
             </View>
           </View>

@@ -47,7 +47,7 @@ const DDCExpand = () => {
           color="#181C20"
           onPress={() => {
             router.push({
-              pathname: '/DDC',
+              pathname: '/ddc',
               params: {
                 drugName: params.drugName,
                 quantity: params.quantity,

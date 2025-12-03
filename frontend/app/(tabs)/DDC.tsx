@@ -11,7 +11,7 @@ import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-ic
 import DDCMedInfoRow from '../components/ddc/DDCMedInfoRow';
 import DDCShareModal from '../components/ddc/DDCShareModal';
 import DefaultHeader from '../components/DefaultHeader';
-import DDCFaqScreen from './DDCFaqScreen';
+import DDCFaqScreen from './ddc-faq';
 
 const DST_DDCCardFront = require('../assets/DST_DDCDetailsFront.png');
 const DST_DDCCardBack = require('../assets/DST_DDCBackDetails.png');
@@ -115,7 +115,7 @@ const DDC = () => {
                   style={styles.actionButton}
                   onPress={() => {
                     router.push({
-                      pathname: '/DDCExpand',
+                      pathname: '/ddc-expand',
                       params: {
                         drugName: params.drugName,
                         quantity: params.quantity,
