@@ -22,33 +22,49 @@ async function client() {
 type httpMethod = 'GET' | 'POST';
 
 async function performRequest(method: httpMethod, path: string, params: Record<string, any>) {
-  const c = await client();
-
-  const MAX_ATTEMPTS = 3;
+  const MAX_ATTEMPTS = 3; // for 5xx retries
   let lastError: any;
+  let retried401 = false; // only retry 401 once
+
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    const c = await client(); // always fetch latest token
+
     let res;
-    if (method === 'GET') {
-      res = await c.get(path, { params });
-    } else if (method === 'POST') {
-      res = await c.post(path, params);
-    } else {
-      throw new Error(`Invalid HTTP method`);
+    try {
+      if (method === 'GET') {
+        res = await c.get(path, { params });
+      } else if (method === 'POST') {
+        res = await c.post(path, params);
+      } else {
+        throw new Error(`Invalid HTTP method`);
+      }
+    } catch (err) {
+      lastError = err;
+      continue;
     }
 
     if (res.status >= 200 && res.status < 300) return res.data;
+
+    if (res.status === 401 && !retried401) {
+      retried401 = true;
+      await scriptSaveTokenManager.refreshToken();
+      continue;
+    }
+
     if (res.status >= 400 && res.status < 500) {
       const err: any = new Error(`ScriptSave returned ${res.status}`);
       err.status = res.status;
       throw err;
     }
-    // 5xx -> retry except last attempt
+
+    // 5xx -> retry unless last attempt
     lastError = res;
     if (attempt < MAX_ATTEMPTS) continue;
   }
+
   const res = lastError;
-  const err: any = new Error(`ScriptSave returned ${res.status}`);
-  err.status = res.status;
+  const err: any = new Error(`ScriptSave returned ${res?.status ?? 'unknown'}`);
+  err.status = res?.status ?? 500;
   throw err;
 }
 
