@@ -1,0 +1,16 @@
+node_modules
+npm-debug.log
+.DS_Store
+coverage
+jest.config.js
+src/**/*.test.ts
+.git
+.gitignore
+**/*.md
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.svg
+**/*.gif
+
+
