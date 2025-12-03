@@ -40,8 +40,7 @@
       "router": {},
       "eas": {
         "projectId": "8f383cc3-4987-4ea9-820f-d3f841ebc13f"
-      },
-      "apiBase": "${EXPO_PUBLIC_API_BASE}"
+      }
     },
     "updates": {
       "url": "https://u.expo.dev/8f383cc3-4987-4ea9-820f-d3f841ebc13f"
