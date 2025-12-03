@@ -59,7 +59,6 @@ const MedicationLookupAutocompleteScreen = () => {
         }
         setResults(autoCompleteDrugNames);
       } catch (error: any) {
-        console.log(error);
         setErrorType('loading');
       } finally {
         setIsLoading(false);

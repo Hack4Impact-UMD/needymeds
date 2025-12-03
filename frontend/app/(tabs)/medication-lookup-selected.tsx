@@ -88,7 +88,6 @@ const MedicationLookupSelectedScreen = () => {
         setForm(mappedForms[0].value);
         setFormOptions(mappedForms);
       } catch (error: any) {
-        console.error('Error initializing drug search:', error);
         setErrorType('loading');
       }
     }
@@ -125,7 +124,6 @@ const MedicationLookupSelectedScreen = () => {
         }
         setDrugResults(drugSearchResults);
       } catch (error) {
-        console.error('Error fetching drug results:', error);
         setErrorType('loading');
         setDrugResults([]);
       } finally {
@@ -280,28 +278,6 @@ const MedicationLookupSelectedScreen = () => {
                   onFocus={() => setZipFocused(true)}
                   onBlur={() => setZipFocused(false)}
                 />
-
-                {zipFocused &&
-                  zipCode.length !== ZIPCODE_LENGTH &&
-                  drugResults.length === 0 &&
-                  includeGeneric && (
-                    <TouchableOpacity
-                      style={styles.detectLocationButton}
-                      onPress={() => detectZipFromLocation()}
-                      disabled={detectingZip}
-                    >
-                      {detectingZip && (
-                        <ActivityIndicator
-                          size="small"
-                          color="#3B82F6"
-                          style={{ marginRight: 6 }}
-                        />
-                      )}
-                      <Text style={styles.detectLocationText}>
-                        {detectingZip ? 'Detecting...' : 'Detect my location'}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
               </View>
 
               {/* Radius field */}
@@ -320,6 +296,22 @@ const MedicationLookupSelectedScreen = () => {
                 />
                 <Text style={styles.radiusUnit}>miles</Text>
               </View>
+
+              {/* Dropdown with "Detect my location" option */}
+              {zipFocused && zipCode.length !== ZIPCODE_LENGTH && drugResults.length === 0 && (
+                <TouchableOpacity
+                  style={styles.detectLocationButton}
+                  onPress={() => detectZipFromLocation()}
+                  disabled={detectingZip}
+                >
+                  {detectingZip && (
+                    <ActivityIndicator size="small" color="#3B82F6" style={{ marginRight: 6 }} />
+                  )}
+                  <Text style={styles.detectLocationText}>
+                    {detectingZip ? 'Detecting...' : 'Detect my location'}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
 

@@ -56,7 +56,6 @@ export function useSearchPharmacies(zipCode?: string, radius?: number) {
 
         if (!isCancelled) setPharmacies(filtered);
       } catch (err: any) {
-        console.error('Error fetching pharmacies:', err);
         if (!isCancelled) setError(err.message || 'Unknown error');
       } finally {
         if (!isCancelled) setLoading(false);

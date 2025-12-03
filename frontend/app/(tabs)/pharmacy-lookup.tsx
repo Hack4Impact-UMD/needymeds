@@ -136,22 +136,6 @@ const PharmacyLocatorScreen = () => {
                   ) : undefined
                 }
               />
-
-              {/* Dropdown with "Detect my location" option */}
-              {zipFocused && zipCode.length !== ZIPCODE_LENGTH && (
-                <TouchableOpacity
-                  style={styles.detectLocationButton}
-                  onPress={() => detectZipFromLocation()}
-                  disabled={detectingZip}
-                >
-                  {detectingZip && (
-                    <ActivityIndicator size="small" color="#3B82F6" style={{ marginRight: 6 }} />
-                  )}
-                  <Text style={styles.detectLocationText}>
-                    {detectingZip ? 'Detecting...' : t('ZipDetectOpt')}
-                  </Text>
-                </TouchableOpacity>
-              )}
             </View>
 
             {/* Radius Input */}
@@ -173,6 +157,22 @@ const PharmacyLocatorScreen = () => {
                 }
               />
             </View>
+
+            {/* Dropdown with "Detect my location" option */}
+            {zipFocused && zipCode.length !== ZIPCODE_LENGTH && (
+              <TouchableOpacity
+                style={styles.detectLocationButton}
+                onPress={() => detectZipFromLocation()}
+                disabled={detectingZip}
+              >
+                {detectingZip && (
+                  <ActivityIndicator size="small" color="#3B82F6" style={{ marginRight: 6 }} />
+                )}
+                <Text style={styles.detectLocationText}>
+                  {detectingZip ? 'Detecting...' : t('ZipDetectOpt')}
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           {/* Search Button */}

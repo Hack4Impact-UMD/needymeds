@@ -28,7 +28,7 @@ const ErrorState: React.FC<ErrorStateProps> = ({
       onCallPress();
     } else {
       const telUrl = `tel:${phoneNumber}`;
-      Linking.openURL(telUrl).catch((err) => console.error('Error opening phone dialer:', err));
+      Linking.openURL(telUrl);
     }
   };
 

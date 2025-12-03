@@ -39,7 +39,6 @@ const DDCShareModal = ({ isOpen, onClose, adjudicator }: DDCShareModalProps) => 
         dialogTitle: 'Share Drug Discount Card',
       });
     } catch (error) {
-      console.error(error);
       Alert.alert('Error', 'Could not share image.');
     }
   }
@@ -56,7 +55,6 @@ const DDCShareModal = ({ isOpen, onClose, adjudicator }: DDCShareModalProps) => 
       await MediaLibrary.saveToLibraryAsync(uri);
       Alert.alert('Success', 'Image saved to your photo library!');
     } catch (error) {
-      console.error(error);
       Alert.alert('Error', 'Could not save image.');
     }
   }

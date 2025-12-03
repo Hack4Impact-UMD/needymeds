@@ -6,6 +6,7 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text, TouchableRipple } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Colors } from '@/constants/theme';
 import BottomNavBar from '../components/BottomNavBar';
 import CustomBackgroundShape from '../components/CustomBackgroundShape';
 import DefaultHeader from '../components/DefaultHeader';
@@ -81,14 +82,14 @@ const MedicationLookupScreen = () => {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.default.neutrallt,
   },
   mobileWrapper: {
     flex: 1,
     width: '100%',
     maxWidth: 412,
     alignSelf: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: Colors.default.neutrallt,
   },
   container: {
     flex: 1,
