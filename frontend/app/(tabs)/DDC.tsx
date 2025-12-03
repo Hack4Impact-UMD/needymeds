@@ -1,19 +1,17 @@
 import { Colors } from '@/constants/theme';
-import { MaterialIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Adjudicator, DrugSearchResult } from '../../api/types';
-import DDCMedInfoRow from '../components/DDCMedInfoRow';
-import DefaultHeader from '../components/DefaultHeader';
-import DDCFaqScreen from './DDCFaqScreen';
 
-const backArrow = require('../assets/arrow_back.png');
-const expandIcon = require('../assets/aspect_ratio.png');
-const shareIcon = require('../assets/share.png');
+import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import DDCMedInfoRow from '../components/ddc/DDCMedInfoRow';
+import DDCShareModal from '../components/ddc/DDCShareModal';
+import DefaultHeader from '../components/DefaultHeader';
+import DDCFaqScreen from './ddc-faq';
 
 const DST_DDCCardFront = require('../assets/DST_DDCDetailsFront.png');
 const DST_DDCCardBack = require('../assets/DST_DDCBackDetails.png');
@@ -39,7 +37,7 @@ const DDC = () => {
   };
 
   const [showFAQ, setShowFAQ] = useState(false);
-  const [showShare, setShowShare] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -53,46 +51,62 @@ const DDC = () => {
             <>
               <View style={styles.pageHeader}>
                 <View style={styles.backButton}>
-                  <Pressable onPress={() => router.push('/medication-lookup')}>
-                    <Image source={backArrow} style={styles.backIcon} resizeMode="contain" />
-                  </Pressable>
+                  <Ionicons
+                    name="arrow-back"
+                    size={25}
+                    color="#181C20"
+                    onPress={() => {
+                      router.push({
+                        pathname: '/medication-lookup-selected',
+                        params: {
+                          drugName: params.drugName,
+                        },
+                      });
+                    }}
+                  />
                 </View>
-                <Text variant="headlineLarge" style={styles.title}>
-                  {t('CardHeader')}
-                </Text>
               </View>
+              <Text variant="headlineLarge" style={styles.title}>
+                {t('CardHeader')}
+              </Text>
 
               <View style={styles.medInfoWrapper}>
-                <DDCMedInfoRow result={result} />
+                <DDCMedInfoRow
+                  result={result}
+                  form={params.form as string}
+                  quantity={params.quantity as string}
+                />
               </View>
 
-              <View style={styles.cardSection}>
-                <Text variant="titleMedium" style={styles.sectionLabel}>
-                  {t('ImageHeader1')}
-                </Text>
-                <View style={styles.cardImageWrapper}>
-                  <Image
-                    source={
-                      result.adjudicator === 'DSNT' ? DST_DDCCardFront : ScriptSave_DDCCardFront
-                    }
-                    style={styles.cardImage}
-                    resizeMode="contain"
-                  />
+              <View style={styles.cardContainer}>
+                <View style={styles.cardSection}>
+                  <Text variant="titleMedium" style={styles.sectionLabel}>
+                    {t('ImageHeader1')}
+                  </Text>
+                  <View style={styles.cardImageWrapper}>
+                    <Image
+                      source={
+                        result.adjudicator === 'DSNT' ? DST_DDCCardFront : ScriptSave_DDCCardFront
+                      }
+                      style={styles.cardImage}
+                      resizeMode="contain"
+                    />
+                  </View>
                 </View>
-              </View>
 
-              <View style={styles.cardSection}>
-                <Text variant="titleMedium" style={styles.sectionLabel}>
-                  {t('ImageHeader2')}
-                </Text>
-                <View style={styles.cardImageWrapper}>
-                  <Image
-                    source={
-                      result.adjudicator === 'DSNT' ? DST_DDCCardBack : ScriptSave_DDCCardBack
-                    }
-                    style={styles.cardImage}
-                    resizeMode="contain"
-                  />
+                <View style={styles.cardSection}>
+                  <Text variant="titleMedium" style={styles.sectionLabel}>
+                    {t('ImageHeader2')}
+                  </Text>
+                  <View style={styles.cardImageWrapper}>
+                    <Image
+                      source={
+                        result.adjudicator === 'DSNT' ? DST_DDCCardBack : ScriptSave_DDCCardBack
+                      }
+                      style={styles.cardImage}
+                      resizeMode="contain"
+                    />
+                  </View>
                 </View>
               </View>
 
@@ -101,19 +115,31 @@ const DDC = () => {
                   style={styles.actionButton}
                   onPress={() => {
                     router.push({
-                      pathname: '/DDCExpand',
+                      pathname: '/ddc-expand',
                       params: {
+                        drugName: params.drugName,
+                        quantity: params.quantity,
+                        form: params.form,
                         adjudicator: result.adjudicator,
+                        pharmacyName: params.pharmacyName,
+                        pharmacyAddress: params.pharmacyAddress,
+                        pharmacyPhone: params.pharmacyPhone,
+                        ndc: params.ndc,
+                        labelName: params.labelName,
+                        price: params.price,
+                        latitude: params.latitude,
+                        longitude: params.longitude,
+                        distance: params.distance,
                       },
                     });
                   }}
                 >
-                  <Image source={expandIcon} style={styles.actionIcon} resizeMode="contain" />
+                  <MaterialCommunityIcons name="aspect-ratio" size={20} color="white" />
                   <Text style={styles.buttonText}>{t('ButtonLabel1')}</Text>
                 </Pressable>
 
-                <Pressable style={styles.actionButton} onPress={() => setShowShare(true)}>
-                  <Image source={shareIcon} style={styles.actionIcon} resizeMode="contain" />
+                <Pressable style={styles.actionButton} onPress={() => setShowShareModal(true)}>
+                  <MaterialIcons name="share" size={20} color="white" />
                   <Text style={styles.buttonText}>{t('ButtonLabel2')}</Text>
                 </Pressable>
               </View>
@@ -121,7 +147,8 @@ const DDC = () => {
               <View style={styles.footerNote}>
                 <Pressable onPress={() => setShowFAQ(true)}>
                   <Text style={styles.footerQuestion}>
-                    {t('HelpLink1')} {t('HelpLink2')}
+                    {t('HelpLink1')}
+                    {'\n'} {t('HelpLink2')}
                   </Text>
                 </Pressable>
               </View>
@@ -130,51 +157,11 @@ const DDC = () => {
         </View>
       </ScrollView>
 
-      <Modal
-        transparent
-        animationType="slide"
-        visible={showShare}
-        onRequestClose={() => setShowShare(false)}
-      >
-        {/* Background overlay */}
-        <Pressable style={styles.overlay} onPress={() => setShowShare(false)} />
-
-        {/* Bottom popup container */}
-        <View style={styles.bottomSheet}>
-          <Pressable style={styles.closeIconContainer} onPress={() => setShowShare(false)}>
-            <MaterialIcons name="close" size={24} color="#555" />
-          </Pressable>
-
-          <Text style={styles.sheetTitle}>Share Drug Discount Card</Text>
-
-          <Text style={styles.sheetSubTitle}>Send image to:</Text>
-
-          <Pressable style={styles.sheetRow} onPress={() => {}}>
-            <View style={styles.iconCircle}>
-              <MaterialIcons name="sms" size={24} color="#fff" />
-            </View>
-            <Text style={styles.sheetText}>Text</Text>
-          </Pressable>
-
-          <View style={styles.separator} />
-
-          <Pressable style={styles.sheetRow} onPress={() => {}}>
-            <View style={styles.iconCircle}>
-              <MaterialIcons name="email" size={24} color="#fff" />
-            </View>
-            <Text style={styles.sheetText}>Email</Text>
-          </Pressable>
-
-          <View style={styles.separator} />
-
-          <Pressable style={styles.sheetRow} onPress={() => {}}>
-            <View style={styles.iconCircle}>
-              <MaterialIcons name="file-download" size={24} color="#fff" />
-            </View>
-            <Text style={styles.sheetText}>Download to device</Text>
-          </Pressable>
-        </View>
-      </Modal>
+      <DDCShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        adjudicator={result.adjudicator}
+      />
     </SafeAreaView>
   );
 };
@@ -184,31 +171,13 @@ export default DDC;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#E7EDF5',
+    backgroundColor: Colors.default.neutrallt,
   },
   scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 48,
-    paddingTop: 12,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    height: 44,
-    marginBottom: 16,
-  },
-  dropdown: {
-    width: 60,
-    borderColor: '#C1C7CE',
-    borderWidth: 1,
-    paddingVertical: 6,
-    paddingHorizontal: 8,
-    borderRadius: 12,
+    padding: 20,
   },
   pageBody: {
-    paddingVertical: 24,
-    gap: 24,
+    gap: 5,
   },
   pageHeader: {
     flexDirection: 'row',
@@ -222,18 +191,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backIcon: {
-    width: 16,
-    height: 16,
-  },
   title: {
     flex: 1,
+    paddingHorizontal: 50,
     textAlign: 'center',
     fontWeight: '400',
     color: '#1F2328',
+    fontFamily: 'Nunito Sans',
   },
   medInfoWrapper: {
     paddingHorizontal: 2,
+  },
+  cardContainer: {
+    gap: 20,
+    marginBottom: 15,
   },
   cardSection: {
     gap: 12,
@@ -243,7 +214,9 @@ const styles = StyleSheet.create({
     height: 40,
   },
   sectionLabel: {
-    color: '#353D4E',
+    color: '#181C20',
+    fontFamily: 'Open Sans',
+    fontWeight: '400',
   },
   cardImageWrapper: {
     alignItems: 'center',
@@ -255,6 +228,7 @@ const styles = StyleSheet.create({
   actionRow: {
     flexDirection: 'row',
     gap: 12,
+    marginBottom: 25,
     justifyContent: 'center',
   },
   actionButton: {
@@ -267,16 +241,12 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
   },
-  actionIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 8,
-    tintColor: Colors.default.neutrallt,
-  },
   buttonText: {
-    color: Colors.default.neutrallt,
+    paddingLeft: 10,
+    color: 'white',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '400',
+    fontFamily: 'Open Sans',
   },
   footerNote: {
     alignItems: 'center',
@@ -285,83 +255,9 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   footerQuestion: {
-    color: '#41484D',
+    color: '#181C20',
     textAlign: 'center',
-    textDecorationLine: 'underline',
-  },
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    paddingTop: 40,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-  },
-  bottomSheet: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: '#FFF',
-    paddingTop: 20,
-    paddingBottom: 36,
-    paddingHorizontal: 24,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-
-    // iOS-style drop shadow
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-
-    // Android elevation
-    elevation: 10,
-  },
-  sheetTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  sheetSubTitle: {
-    width: '100%',
-    fontSize: 16,
-    paddingVertical: 14,
-    textAlign: 'center',
-  },
-  sheetText: {
-    width: '100%',
-    fontSize: 16,
-    paddingVertical: 14,
-  },
-  separator: {
-    width: '100%',
-    height: 1,
-    backgroundColor: '#E5E5EA',
-  },
-  closeIconContainer: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    zIndex: 10,
-    padding: 4,
-  },
-  sheetRow: {
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    flexDirection: 'row',
-    gap: 12,
-    paddingVertical: 10,
-  },
-  iconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20, // makes it a circle
-    backgroundColor: '#1d658c', // navy blue
-    alignItems: 'center',
-    justifyContent: 'center',
+    fontSize: 13,
+    fontFamily: 'Open Sans',
   },
 });

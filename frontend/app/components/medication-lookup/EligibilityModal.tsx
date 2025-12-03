@@ -1,15 +1,9 @@
 import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import {
-  Modal,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Modal from 'react-native-modal';
 
 interface EligibilityModalProps {
   showEligibilityModal: boolean;
@@ -24,10 +18,20 @@ const EligibilityModal = ({
 
   return (
     <Modal
-      visible={showEligibilityModal}
-      transparent
-      animationType="slide"
-      onRequestClose={() => setShowEligibilityModal(false)}
+      isVisible={showEligibilityModal}
+      onSwipeComplete={() => setShowEligibilityModal(false)}
+      swipeDirection={['down']}
+      style={{ margin: 0, justifyContent: 'flex-end' }}
+      backdropColor="black"
+      backdropOpacity={0.7}
+      backdropTransitionInTiming={300}
+      backdropTransitionOutTiming={300}
+      onBackdropPress={() => setShowEligibilityModal(false)}
+      useNativeDriver={false}
+      animationIn="slideInUp"
+      animationOut="slideOutDown"
+      animationInTiming={300}
+      animationOutTiming={300}
     >
       <View style={styles.modalOverlay}>
         <TouchableOpacity
@@ -65,7 +69,13 @@ const EligibilityModal = ({
               ))}
             </ScrollView>
 
-            <TouchableOpacity style={styles.modalFooter}>
+            <TouchableOpacity
+              style={styles.modalFooter}
+              onPress={() => {
+                setShowEligibilityModal(false);
+                router.push('/prescription-savings-tips');
+              }}
+            >
               <Text style={styles.modalFooterText}>{t('FooterLink')}</Text>
               <MaterialCommunityIcons name="open-in-new" size={18} color="#181C20" />
             </TouchableOpacity>
@@ -80,7 +90,6 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalBackdrop: {
     position: 'absolute',

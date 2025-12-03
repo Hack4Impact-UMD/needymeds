@@ -82,7 +82,6 @@ export default async function getUserLocation(): Promise<UserLocationResult> {
 
     return { userZipCode };
   } catch (error) {
-    console.error('Error in getUserLocation:', error);
     throw error;
   } finally {
     dispatch(setLoading(false));

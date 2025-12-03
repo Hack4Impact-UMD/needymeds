@@ -1,12 +1,14 @@
 import { router } from 'expo-router';
 
-import { Image, Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Image, Linking, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Card, Divider, Icon, IconButton } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useTranslation } from 'react-i18next';
+import { Colors } from '@/constants/theme';
 import BottomNavBar from '../components/BottomNavBar';
 import DefaultHeader from '../components/DefaultHeader';
+
 const v_logo = require('../assets/vertical_logo.png');
 
 const EducationScreen = () => {
@@ -22,7 +24,7 @@ const EducationScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         {/* HEADER */}
         <DefaultHeader />
 
@@ -40,7 +42,9 @@ const EducationScreen = () => {
           <Card.Title
             title={t('Header3')}
             subtitle={
-              <Text onPress={() => router.push('/(tabs)/tips')}>{t('CardSecondaryLine1')}</Text>
+              <Text onPress={() => router.push('/(tabs)/prescription-savings-tips')}>
+                {t('CardSecondaryLine1')}
+              </Text>
             }
             left={() => <Icon source="piggy-bank-outline" color="#41484D" size={40} />}
             style={styles.title_cards}
@@ -115,26 +119,22 @@ const EducationScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F6FAFE',
+    backgroundColor: Colors.default.neutrallt,
   },
   container: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-  },
-  header: {
-    width: 340,
-    height: 85,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    paddingTop: 20,
+    paddingRight: 20,
+    paddingBottom: Platform.OS === 'ios' ? 84 : 68, // bottom navbar height
+    paddingLeft: 20,
   },
   title: {
+    paddingHorizontal: 40,
     textAlign: 'center',
     fontSize: 32,
-    fontWeight: 300,
+    fontWeight: '400',
     color: '#181C20',
-    margin: 10,
+    fontFamily: 'Nunito Sans',
+    marginBottom: 20,
   },
   subtitle: {
     flexDirection: 'row',
@@ -142,16 +142,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     margin: 12,
     paddingBottom: 20,
+    fontFamily: 'Open Sans',
   },
   description: {
     fontSize: 14,
     color: '#181C20',
     paddingLeft: 15,
+    fontFamily: 'Open Sans',
   },
   cards: {
     marginVertical: 8,
     width: '100%',
     backgroundColor: '#F1F4F9',
+    fontFamily: 'Open Sans',
   },
   title_cards: {
     height: 100,

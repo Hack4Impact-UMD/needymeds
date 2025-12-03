@@ -9,11 +9,11 @@ import getUserLocation from '@/api/userLocation';
 import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Alert,
-  Image,
+  Keyboard,
   Platform,
   ScrollView,
   StyleSheet,
@@ -23,13 +23,15 @@ import {
 import { Dropdown } from 'react-native-element-dropdown';
 import { ActivityIndicator, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 import BottomNavBar from '../components/BottomNavBar';
-import ErrorState from '../components/errorMessage';
+import ErrorState, { ErrorStateType } from '../components/ErrorState';
 import LanguageDropdown from '../components/LanguageDropdown';
-import { LookupSearchbar } from '../components/LookupSearchbar';
-import MedicationLookupResultModal from '../components/medication-lookup/MedicationLookupResultModal';
+import MedicationDetailModal from '../components/medication-lookup/MedicationDetailModal';
+import MedicationSearchbar from '../components/medication-lookup/MedicationSearchbar';
 
 const ZIPCODE_LENGTH = 5;
+const GENERIC_NAME_TRUNCATE_CUTOFF = 7;
 
 const MedicationLookupSelectedScreen = () => {
   const { t } = useTranslation();
@@ -39,6 +41,14 @@ const MedicationLookupSelectedScreen = () => {
     { label: t('FilterChipSortDist'), value: 'distance' },
   ];
 
+  const params = useLocalSearchParams<{ drugName: string }>();
+  const drugNameParam = Array.isArray(params.drugName) ? params.drugName[0] : params.drugName || '';
+
+  useEffect(() => {
+    setDrugName(drugNameParam);
+  }, [drugNameParam]);
+
+  const [drugName, setDrugName] = useState(drugNameParam);
   const [form, setForm] = useState('');
   const [quantity, setQuantity] = useState('1');
   const [zipCode, setZipCode] = useState('');
@@ -47,35 +57,39 @@ const MedicationLookupSelectedScreen = () => {
   const [includeGeneric, setIncludeGeneric] = useState(true);
   const [genericName, setGenericName] = useState('');
   const [selectedDrugResult, setSelectedDrugResult] = useState<DrugSearchResult | null>(null);
-  const [query, setQuery] = useState('');
   const [zipFocused, setZipFocused] = useState(false);
   const [detectingZip, setDetectingZip] = useState(false);
   const [formOptions, setFormOptions] = useState<{ label: string; value: string }[]>([]);
   const [drugResults, setDrugResults] = useState<DrugSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [hasError, setHasError] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
-
-  type PaperInputRef = React.ComponentRef<typeof TextInput>;
-  const inputRef = useRef<PaperInputRef>(null);
-
-  const params = useLocalSearchParams<{ drugName: string }>();
-  const drugName = Array.isArray(params.drugName) ? params.drugName[0] : params.drugName || '';
+  const [errorType, setErrorType] = useState<ErrorStateType | null>(null);
 
   useEffect(() => {
     async function initializeSearch() {
-      const { genericVersion, availableForms } = (await initializeDrugSearch(
-        drugName
-      )) as InitializeDrugSearchResult;
-      setGenericName(genericVersion || '');
+      try {
+        const { genericVersion, availableForms } = (await initializeDrugSearch(
+          drugName
+        )) as InitializeDrugSearchResult;
+        if (!genericVersion) {
+          setGenericName('');
+        } else {
+          setGenericName(
+            genericVersion.length >= GENERIC_NAME_TRUNCATE_CUTOFF
+              ? `${genericVersion.slice(0, GENERIC_NAME_TRUNCATE_CUTOFF - 1)}..`
+              : genericVersion
+          );
+        }
 
-      const mappedForms = (availableForms || []).map((f) => ({
-        label: f,
-        value: f,
-      }));
+        const mappedForms = (availableForms || []).map((f) => ({
+          label: f,
+          value: f,
+        }));
 
-      setForm(mappedForms[0].value);
-      setFormOptions(mappedForms);
+        setForm(mappedForms[0].value);
+        setFormOptions(mappedForms);
+      } catch (error: any) {
+        setErrorType('loading');
+      }
     }
 
     initializeSearch();
@@ -89,7 +103,7 @@ const MedicationLookupSelectedScreen = () => {
     const fetchDrugSearchResults = async () => {
       try {
         setIsLoading(true);
-        setHasError(false);
+        setErrorType(null);
         let drugSearchResults: DrugSearchResult[];
         if (sortBy === 'price') {
           drugSearchResults = await searchDrugByPrice(
@@ -109,12 +123,9 @@ const MedicationLookupSelectedScreen = () => {
           );
         }
         setDrugResults(drugSearchResults);
-        setHasSearched(true);
       } catch (error) {
-        console.error('Error fetching drug results:', error);
-        setHasError(true);
+        setErrorType('loading');
         setDrugResults([]);
-        setHasSearched(true);
       } finally {
         setIsLoading(false);
       }
@@ -124,9 +135,12 @@ const MedicationLookupSelectedScreen = () => {
   }, [sortBy, form, radius, includeGeneric, zipCode]);
 
   const clearSearch = () => {
-    setQuery('');
-    inputRef.current?.focus();
-    router.push('/medication-lookup-autocomplete');
+    router.push({
+      pathname: '/medication-lookup-autocomplete',
+      params: {
+        drugName: '',
+      },
+    });
   };
 
   const detectZipFromLocation = async () => {
@@ -156,11 +170,18 @@ const MedicationLookupSelectedScreen = () => {
           <View style={styles.header}>
             <View style={styles.searchContainer}>
               <View style={{ width: '80%' }}>
-                <LookupSearchbar
+                <MedicationSearchbar
                   query={drugName}
-                  onChangeText={setQuery}
+                  onChangeText={setDrugName}
                   onClear={clearSearch}
-                  onFocus={() => router.push('/medication-lookup-autocomplete')}
+                  onFocus={() =>
+                    router.push({
+                      pathname: '/medication-lookup-autocomplete',
+                      params: {
+                        drugName,
+                      },
+                    })
+                  }
                   removeFocus={true}
                 />
               </View>
@@ -184,7 +205,7 @@ const MedicationLookupSelectedScreen = () => {
                       labelField="label"
                       valueField="value"
                       value={form}
-                      onChange={(item) => setForm(item.value)}
+                      onChange={(item: any) => setForm(item.value)}
                       style={styles.dropdownInner}
                       selectedTextStyle={styles.dropdownText}
                       itemTextStyle={styles.dropdownText}
@@ -192,6 +213,8 @@ const MedicationLookupSelectedScreen = () => {
                     />
                   )}
                   outlineStyle={{ borderRadius: 5 }}
+                  activeOutlineColor="#236488"
+                  textColor="#181C20"
                   style={{ backgroundColor: Colors.default.neutrallt }}
                 />
               </View>
@@ -205,6 +228,9 @@ const MedicationLookupSelectedScreen = () => {
                   onChangeText={setQuantity}
                   keyboardType="numeric"
                   outlineStyle={{ borderRadius: 5 }}
+                  activeOutlineColor="#236488"
+                  textColor="#181C20"
+                  maxLength={3}
                   style={{ backgroundColor: Colors.default.neutrallt }}
                 />
               </View>
@@ -220,6 +246,8 @@ const MedicationLookupSelectedScreen = () => {
                   onChangeText={setZipCode}
                   keyboardType="numeric"
                   outlineStyle={{ borderRadius: 5 }}
+                  activeOutlineColor="#236488"
+                  textColor="#181C20"
                   style={{ backgroundColor: Colors.default.neutrallt }}
                   maxLength={5}
                   left={
@@ -248,22 +276,8 @@ const MedicationLookupSelectedScreen = () => {
                     ) : null
                   }
                   onFocus={() => setZipFocused(true)}
+                  onBlur={() => setZipFocused(false)}
                 />
-
-                {zipFocused && drugResults.length === 0 && includeGeneric && (
-                  <TouchableOpacity
-                    style={styles.detectLocationButton}
-                    onPress={() => detectZipFromLocation()}
-                    disabled={detectingZip}
-                  >
-                    {detectingZip && (
-                      <ActivityIndicator size="small" color="#3B82F6" style={{ marginRight: 6 }} />
-                    )}
-                    <Text style={styles.detectLocationText}>
-                      {detectingZip ? 'Detecting...' : 'Detect my location'}
-                    </Text>
-                  </TouchableOpacity>
-                )}
               </View>
 
               {/* Radius field */}
@@ -275,10 +289,29 @@ const MedicationLookupSelectedScreen = () => {
                   onChangeText={setRadius}
                   keyboardType="numeric"
                   outlineStyle={{ borderRadius: 5 }}
+                  activeOutlineColor="#236488"
+                  textColor="#181C20"
+                  maxLength={4}
                   style={{ backgroundColor: Colors.default.neutrallt }}
                 />
                 <Text style={styles.radiusUnit}>miles</Text>
               </View>
+
+              {/* Dropdown with "Detect my location" option */}
+              {zipFocused && zipCode.length !== ZIPCODE_LENGTH && drugResults.length === 0 && (
+                <TouchableOpacity
+                  style={styles.detectLocationButton}
+                  onPress={() => detectZipFromLocation()}
+                  disabled={detectingZip}
+                >
+                  {detectingZip && (
+                    <ActivityIndicator size="small" color="#3B82F6" style={{ marginRight: 6 }} />
+                  )}
+                  <Text style={styles.detectLocationText}>
+                    {detectingZip ? 'Detecting...' : 'Detect my location'}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
 
@@ -291,7 +324,7 @@ const MedicationLookupSelectedScreen = () => {
                   labelField="label"
                   valueField="value"
                   value={sortBy}
-                  onChange={(item) => setSortBy(item.value)}
+                  onChange={(item: any) => setSortBy(item.value)}
                   style={styles.sortDropdown}
                   selectedTextStyle={styles.sortDropdownText}
                   placeholderStyle={styles.sortDropdownText}
@@ -339,15 +372,16 @@ const MedicationLookupSelectedScreen = () => {
             style={styles.scrollContent}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scrollContentContainer}
+            onTouchStart={Keyboard.dismiss}
           >
             <View style={styles.pharmacyListContainer}>
               {isLoading ? (
                 // Show loading state
-                <ErrorState type="loading" />
-              ) : hasError ? (
+                <ActivityIndicator size="large" style={{ marginTop: 200 }} color="#236488" />
+              ) : errorType ? (
                 // Show error state
                 <ErrorState
-                  type="generic"
+                  type={errorType}
                   message="We couldn't load pharmacy results right now. Please check your connection and try again."
                 />
               ) : drugResults.length === 0 ? (
@@ -366,10 +400,7 @@ const MedicationLookupSelectedScreen = () => {
                   >
                     <View style={styles.pharmacyLeft}>
                       <View style={styles.pharmacyIcon}>
-                        <Image
-                          source={require('../assets/confirmation_number.png')}
-                          style={{ width: 24, height: 24 }}
-                        />
+                        <MaterialIcons name="confirmation-number" size={24} color="#41484D" />
                       </View>
                       <View style={styles.pharmacyInfo}>
                         <View style={[styles.pharmacyHeader, styles.pharmacyHeaderColumn]}>
@@ -377,13 +408,13 @@ const MedicationLookupSelectedScreen = () => {
                           <Text style={styles.pharmacyName}>{result.pharmacyName}</Text>
                         </View>
                         <Text style={styles.pharmacyPrice}>
-                          ${Number(result.price) * Number(quantity)}
+                          ${(Number(result.price) * Number(quantity)).toFixed(2)}
                         </Text>
                       </View>
                     </View>
                     <View style={styles.pharmacyRight}>
                       <Text style={styles.pharmacyDistance}>
-                        {`${Number(result.distance).toFixed(2)}mi`}
+                        {`${Number(result.distance).toFixed(1)}mi`}
                       </Text>
                       <MaterialCommunityIcons name="chevron-right" size={20} color="#41484D" />
                     </View>
@@ -397,14 +428,14 @@ const MedicationLookupSelectedScreen = () => {
       <BottomNavBar />
 
       {/* Medication Lookup Result Modal */}
-      {selectedDrugResult && (
-        <MedicationLookupResultModal
-          result={selectedDrugResult}
-          setSelectedDrugResult={setSelectedDrugResult}
-          quantity={quantity}
-          form={form}
-        />
-      )}
+      <MedicationDetailModal
+        drugName={drugName}
+        result={selectedDrugResult}
+        quantity={quantity}
+        form={form}
+        isOpen={!!selectedDrugResult}
+        onClose={() => setSelectedDrugResult(null)}
+      />
     </SafeAreaView>
   );
 };
@@ -501,10 +532,16 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     paddingVertical: 15,
-    zIndex: 100,
     paddingHorizontal: 8,
+    zIndex: 100,
     backgroundColor: '#EBEEF3',
-    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.30), 0 2px 6px 2px rgba(0, 0, 0, 0.15)',
+    // iOS shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 2,
+    // Android shadow
+    elevation: 2,
   },
   detectLocationText: {
     color: '#181C20',
@@ -546,7 +583,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#D1D5DB',
-    backgroundColor: '#F6FAFE',
+    backgroundColor: Colors.default.neutrallt,
     color: '#004E60',
   },
   filterButtonActive: {
@@ -684,7 +721,7 @@ const styles = StyleSheet.create({
   },
   dropdownText: {
     fontSize: 15,
-    color: '#111827',
+    color: '#181C20',
     fontFamily: 'Open Sans',
   },
   dropdownContainer: {

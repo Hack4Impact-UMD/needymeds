@@ -2,14 +2,15 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text, TouchableRipple } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Colors } from '@/constants/theme';
 import BottomNavBar from '../components/BottomNavBar';
+import CustomBackgroundShape from '../components/CustomBackgroundShape';
 import DefaultHeader from '../components/DefaultHeader';
 import EligibilityModal from '../components/medication-lookup/EligibilityModal';
-import MedicationLookupBackgroundShape from '../components/medication-lookup/MedicationLookupBackgroundShape';
 
 const MedicationLookupScreen = () => {
   const { t } = useTranslation();
@@ -49,12 +50,7 @@ const MedicationLookupScreen = () => {
           </TouchableOpacity>
 
           {/* Blue Background */}
-          <MedicationLookupBackgroundShape
-            top={280}
-            color="#236488"
-            maxWidth={700}
-            maxHeight={1500}
-          />
+          <CustomBackgroundShape top={290} color="#236488" maxWidth={700} maxHeight={1500} />
           {/* Eligible Link */}
           <TouchableRipple
             onPress={() => setShowEligibilityModal(true)}
@@ -86,20 +82,18 @@ const MedicationLookupScreen = () => {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.default.neutrallt,
   },
   mobileWrapper: {
     flex: 1,
     width: '100%',
     maxWidth: 412,
     alignSelf: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: Colors.default.neutrallt,
   },
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: Platform.OS === 'ios' ? 84 : 68,
+    padding: 20,
   },
   promoWrap: {
     alignItems: 'center',

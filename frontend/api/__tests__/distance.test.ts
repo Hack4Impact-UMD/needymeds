@@ -1,4 +1,4 @@
-import { zipToCoords, distanceBetweenCoordinates } from '../distance';
+import { distanceBetweenCoordinates, zipToCoords } from '../distance';
 
 describe('converting to coordinates and calculating distances', () => {
   // mock fetching that returns a json with just lat and lon

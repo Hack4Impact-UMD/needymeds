@@ -65,7 +65,10 @@ function BottomNavBar() {
               color="#004E60"
             />
           </View>
-          <Text variant="labelMedium" style={styles.navLabel}>
+          <Text
+            variant="labelMedium"
+            style={[styles.navLabel, isPharmacyLookupActive && styles.navLabelActive]}
+          >
             {t('PharmaciesTab')}
           </Text>
         </TouchableOpacity>

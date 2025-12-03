@@ -1,24 +1,43 @@
 import { autoCompleteSearchDrug } from '@/api/drugSearch';
 import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Keyboard, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import { Text } from 'react-native-paper';
+import {
+  FlatList,
+  Keyboard,
+  Platform,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { ActivityIndicator, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 import BottomNavBar from '../components/BottomNavBar';
-import ErrorState from '../components/errorMessage';
+import ErrorState, { ErrorStateType } from '../components/ErrorState';
 import LanguageDropdown from '../components/LanguageDropdown';
-import { LookupSearchbar } from '../components/LookupSearchbar';
+import MedicationSearchbar from '../components/medication-lookup/MedicationSearchbar';
+
+const MIN_QUERY_LENGTH = 3;
 
 const MedicationLookupAutocompleteScreen = () => {
   const { t } = useTranslation();
 
-  const [query, setQuery] = useState('');
+  const params = useLocalSearchParams<{ drugName: string }>();
+  const drugNameParam = Array.isArray(params.drugName) ? params.drugName[0] : params.drugName || '';
+
+  useEffect(() => {
+    setQuery(drugNameParam);
+  }, [drugNameParam]);
+
+  const [query, setQuery] = useState(drugNameParam);
   const [results, setResults] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
+  const [errorType, setErrorType] = useState<ErrorStateType | null>(null);
+
   const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
@@ -33,21 +52,22 @@ const MedicationLookupAutocompleteScreen = () => {
       try {
         setIsLoading(true);
         const autoCompleteDrugNames: string[] = await autoCompleteSearchDrug(q);
+        if (autoCompleteDrugNames.length > 0) {
+          setErrorType(null);
+        } else {
+          setErrorType('notFound');
+        }
         setResults(autoCompleteDrugNames);
-        setHasSearched(true);
       } catch (error: any) {
-        console.log(error);
-        setResults([]);
-        setHasSearched(true);
+        setErrorType('loading');
       } finally {
         setIsLoading(false);
       }
     };
 
     const q = query.trim().toLowerCase();
-    if (q.length < 3) {
+    if (q.length < MIN_QUERY_LENGTH) {
       setResults([]);
-      setHasSearched(false);
     } else {
       fetchAutoCompleteDrugNames(q);
     }
@@ -65,7 +85,6 @@ const MedicationLookupAutocompleteScreen = () => {
 
   const clearSearch = () => {
     setQuery('');
-    setHasSearched(false);
     inputRef.current?.focus();
   };
 
@@ -76,25 +95,25 @@ const MedicationLookupAutocompleteScreen = () => {
           {/* Search Bar */}
           <View style={styles.searchContainer}>
             <View style={{ width: '80%' }}>
-              <LookupSearchbar query={query} onChangeText={setQuery} onClear={clearSearch} />
+              <MedicationSearchbar query={query} onChangeText={setQuery} onClear={clearSearch} />
             </View>
 
             <LanguageDropdown />
           </View>
 
           {/* Results or Empty State */}
-          <View style={styles.resultsContainer}>
-            {query.length === 0 ? (
+          <View style={styles.resultsContainer} onTouchStart={Keyboard.dismiss}>
+            {query.length < MIN_QUERY_LENGTH ? (
               // Show placeholder message when no search
               <View style={styles.emptyState}>
                 <Text style={styles.emptyText}>{t('EmptyMsg')}</Text>
               </View>
             ) : isLoading ? (
-              // Show loading error state
-              <ErrorState type="loading" />
-            ) : results.length === 0 && hasSearched ? (
-              // Show not found error state
-              <ErrorState type="notFound" query={query} />
+              // Show loading state
+              <ActivityIndicator size="large" style={{ marginTop: 200 }} color="#236488" />
+            ) : errorType ? (
+              // Show error state
+              <ErrorState type={errorType} />
             ) : (
               // Show results list
               <FlatList
@@ -140,6 +159,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     maxWidth: 412,
+    paddingBottom: Platform.OS === 'ios' ? 84 : 68, // bottom navbar height
     backgroundColor: Colors.default.neutrallt,
   },
   searchContainer: {
@@ -153,7 +173,7 @@ const styles = StyleSheet.create({
   },
   resultsContainer: {
     flex: 1,
-    backgroundColor: '#F6FAFE',
+    backgroundColor: Colors.default.neutrallt,
   },
   emptyState: {
     maxWidth: '100%',
@@ -165,7 +185,7 @@ const styles = StyleSheet.create({
   emptyText: {
     color: '#181C20',
     textAlign: 'left',
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
     lineHeight: 22,
     fontSize: 16,
     borderBottomWidth: 1,
@@ -183,7 +203,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 14,
     paddingHorizontal: 16,
-    backgroundColor: '#F6FAFE',
+    backgroundColor: Colors.default.neutrallt,
     borderBottomWidth: 1,
     borderBottomColor: '#F3F4F6',
   },
@@ -192,10 +212,10 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   resultName: {
-    fontSize: 15,
-    fontWeight: '500',
-    fontFamily: 'Nunito Sans',
-    color: '#111827',
+    fontSize: 16,
+    fontWeight: '400',
+    fontFamily: 'Open Sans',
+    color: '#181C20',
     lineHeight: 22,
   },
 });

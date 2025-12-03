@@ -1,4 +1,5 @@
 import { Image, StyleSheet, View } from 'react-native';
+
 import LanguageDropdown from './LanguageDropdown';
 
 const DefaultHeader = () => {
