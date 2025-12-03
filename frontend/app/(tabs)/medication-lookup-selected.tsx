@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Alert,
   Image,
+  Keyboard,
   Platform,
   ScrollView,
   StyleSheet,
@@ -380,6 +381,7 @@ const MedicationLookupSelectedScreen = () => {
             style={styles.scrollContent}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scrollContentContainer}
+            onTouchStart={Keyboard.dismiss}
           >
             <View style={styles.pharmacyListContainer}>
               {isLoading ? (

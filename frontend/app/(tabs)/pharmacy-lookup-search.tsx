@@ -4,7 +4,15 @@ import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-ic
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  Keyboard,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { ActivityIndicator, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Pharmacy } from '../../api/types';
@@ -116,7 +124,7 @@ const PharmacyLocatorScreen = () => {
       <View style={styles.container}>
         <DefaultHeader />
         {/* Title Section */}
-        <View style={styles.titleSection}>
+        <View style={styles.titleSection} onTouchStart={Keyboard.dismiss}>
           <TouchableOpacity style={styles.breadcrumbContainer} onPress={goBack}>
             <Ionicons name="arrow-back" size={25} color="#41484D" />
             <Text style={styles.breadcrumb}>{t('Breadcrumb')}</Text>
@@ -226,7 +234,7 @@ const PharmacyLocatorScreen = () => {
             />
           </View>
 
-          <ScrollView keyboardShouldPersistTaps="handled">
+          <ScrollView showsVerticalScrollIndicator={false} onTouchStart={Keyboard.dismiss}>
             {loading ? (
               <ActivityIndicator size="large" style={{ marginTop: 200 }} color="#236488" />
             ) : pharmacies.length === 0 ? (

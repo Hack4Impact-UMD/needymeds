@@ -4,7 +4,15 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Keyboard, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  FlatList,
+  Keyboard,
+  Platform,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { ActivityIndicator, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -95,7 +103,7 @@ const MedicationLookupAutocompleteScreen = () => {
           </View>
 
           {/* Results or Empty State */}
-          <View style={styles.resultsContainer}>
+          <View style={styles.resultsContainer} onTouchStart={Keyboard.dismiss}>
             {query.length < MIN_QUERY_LENGTH ? (
               // Show placeholder message when no search
               <View style={styles.emptyState}>
@@ -152,6 +160,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     maxWidth: 412,
+    paddingBottom: Platform.OS === 'ios' ? 84 : 68, // bottom navbar height
     backgroundColor: Colors.default.neutrallt,
   },
   searchContainer: {

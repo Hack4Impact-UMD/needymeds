@@ -3,7 +3,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, Keyboard, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ActivityIndicator, Button, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import getUserLocation from '../../api/userLocation';
@@ -99,7 +99,7 @@ const PharmacyLocatorScreen = () => {
         <CustomBackgroundShape top={590} maxHeight={700} maxWidth={650} color="#C7E7FF" />
 
         {/* Title Section */}
-        <View style={styles.titleSection}>
+        <View style={styles.titleSection} onTouchStart={Keyboard.dismiss}>
           <Text style={styles.subtitle}>{t('HeroOverline')}</Text>
           <Text style={styles.title}>{t('HeroHeader')}</Text>
         </View>
@@ -178,6 +178,7 @@ const PharmacyLocatorScreen = () => {
           {/* Search Button */}
           <Button
             mode="contained"
+            onTouchStart={Keyboard.dismiss}
             onPress={handleSearch}
             disabled={!isSearchEnabled}
             buttonColor="#226488"

@@ -1,5 +1,6 @@
 import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -83,7 +84,13 @@ const EligibilityModal = ({
               ))}
             </ScrollView>
 
-            <TouchableOpacity style={styles.modalFooter}>
+            <TouchableOpacity
+              style={styles.modalFooter}
+              onPress={() => {
+                setShowEligibilityModal(false);
+                router.push('/prescription-savings-tips');
+              }}
+            >
               <Text style={styles.modalFooterText}>{t('FooterLink')}</Text>
               <MaterialCommunityIcons name="open-in-new" size={18} color="#181C20" />
             </TouchableOpacity>

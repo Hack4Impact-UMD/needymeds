@@ -49,7 +49,7 @@ export default function DDCFaqScreen({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <Text style={styles.x} onPress={onClose}>
         {' '}
         ㄨ{' '}

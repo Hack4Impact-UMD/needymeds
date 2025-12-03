@@ -59,9 +59,8 @@ export default function PrescriptionSavingsTips() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <DefaultHeader />
-        <BottomNavBar />
 
-        <ScrollView contentContainerStyle={styles.content}>
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.heading}>
             <TouchableOpacity
               onPress={() => router.push('/(tabs)/educational-resources')}
@@ -108,6 +107,7 @@ export default function PrescriptionSavingsTips() {
           <View style={{ height: 24 }} />
         </ScrollView>
       </View>
+      <BottomNavBar />
     </SafeAreaView>
   );
 }
@@ -118,7 +118,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.default.neutrallt,
   },
   container: {
-    flex: 1,
     paddingTop: 20,
     paddingRight: 20,
     paddingBottom: Platform.OS === 'ios' ? 84 : 68, // bottom navbar height
@@ -185,11 +184,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#181C20',
     lineHeight: 22,
+    fontFamily: 'Open Sans',
   },
   bulletRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 6,
+    fontFamily: 'Open Sans',
   },
   bullet: {
     fontSize: 20,

@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { Dimensions, Keyboard, StyleSheet, View } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -22,7 +22,7 @@ export default function CustomBackgroundShape({
   const radius = circleWidth;
 
   return (
-    <View pointerEvents="none" style={[styles.wrap, { top, maxWidth: maxWidth }]}>
+    <View onTouchStart={Keyboard.dismiss} style={[styles.wrap, { top, maxWidth: maxWidth }]}>
       <View
         style={{
           width: circleWidth,
