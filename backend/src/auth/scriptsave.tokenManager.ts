@@ -13,15 +13,11 @@ class ScriptSaveTokenManager {
     if (Date.now() >= this.expiresAt || !this.token) {
       await this.refreshToken();
     }
+    console.log(Date.now() - this.expiresAt);
     return this.token;
   }
 
-  private async refreshToken() {
-    if (process.env.NODE_ENV === 'test') {
-      this.token = 'test-access-token';
-      this.expiresAt = Date.now() + 60_000;
-      return this.token;
-    }
+  public async refreshToken() {
     const path = '/AuthorizationCore/api/Authentication/AcquireToken';
     const { baseUrl, subscriptionKey, TenantId, ClientId, ClientSecret } =
       await getScriptSaveSecret();
@@ -43,7 +39,7 @@ class ScriptSaveTokenManager {
 
     if (res.status >= 200 && res.status < 300) {
       const data = res.data;
-      this.expiresAt = Date.now() + data.expiresAt;
+      this.expiresAt = Date.now() + data.expiresIn * 1000;
       this.token = data.accessToken;
       return this.token;
     } else if (res.status >= 400 && res.status < 500) {
