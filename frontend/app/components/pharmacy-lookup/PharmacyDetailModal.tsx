@@ -1,7 +1,6 @@
 import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
@@ -18,19 +17,7 @@ const PHONE_NUMBER_LENGTH = 10;
 export default function PharmacyDetailModal({ pharmacy, isOpen, onClose }: Props) {
   const { t } = useTranslation();
 
-  const [showContent, setShowContent] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      // small delay to allow modal animation to start
-      const timeout = setTimeout(() => setShowContent(true), 100);
-      return () => clearTimeout(timeout);
-    } else {
-      setShowContent(false);
-    }
-  }, [isOpen]);
-
-  if (!pharmacy || !showContent) return null;
+  if (!pharmacy) return null;
 
   const data = pharmacy;
 
@@ -41,7 +28,7 @@ export default function PharmacyDetailModal({ pharmacy, isOpen, onClose }: Props
 
   const formatPhoneNumber = (phone: string) => {
     if (phone.length === PHONE_NUMBER_LENGTH) {
-      return `(${phone.slice(0, 3)}) ${phone.slice(3, 6)}-${phone.slice(6, 9)}`;
+      return `(${phone.slice(0, 3)}) ${phone.slice(3, 6)}-${phone.slice(6, 10)}`;
     } else {
       return phone;
     }

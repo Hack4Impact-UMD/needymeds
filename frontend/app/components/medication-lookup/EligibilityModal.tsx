@@ -1,7 +1,6 @@
 import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
@@ -16,20 +15,6 @@ const EligibilityModal = ({
   setShowEligibilityModal,
 }: EligibilityModalProps) => {
   const { t } = useTranslation();
-
-  const [showContent, setShowContent] = useState(false);
-
-  useEffect(() => {
-    if (showEligibilityModal) {
-      // small delay to allow modal animation to start
-      const timeout = setTimeout(() => setShowContent(true), 100);
-      return () => clearTimeout(timeout);
-    } else {
-      setShowContent(false);
-    }
-  }, [showEligibilityModal]);
-
-  if (!showContent) return null;
 
   return (
     <Modal

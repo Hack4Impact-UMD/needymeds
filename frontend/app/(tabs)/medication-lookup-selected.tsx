@@ -207,7 +207,7 @@ const MedicationLookupSelectedScreen = () => {
                       labelField="label"
                       valueField="value"
                       value={form}
-                      onChange={(item) => setForm(item.value)}
+                      onChange={(item: any) => setForm(item.value)}
                       style={styles.dropdownInner}
                       selectedTextStyle={styles.dropdownText}
                       itemTextStyle={styles.dropdownText}
@@ -332,7 +332,7 @@ const MedicationLookupSelectedScreen = () => {
                   labelField="label"
                   valueField="value"
                   value={sortBy}
-                  onChange={(item) => setSortBy(item.value)}
+                  onChange={(item: any) => setSortBy(item.value)}
                   style={styles.sortDropdown}
                   selectedTextStyle={styles.sortDropdownText}
                   placeholderStyle={styles.sortDropdownText}
@@ -543,7 +543,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     zIndex: 100,
     backgroundColor: '#EBEEF3',
-    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.30), 0 2px 6px 2px rgba(0, 0, 0, 0.15)',
+    // iOS shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 2,
+    // Android shadow
+    elevation: 2,
   },
   detectLocationText: {
     color: '#181C20',

@@ -3,7 +3,6 @@ import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
 import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
 
@@ -26,25 +25,13 @@ const MedicationDetailModal = ({
   isOpen,
   onClose,
 }: MedicationDetailModalProps) => {
-  const [showContent, setShowContent] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      // small delay to allow modal animation to start
-      const timeout = setTimeout(() => setShowContent(true), 100);
-      return () => clearTimeout(timeout);
-    } else {
-      setShowContent(false);
-    }
-  }, [isOpen]);
-
-  if (!result || !showContent) {
+  if (!result) {
     return null;
   }
 
   const formatPhoneNumber = (phone: string) => {
     if (phone.length === PHONE_NUMBER_LENGTH) {
-      return `(${phone.slice(0, 3)}) ${phone.slice(3, 6)}-${phone.slice(6, 9)}`;
+      return `(${phone.slice(0, 3)}) ${phone.slice(3, 6)}-${phone.slice(6, 10)}`;
     } else {
       return phone;
     }

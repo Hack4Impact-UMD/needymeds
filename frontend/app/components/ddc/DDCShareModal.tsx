@@ -3,7 +3,6 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { Asset } from 'expo-asset';
 import * as MediaLibrary from 'expo-media-library';
 import * as Sharing from 'expo-sharing';
-import { useEffect, useState } from 'react';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
 
@@ -14,20 +13,6 @@ interface DDCShareModalProps {
 }
 
 const DDCShareModal = ({ isOpen, onClose, adjudicator }: DDCShareModalProps) => {
-  const [showContent, setShowContent] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      // small delay to allow modal animation to start
-      const timeout = setTimeout(() => setShowContent(true), 100);
-      return () => clearTimeout(timeout);
-    } else {
-      setShowContent(false);
-    }
-  }, [isOpen]);
-
-  if (!showContent) return null;
-
   async function ensureAssetUri(): Promise<string> {
     const ddcImage =
       adjudicator === 'DSNT'
