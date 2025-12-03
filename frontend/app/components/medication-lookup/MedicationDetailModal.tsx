@@ -57,7 +57,7 @@ const MedicationDetailModal = ({
   const openDDC = () => {
     onClose();
     router.push({
-      pathname: '/ddc',
+      pathname: '/DDC',
       params: {
         drugName,
         quantity,
