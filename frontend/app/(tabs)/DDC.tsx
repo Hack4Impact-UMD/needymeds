@@ -197,6 +197,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '400',
     color: '#1F2328',
+    fontFamily: 'Nunito Sans',
   },
   medInfoWrapper: {
     paddingHorizontal: 2,
@@ -254,7 +255,9 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   footerQuestion: {
-    color: '#41484D',
+    color: '#181C20',
     textAlign: 'center',
+    fontSize: 13,
+    fontFamily: 'Open Sans',
   },
 });

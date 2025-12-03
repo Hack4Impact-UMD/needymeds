@@ -9,9 +9,11 @@ import { ActivityIndicator, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BottomNavBar from '../components/BottomNavBar';
-import ErrorState from '../components/ErrorState';
+import ErrorState, { ErrorStateType } from '../components/ErrorState';
 import LanguageDropdown from '../components/LanguageDropdown';
 import MedicationSearchbar from '../components/medication-lookup/MedicationSearchbar';
+
+const MIN_QUERY_LENGTH = 3;
 
 const MedicationLookupAutocompleteScreen = () => {
   const { t } = useTranslation();
@@ -26,7 +28,8 @@ const MedicationLookupAutocompleteScreen = () => {
   const [query, setQuery] = useState(drugNameParam);
   const [results, setResults] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
+  const [errorType, setErrorType] = useState<ErrorStateType | null>(null);
+
   const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
@@ -41,21 +44,23 @@ const MedicationLookupAutocompleteScreen = () => {
       try {
         setIsLoading(true);
         const autoCompleteDrugNames: string[] = await autoCompleteSearchDrug(q);
+        if (autoCompleteDrugNames.length > 0) {
+          setErrorType(null);
+        } else {
+          setErrorType('notFound');
+        }
         setResults(autoCompleteDrugNames);
-        setHasSearched(true);
       } catch (error: any) {
         console.log(error);
-        setResults([]);
-        setHasSearched(true);
+        setErrorType('loading');
       } finally {
         setIsLoading(false);
       }
     };
 
     const q = query.trim().toLowerCase();
-    if (q.length < 3) {
+    if (q.length < MIN_QUERY_LENGTH) {
       setResults([]);
-      setHasSearched(false);
     } else {
       fetchAutoCompleteDrugNames(q);
     }
@@ -73,7 +78,6 @@ const MedicationLookupAutocompleteScreen = () => {
 
   const clearSearch = () => {
     setQuery('');
-    setHasSearched(false);
     inputRef.current?.focus();
   };
 
@@ -92,7 +96,7 @@ const MedicationLookupAutocompleteScreen = () => {
 
           {/* Results or Empty State */}
           <View style={styles.resultsContainer}>
-            {query.length === 0 ? (
+            {query.length < MIN_QUERY_LENGTH ? (
               // Show placeholder message when no search
               <View style={styles.emptyState}>
                 <Text style={styles.emptyText}>{t('EmptyMsg')}</Text>
@@ -100,9 +104,9 @@ const MedicationLookupAutocompleteScreen = () => {
             ) : isLoading ? (
               // Show loading state
               <ActivityIndicator size="large" style={{ marginTop: 200 }} color="#236488" />
-            ) : results.length === 0 && hasSearched ? (
-              // Show not found error state
-              <ErrorState type="notFound" query={query} />
+            ) : errorType ? (
+              // Show error state
+              <ErrorState type={errorType} />
             ) : (
               // Show results list
               <FlatList
@@ -191,7 +195,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 14,
     paddingHorizontal: 16,
-    backgroundColor: '#F6FAFE',
+    backgroundColor: Colors.default.neutrallt,
     borderBottomWidth: 1,
     borderBottomColor: '#F3F4F6',
   },

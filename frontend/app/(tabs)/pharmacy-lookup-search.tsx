@@ -12,6 +12,7 @@ import getUserLocation from '../../api/userLocation';
 
 import BottomNavBar from '../components/BottomNavBar';
 import DefaultHeader from '../components/DefaultHeader';
+import ErrorState, { ErrorStateType } from '../components/ErrorState';
 import PharmacyDetailModal from '../components/pharmacy-lookup/PharmacyDetailModal';
 import PharmacySearchResult from '../components/pharmacy-lookup/PharmacySearchResult';
 
@@ -36,8 +37,28 @@ const PharmacyLocatorScreen = () => {
   const [filterText, setFilterText] = useState('');
   const [filterTextFocused, setFilterTextFocused] = useState(false);
   const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(null);
+  const [filteredPharmacies, setFilteredPharmacies] = useState<Pharmacy[]>([]);
+  const [errorType, setErrorType] = useState<ErrorStateType | null>(null);
 
   const { pharmacies, loading, error } = useSearchPharmacies(zipCode, parseFloat(radius));
+
+  useEffect(() => {
+    if (loading) return;
+
+    const filtered = !filterText
+      ? pharmacies
+      : pharmacies.filter((p) => p.pharmacyName.toLowerCase().includes(filterText.toLowerCase()));
+
+    setFilteredPharmacies(filtered);
+
+    if (error) {
+      setErrorType('loading');
+    } else if (filtered.length === 0) {
+      setErrorType('noPharmacies');
+    } else {
+      setErrorType(null);
+    }
+  }, [pharmacies, filterText, error, loading]);
 
   // Handle ZIP code input - restrict to 5 digits only
   const handleZipChange = (text: string) => {
@@ -213,22 +234,21 @@ const PharmacyLocatorScreen = () => {
                 <MaterialIcons name="add-business" size={41} color="#41484D" />
                 <Text style={styles.emptyMessage}>{t('EmptyMsg2')}</Text>
               </View>
+            ) : errorType ? (
+              <ErrorState
+                type={errorType}
+                iconName={errorType === 'noPharmacies' ? 'store-outline' : undefined}
+              />
             ) : (
-              pharmacies
-                .filter((pharmacy) => {
-                  // Filter by name if filterText is provided
-                  if (!filterText) return true;
-                  return pharmacy.pharmacyName.toLowerCase().includes(filterText.toLowerCase());
-                })
-                .map((pharmacy) => (
-                  <PharmacySearchResult
-                    key={`${pharmacy.pharmacyName}, ${pharmacy.pharmacyStreet1}, ${pharmacy.pharmacyCity}`}
-                    name={pharmacy.pharmacyName}
-                    address={`${pharmacy.pharmacyStreet1}, ${pharmacy.pharmacyCity}`}
-                    distance={pharmacy.distance!}
-                    onPress={() => setSelectedPharmacy(pharmacy)}
-                  />
-                ))
+              filteredPharmacies.map((pharmacy) => (
+                <PharmacySearchResult
+                  key={`${pharmacy.pharmacyName}, ${pharmacy.pharmacyStreet1}, ${pharmacy.pharmacyCity}`}
+                  name={pharmacy.pharmacyName}
+                  address={`${pharmacy.pharmacyStreet1}, ${pharmacy.pharmacyCity}`}
+                  distance={pharmacy.distance!}
+                  onPress={() => setSelectedPharmacy(pharmacy)}
+                />
+              ))
             )}
           </ScrollView>
         </View>
@@ -288,6 +308,7 @@ const styles = StyleSheet.create({
   textInput: {
     backgroundColor: Colors.default.neutrallt,
     fontSize: 16,
+    fontFamily: 'Open Sans',
   },
   inputOutline: {
     borderRadius: 8,

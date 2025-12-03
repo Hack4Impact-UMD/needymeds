@@ -25,7 +25,7 @@ import { ActivityIndicator, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BottomNavBar from '../components/BottomNavBar';
-import ErrorState from '../components/ErrorState';
+import ErrorState, { ErrorStateType } from '../components/ErrorState';
 import LanguageDropdown from '../components/LanguageDropdown';
 import MedicationDetailModal from '../components/medication-lookup/MedicationDetailModal';
 import MedicationSearchbar from '../components/medication-lookup/MedicationSearchbar';
@@ -62,30 +62,35 @@ const MedicationLookupSelectedScreen = () => {
   const [formOptions, setFormOptions] = useState<{ label: string; value: string }[]>([]);
   const [drugResults, setDrugResults] = useState<DrugSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [hasError, setHasError] = useState(false);
+  const [errorType, setErrorType] = useState<ErrorStateType | null>(null);
 
   useEffect(() => {
     async function initializeSearch() {
-      const { genericVersion, availableForms } = (await initializeDrugSearch(
-        drugName
-      )) as InitializeDrugSearchResult;
-      if (!genericVersion) {
-        setGenericName('');
-      } else {
-        setGenericName(
-          genericVersion.length >= GENERIC_NAME_TRUNCATE_CUTOFF
-            ? `${genericVersion.slice(0, GENERIC_NAME_TRUNCATE_CUTOFF - 1)}..`
-            : genericVersion
-        );
+      try {
+        const { genericVersion, availableForms } = (await initializeDrugSearch(
+          drugName
+        )) as InitializeDrugSearchResult;
+        if (!genericVersion) {
+          setGenericName('');
+        } else {
+          setGenericName(
+            genericVersion.length >= GENERIC_NAME_TRUNCATE_CUTOFF
+              ? `${genericVersion.slice(0, GENERIC_NAME_TRUNCATE_CUTOFF - 1)}..`
+              : genericVersion
+          );
+        }
+
+        const mappedForms = (availableForms || []).map((f) => ({
+          label: f,
+          value: f,
+        }));
+
+        setForm(mappedForms[0].value);
+        setFormOptions(mappedForms);
+      } catch (error: any) {
+        console.error('Error initializing drug search:', error);
+        setErrorType('loading');
       }
-
-      const mappedForms = (availableForms || []).map((f) => ({
-        label: f,
-        value: f,
-      }));
-
-      setForm(mappedForms[0].value);
-      setFormOptions(mappedForms);
     }
 
     initializeSearch();
@@ -99,7 +104,7 @@ const MedicationLookupSelectedScreen = () => {
     const fetchDrugSearchResults = async () => {
       try {
         setIsLoading(true);
-        setHasError(false);
+        setErrorType(null);
         let drugSearchResults: DrugSearchResult[];
         if (sortBy === 'price') {
           drugSearchResults = await searchDrugByPrice(
@@ -121,7 +126,7 @@ const MedicationLookupSelectedScreen = () => {
         setDrugResults(drugSearchResults);
       } catch (error) {
         console.error('Error fetching drug results:', error);
-        setHasError(true);
+        setErrorType('loading');
         setDrugResults([]);
       } finally {
         setIsLoading(false);
@@ -380,10 +385,10 @@ const MedicationLookupSelectedScreen = () => {
               {isLoading ? (
                 // Show loading state
                 <ActivityIndicator size="large" style={{ marginTop: 200 }} color="#236488" />
-              ) : hasError ? (
+              ) : errorType ? (
                 // Show error state
                 <ErrorState
-                  type="generic"
+                  type={errorType}
                   message="We couldn't load pharmacy results right now. Please check your connection and try again."
                 />
               ) : drugResults.length === 0 ? (
@@ -582,7 +587,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#D1D5DB',
-    backgroundColor: '#F6FAFE',
+    backgroundColor: Colors.default.neutrallt,
     color: '#004E60',
   },
   filterButtonActive: {

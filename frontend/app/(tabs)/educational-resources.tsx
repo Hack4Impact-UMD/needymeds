@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 
 import { useTranslation } from 'react-i18next';
-import { Image, Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Linking, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Card, Divider, Icon, IconButton } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -122,15 +122,18 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.default.neutrallt,
   },
   container: {
-    flex: 1,
-    padding: 20,
+    paddingTop: 20,
+    paddingRight: 20,
+    paddingBottom: Platform.OS === 'ios' ? 84 : 68, // bottom navbar height
+    paddingLeft: 20,
   },
   title: {
     paddingHorizontal: 40,
     textAlign: 'center',
     fontSize: 32,
-    fontWeight: 300,
+    fontWeight: '400',
     color: '#181C20',
+    fontFamily: 'Nunito Sans',
     marginBottom: 20,
   },
   subtitle: {
@@ -139,16 +142,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     margin: 12,
     paddingBottom: 20,
+    fontFamily: 'Open Sans',
   },
   description: {
     fontSize: 14,
     color: '#181C20',
     paddingLeft: 15,
+    fontFamily: 'Open Sans',
   },
   cards: {
     marginVertical: 8,
     width: '100%',
     backgroundColor: '#F1F4F9',
+    fontFamily: 'Open Sans',
   },
   title_cards: {
     height: 100,

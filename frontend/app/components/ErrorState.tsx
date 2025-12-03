@@ -2,11 +2,10 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
 
-type ErrorStateType = 'loading' | 'notFound' | 'generic';
+export type ErrorStateType = 'loading' | 'notFound' | 'noPharmacies' | 'generic';
 
 interface ErrorStateProps {
   type: ErrorStateType;
-  query?: string;
   message?: string;
   showCallButton?: boolean;
   phoneNumber?: string;
@@ -17,10 +16,9 @@ interface ErrorStateProps {
 
 const ErrorState: React.FC<ErrorStateProps> = ({
   type,
-  query,
   message,
   showCallButton = true,
-  phoneNumber = '(800) 503-6897',
+  phoneNumber = '8005036897',
   onCallPress,
   iconName = 'magnify',
   iconColor = '#41484D',
@@ -40,6 +38,8 @@ const ErrorState: React.FC<ErrorStateProps> = ({
         return 'We could not load results right now. This happens when the connection is slow or the system is busy.';
       case 'notFound':
         return `We could not find that drug. You might find it at a pharmacy even if it is not on our discount list.\nMake sure it is spelled correctly.`;
+      case 'noPharmacies':
+        return `We're sorry that there are no matching pharmacies in our network yet. Try checking other ZIP Codes or increasing the search radius.`;
       case 'generic':
       default:
         return 'Something went wrong. Please try again later.';
@@ -73,11 +73,11 @@ const styles = StyleSheet.create({
   messageText: {
     color: '#181C20',
     textAlign: 'center',
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
     lineHeight: 22,
     fontSize: 16,
     marginTop: 20,
-    marginBottom: 20,
+    marginBottom: 15,
   },
   callButton: {
     flexDirection: 'row',
@@ -88,15 +88,14 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#236488',
-    backgroundColor: '#FFFFFF',
-    marginTop: 20,
+    marginTop: 10,
     gap: 8,
   },
   callButtonText: {
     color: '#236488',
     fontSize: 15,
-    fontFamily: 'Nunito Sans',
-    fontWeight: '600',
+    fontFamily: 'Open Sans',
+    fontWeight: '400',
   },
 });
 

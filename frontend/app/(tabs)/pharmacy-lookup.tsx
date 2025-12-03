@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: '#1F1F1F',
     lineHeight: 32,
-    fontFamily: 'Nunito',
+    fontFamily: 'Nunito Sans',
   },
   inputsContainer: {
     gap: 60,
@@ -237,6 +237,7 @@ const styles = StyleSheet.create({
   textInput: {
     backgroundColor: Colors.default.neutrallt,
     fontSize: 16,
+    fontFamily: 'Open Sans',
   },
   inputOutline: {
     borderRadius: 8,

@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     paddingRight: 20,
     paddingBottom: Platform.OS === 'ios' ? 84 : 68, // bottom navbar height
     paddingLeft: 20,
-    fontFamily: 'Nunito Sans',
+    fontFamily: 'Open Sans',
   },
   content: {
     paddingVertical: 8,
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 32,
     lineHeight: 34,
-    fontWeight: 300,
+    fontWeight: '400',
     fontFamily: 'Nunito Sans',
     color: '#181C20',
   },
@@ -157,6 +157,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 22,
     color: '#181C20',
+    fontFamily: 'Open Sans',
   },
   card: {
     borderRadius: 12,
@@ -173,10 +174,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 400,
     color: '#181C20',
+    fontFamily: 'Open Sans',
   },
   body: {
     marginTop: 8,
     gap: 6,
+    fontFamily: 'Open Sans',
   },
   line: {
     fontSize: 15,

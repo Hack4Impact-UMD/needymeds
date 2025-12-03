@@ -97,7 +97,6 @@ export async function initializeDrugSearch(drugName: string) {
  * @param radius to search within, relative to 'zipCode'.
  */
 async function searchDrug(
-  drugName: string,
   form: string,
   radius: number,
   includeGeneric: boolean,
@@ -249,34 +248,29 @@ export async function searchDrugByPrice(
   includeGeneric: boolean,
   zipCode?: number
 ): Promise<DrugSearchResult[]> {
-  try {
-    const { userZipCode } = await getUserLocation();
+  const { userZipCode } = await getUserLocation();
 
-    const effectiveZip = zipCode !== undefined && zipCode !== null ? String(zipCode) : userZipCode;
+  const effectiveZip = zipCode !== undefined && zipCode !== null ? String(zipCode) : userZipCode;
 
-    const key = `${drugName.toLowerCase()}-${effectiveZip}-${radius}-${form}-${includeGeneric}`;
-    const state = store.getState() as any;
-    const cachedEntry = state.drugSearch.resultsByPrice[key];
-    if (cachedEntry) return cachedEntry.results;
+  const key = `${drugName.toLowerCase()}-${effectiveZip}-${radius}-${form}-${includeGeneric}`;
+  const state = store.getState() as any;
+  const cachedEntry = state.drugSearch.resultsByPrice[key];
+  if (cachedEntry) return cachedEntry.results;
 
-    // Reutilize distance-sorted cache if available
-    const byDistanceKey = `${drugName.toLowerCase()}-${effectiveZip}-${radius}-${form}-${includeGeneric}`;
-    const cachedDistanceEntry = state.drugSearch.resultsByDistance[byDistanceKey];
-    if (cachedDistanceEntry) {
-      const sorted = [...cachedDistanceEntry.results].sort((a, b) => +a.price - +b.price);
-      store.dispatch(setCacheEntry({ key, results: sorted, by: 'price' }));
-      return sorted;
-    }
-
-    // Fresh query
-    const searchResults = await searchDrug(drugName, form, radius, includeGeneric, effectiveZip);
-    const sorted = [...searchResults].sort((a, b) => +a.price - +b.price);
+  // Reutilize distance-sorted cache if available
+  const byDistanceKey = `${drugName.toLowerCase()}-${effectiveZip}-${radius}-${form}-${includeGeneric}`;
+  const cachedDistanceEntry = state.drugSearch.resultsByDistance[byDistanceKey];
+  if (cachedDistanceEntry) {
+    const sorted = [...cachedDistanceEntry.results].sort((a, b) => +a.price - +b.price);
     store.dispatch(setCacheEntry({ key, results: sorted, by: 'price' }));
     return sorted;
-  } catch (err) {
-    console.error('Error in searchDrugByPrice:', err);
-    return [];
   }
+
+  // Fresh query
+  const searchResults = await searchDrug(form, radius, includeGeneric, effectiveZip);
+  const sorted = [...searchResults].sort((a, b) => +a.price - +b.price);
+  store.dispatch(setCacheEntry({ key, results: sorted, by: 'price' }));
+  return sorted;
 }
 
 // -----------------------------------------------------------------------------
@@ -289,32 +283,27 @@ export async function searchDrugByDistance(
   includeGeneric: boolean,
   zipCode?: number
 ): Promise<DrugSearchResult[]> {
-  try {
-    const { userZipCode } = await getUserLocation();
+  const { userZipCode } = await getUserLocation();
 
-    const effectiveZip = zipCode !== undefined && zipCode !== null ? String(zipCode) : userZipCode;
+  const effectiveZip = zipCode !== undefined && zipCode !== null ? String(zipCode) : userZipCode;
 
-    const key = `${drugName.toLowerCase()}-${effectiveZip}-${radius}-${form}-${includeGeneric}`;
-    const state = store.getState() as any;
-    const cachedEntry = state.drugSearch.resultsByDistance[key];
-    if (cachedEntry) return cachedEntry.results;
+  const key = `${drugName.toLowerCase()}-${effectiveZip}-${radius}-${form}-${includeGeneric}`;
+  const state = store.getState() as any;
+  const cachedEntry = state.drugSearch.resultsByDistance[key];
+  if (cachedEntry) return cachedEntry.results;
 
-    // Reutilize price-sorted cache if available
-    const byPriceKey = `${drugName.toLowerCase()}-${effectiveZip}-${radius}-${form}-${includeGeneric}`;
-    const cachedByPriceEntry = state.drugSearch.resultsByPrice[byPriceKey];
-    if (cachedByPriceEntry) {
-      const sorted = [...cachedByPriceEntry.results].sort((a, b) => +a.distance - +b.distance);
-      store.dispatch(setCacheEntry({ key, results: sorted, by: 'distance' }));
-      return sorted;
-    }
-
-    // Fresh query
-    const searchResults = await searchDrug(drugName, form, radius, includeGeneric, effectiveZip);
-    const sorted = [...searchResults].sort((a, b) => +a.distance - +b.distance);
+  // Reutilize price-sorted cache if available
+  const byPriceKey = `${drugName.toLowerCase()}-${effectiveZip}-${radius}-${form}-${includeGeneric}`;
+  const cachedByPriceEntry = state.drugSearch.resultsByPrice[byPriceKey];
+  if (cachedByPriceEntry) {
+    const sorted = [...cachedByPriceEntry.results].sort((a, b) => +a.distance - +b.distance);
     store.dispatch(setCacheEntry({ key, results: sorted, by: 'distance' }));
     return sorted;
-  } catch (err) {
-    console.error('Error in searchDrugByDistance:', err);
-    return [];
   }
+
+  // Fresh query
+  const searchResults = await searchDrug(form, radius, includeGeneric, effectiveZip);
+  const sorted = [...searchResults].sort((a, b) => +a.distance - +b.distance);
+  store.dispatch(setCacheEntry({ key, results: sorted, by: 'distance' }));
+  return sorted;
 }

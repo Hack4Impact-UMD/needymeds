@@ -1,3 +1,4 @@
+import { Colors } from '@/constants/theme';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Divider, IconButton, Text } from 'react-native-paper';
 const card = require('../../assets/confirmation_number.png');
@@ -66,7 +67,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F6FAFE',
+    backgroundColor: Colors.default.neutrallt,
     paddingHorizontal: 11,
     paddingVertical: 14,
     borderRadius: 8,

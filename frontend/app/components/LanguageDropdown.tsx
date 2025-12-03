@@ -45,16 +45,19 @@ const styles = StyleSheet.create({
     color: '#41484D',
     fontSize: 14,
     fontFamily: 'Open Sans',
+    fontWeight: '600',
   },
   langItemText: {
     color: '#41484D',
     fontSize: 14,
     fontFamily: 'Open Sans',
+    fontWeight: '600',
   },
   langSelectedText: {
     color: '#41484D',
     fontSize: 14,
     fontFamily: 'Open Sans',
+    fontWeight: '600',
   },
 });
 
