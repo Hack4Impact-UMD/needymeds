@@ -152,7 +152,9 @@ const MedicationDetailModal = ({
               <Text style={styles.priceLabel}>
                 {result.labelName} {quantity} {form}
               </Text>
-              <Text style={styles.priceAmount}>${Number(result.price) * Number(quantity)}</Text>
+              <Text style={styles.priceAmount}>
+                ${(Number(result.price) * Number(quantity)).toFixed(2)}
+              </Text>
               <TouchableOpacity style={styles.sendButtonIcon} onPress={openDDC}>
                 <MaterialIcons name="confirmation-number" size={22} color="white" />
               </TouchableOpacity>
