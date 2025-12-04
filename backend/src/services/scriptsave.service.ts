@@ -47,7 +47,7 @@ async function performRequest(method: httpMethod, path: string, params: Record<s
 
     if (res.status === 401 && !retried401) {
       retried401 = true;
-      await scriptSaveTokenManager.refreshToken();
+      await scriptSaveTokenManager.forceRefresh();
       continue;
     }
 

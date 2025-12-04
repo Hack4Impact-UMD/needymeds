@@ -68,14 +68,6 @@ const PharmacyLocatorScreen = () => {
     }
   }, [pharmacies, filterText, error, loading]);
 
-  // Handle ZIP code input - restrict to 5 digits only
-  const handleZipChange = (text: string) => {
-    const numericText = text.replace(/[^0-9]/g, '');
-    if (numericText.length <= 5) {
-      setZipCode(numericText);
-    }
-  };
-
   // Handle radius input - only positive numbers
   const handleRadiusChange = (text: string) => {
     // Allow empty string or valid positive numbers (including decimals)
@@ -139,7 +131,7 @@ const PharmacyLocatorScreen = () => {
               <TextInput
                 label={t('ZipInputLabel2')}
                 value={zipCode}
-                onChangeText={handleZipChange}
+                onChangeText={setZipCode}
                 onFocus={() => setZipFocused(true)}
                 onBlur={() => setZipFocused(false)}
                 placeholder=""
@@ -231,6 +223,8 @@ const PharmacyLocatorScreen = () => {
               }
               onFocus={() => setFilterTextFocused(true)}
               onBlur={() => setFilterTextFocused(false)}
+              autoCorrect={false}
+              spellCheck={false}
             />
           </View>
 

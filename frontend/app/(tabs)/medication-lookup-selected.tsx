@@ -31,7 +31,7 @@ import MedicationDetailModal from '../components/medication-lookup/MedicationDet
 import MedicationSearchbar from '../components/medication-lookup/MedicationSearchbar';
 
 const ZIPCODE_LENGTH = 5;
-const GENERIC_NAME_TRUNCATE_CUTOFF = 7;
+const GENERIC_NAME_TRUNCATE_CUTOFF = 6;
 
 const MedicationLookupSelectedScreen = () => {
   const { t } = useTranslation();
@@ -97,6 +97,7 @@ const MedicationLookupSelectedScreen = () => {
 
   useEffect(() => {
     if (!quantity || !radius || !zipCode || zipCode.length !== ZIPCODE_LENGTH) {
+      setDrugResults([]);
       return;
     }
 
@@ -132,7 +133,7 @@ const MedicationLookupSelectedScreen = () => {
     };
 
     fetchDrugSearchResults();
-  }, [sortBy, form, radius, includeGeneric, zipCode]);
+  }, [drugName, sortBy, form, radius, includeGeneric, zipCode]);
 
   const clearSearch = () => {
     router.push({
@@ -287,7 +288,7 @@ const MedicationLookupSelectedScreen = () => {
                   label={t('RadiusInputLabel')}
                   value={radius}
                   onChangeText={setRadius}
-                  keyboardType="numeric"
+                  keyboardType="decimal-pad"
                   outlineStyle={{ borderRadius: 5 }}
                   activeOutlineColor="#236488"
                   textColor="#181C20"

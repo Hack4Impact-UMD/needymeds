@@ -66,6 +66,12 @@ class ScriptSaveTokenManager {
       }
     }, 30_000);
   }
+
+  public async forceRefresh(): Promise<string> {
+    this.token = ''; // Clear the token
+    this.expiresAt = 0; // Reset expiry
+    return await this.refreshToken();
+  }
 }
 
 export const scriptSaveTokenManager = new ScriptSaveTokenManager();

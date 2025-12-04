@@ -54,6 +54,8 @@ const MedicationSearchbar: React.FC<MedicationSearchbarProps> = ({
           elevation: 0,
         }}
         maxLength={20}
+        autoCorrect={false}
+        spellCheck={false}
       />
     </View>
   );
