@@ -2,24 +2,29 @@ import axios from 'axios';
 import { getScriptSaveSecret } from '../secrets/secrets';
 
 class ScriptSaveTokenManager {
-  token: string;
-  expiresAt: number;
+  private token: string;
+  private expiresAt: number;
+
   constructor() {
     this.token = '';
-    this.expiresAt = Date.now();
+    this.expiresAt = 0;
+    this.startAutoRefresh();
   }
 
-  public async getToken() {
-    if (Date.now() >= this.expiresAt || !this.token) {
+  // Public method to get the current valid token
+  public async getToken(): Promise<string> {
+    if (!this.token || Date.now() >= this.expiresAt) {
       await this.refreshToken();
     }
     return this.token;
   }
 
-  public async refreshToken() {
+  // Refresh the token from ScriptSave
+  public async refreshToken(): Promise<string> {
     const path = '/AuthorizationCore/api/Authentication/AcquireToken';
     const { baseUrl, subscriptionKey, TenantId, ClientId, ClientSecret } =
       await getScriptSaveSecret();
+
     const client = axios.create({
       baseURL: baseUrl,
       timeout: 12000,
@@ -38,14 +43,28 @@ class ScriptSaveTokenManager {
 
     if (res.status >= 200 && res.status < 300) {
       const data = res.data;
-      this.expiresAt = Date.now() + (data.expiresIn - 3) * 1000; // convert to ms - 3 sec
       this.token = data.accessToken;
+      this.expiresAt = Date.now() + (data.expiresIn - 60) * 1000; // Subtract a buffer of 60 seconds to refresh before actual expiry
       return this.token;
-    } else if (res.status >= 400 && res.status < 500) {
-      const err: any = new Error(`ScriptSave returned ${res.status}`);
+    } else {
+      const err: any = new Error(`Failed to acquire ScriptSave token: ${res.status}`);
       err.status = res.status;
       throw err;
     }
+  }
+
+  // Periodically check and refresh the token
+  private startAutoRefresh() {
+    // Run every 30 seconds
+    setInterval(async () => {
+      try {
+        if (!this.token || Date.now() >= this.expiresAt - 60_000) {
+          await this.refreshToken();
+        }
+      } catch (err) {
+        console.error('[ScriptSaveTokenManager] Token refresh failed', err);
+      }
+    }, 30_000);
   }
 }
 
