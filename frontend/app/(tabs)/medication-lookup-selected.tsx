@@ -1,15 +1,10 @@
-import {
-  initializeDrugSearch,
-  InitializeDrugSearchResult,
-  searchDrugByDistance,
-  searchDrugByPrice,
-} from '@/api/drugSearch';
+import { initializeDrugSearch, searchDrugByDistance, searchDrugByPrice } from '@/api/drugSearch';
 import { DrugSearchResult } from '@/api/types';
 import getUserLocation from '@/api/userLocation';
 import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Alert,
@@ -44,9 +39,11 @@ const MedicationLookupSelectedScreen = () => {
   const params = useLocalSearchParams<{ drugName: string }>();
   const drugNameParam = Array.isArray(params.drugName) ? params.drugName[0] : params.drugName || '';
 
-  useEffect(() => {
-    setDrugName(drugNameParam);
-  }, [drugNameParam]);
+  useFocusEffect(
+    useCallback(() => {
+      setDrugName(drugNameParam);
+    }, [drugNameParam])
+  );
 
   const [drugName, setDrugName] = useState(drugNameParam);
   const [form, setForm] = useState('');
@@ -64,36 +61,39 @@ const MedicationLookupSelectedScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorType, setErrorType] = useState<ErrorStateType | null>(null);
 
-  useEffect(() => {
-    async function initializeSearch() {
-      try {
-        const { genericVersion, availableForms } = (await initializeDrugSearch(
-          drugName
-        )) as InitializeDrugSearchResult;
-        if (!genericVersion) {
-          setGenericName('');
-        } else {
-          setGenericName(
-            genericVersion.length >= GENERIC_NAME_TRUNCATE_CUTOFF
-              ? `${genericVersion.slice(0, GENERIC_NAME_TRUNCATE_CUTOFF - 1)}..`
-              : genericVersion
-          );
+  useFocusEffect(
+    useCallback(() => {
+      async function initializeSearch() {
+        try {
+          const { genericVersion, availableForms } = await initializeDrugSearch(drugName);
+
+          // Set generic name
+          if (!genericVersion) {
+            setGenericName('');
+          } else {
+            setGenericName(
+              genericVersion.length >= GENERIC_NAME_TRUNCATE_CUTOFF
+                ? `${genericVersion.slice(0, GENERIC_NAME_TRUNCATE_CUTOFF - 1)}..`
+                : genericVersion
+            );
+          }
+
+          // Map forms
+          const mappedForms = (availableForms || []).map((f) => ({
+            label: f,
+            value: f,
+          }));
+
+          setForm(mappedForms[0]?.value ?? '');
+          setFormOptions(mappedForms);
+        } catch (error: any) {
+          setErrorType('loading');
         }
-
-        const mappedForms = (availableForms || []).map((f) => ({
-          label: f,
-          value: f,
-        }));
-
-        setForm(mappedForms[0].value);
-        setFormOptions(mappedForms);
-      } catch (error: any) {
-        setErrorType('loading');
       }
-    }
 
-    initializeSearch();
-  }, [drugName]);
+      initializeSearch();
+    }, [drugName])
+  );
 
   useEffect(() => {
     if (!quantity || !radius || !zipCode || zipCode.length !== ZIPCODE_LENGTH) {

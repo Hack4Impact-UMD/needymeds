@@ -14,9 +14,10 @@ class ScriptSaveTokenManager {
   // Public method to get the current valid token
   public async getToken(): Promise<string> {
     if (!this.token || Date.now() >= this.expiresAt) {
-      await this.refreshToken();
+      return await this.refreshToken();
+    } else {
+      return this.token;
     }
-    return this.token;
   }
 
   // Refresh the token from ScriptSave

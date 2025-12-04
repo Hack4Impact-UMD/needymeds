@@ -1,8 +1,8 @@
 import { autoCompleteSearchDrug } from '@/api/drugSearch';
 import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   FlatList,
@@ -29,9 +29,11 @@ const MedicationLookupAutocompleteScreen = () => {
   const params = useLocalSearchParams<{ drugName: string }>();
   const drugNameParam = Array.isArray(params.drugName) ? params.drugName[0] : params.drugName || '';
 
-  useEffect(() => {
-    setQuery(drugNameParam);
-  }, [drugNameParam]);
+  useFocusEffect(
+    useCallback(() => {
+      setQuery(drugNameParam);
+    }, [drugNameParam])
+  );
 
   const [query, setQuery] = useState(drugNameParam);
   const [results, setResults] = useState<string[]>([]);
@@ -40,38 +42,33 @@ const MedicationLookupAutocompleteScreen = () => {
 
   const inputRef = useRef<TextInput>(null);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      inputRef.current?.focus();
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    const fetchAutoCompleteDrugNames = async (q: string) => {
-      try {
-        setIsLoading(true);
-        const autoCompleteDrugNames: string[] = await autoCompleteSearchDrug(q);
-        if (autoCompleteDrugNames.length > 0) {
-          setErrorType(null);
-        } else {
-          setErrorType('notFound');
+  useFocusEffect(
+    useCallback(() => {
+      const fetchAutoCompleteDrugNames = async (q: string) => {
+        try {
+          setIsLoading(true);
+          const autoCompleteDrugNames: string[] = await autoCompleteSearchDrug(q);
+          if (autoCompleteDrugNames.length > 0) {
+            setErrorType(null);
+          } else {
+            setErrorType('notFound');
+          }
+          setResults(autoCompleteDrugNames);
+        } catch (error: any) {
+          setErrorType('loading');
+        } finally {
+          setIsLoading(false);
         }
-        setResults(autoCompleteDrugNames);
-      } catch (error: any) {
-        setErrorType('loading');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      };
 
-    const q = query.trim().toLowerCase();
-    if (q.length < MIN_QUERY_LENGTH) {
-      setResults([]);
-    } else {
-      fetchAutoCompleteDrugNames(q);
-    }
-  }, [query]);
+      const q = query.trim().toLowerCase();
+      if (q.length < MIN_QUERY_LENGTH) {
+        setResults([]);
+      } else {
+        fetchAutoCompleteDrugNames(q);
+      }
+    }, [query])
+  );
 
   const handleSelectMed = (item: string) => {
     Keyboard.dismiss();
