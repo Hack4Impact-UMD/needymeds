@@ -13,7 +13,6 @@ class ScriptSaveTokenManager {
     if (Date.now() >= this.expiresAt || !this.token) {
       await this.refreshToken();
     }
-    console.log(Date.now() - this.expiresAt);
     return this.token;
   }
 
@@ -39,7 +38,7 @@ class ScriptSaveTokenManager {
 
     if (res.status >= 200 && res.status < 300) {
       const data = res.data;
-      this.expiresAt = Date.now() + data.expiresIn * 1000;
+      this.expiresAt = Date.now() + (data.expiresIn - 3) * 1000; // convert to ms - 3 sec
       this.token = data.accessToken;
       return this.token;
     } else if (res.status >= 400 && res.status < 500) {
