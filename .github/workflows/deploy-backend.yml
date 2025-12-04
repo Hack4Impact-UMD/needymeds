@@ -3,8 +3,7 @@ name: CI/CD Backend Deployment
 on:
   push:
     branches:
-      - main
-      - staging
+      - backend-cicd
 
 permissions:
   id-token: write # Required for OIDC
