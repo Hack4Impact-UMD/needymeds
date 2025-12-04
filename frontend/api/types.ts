@@ -1,6 +1,6 @@
 /* Data */
 
-type Adjudicator = 'DSNT' | 'ScriptSave';
+export type Adjudicator = 'DSNT' | 'ScriptSave';
 
 export interface DrugSearchResult {
   adjudicator: Adjudicator;
@@ -13,6 +13,19 @@ export interface DrugSearchResult {
   latitude: string;
   longitude: string;
   distance: string;
+}
+
+export interface Pharmacy {
+  pharmacyName: string;
+  pharmacyStreet1: string;
+  pharmacyStreet2: string;
+  pharmacyCity: string;
+  pharmacyState: string;
+  pharmacyZipCode: string;
+  latitude: number;
+  longitude: number;
+  distance?: number;
+  phoneNumber: string;
 }
 
 /* Requests */
@@ -32,6 +45,12 @@ export interface DsntPriceNpiRequest {
   zipCode?: string;
 }
 
+export interface ScriptSaveAutoCompleteRequest {
+  prefixText: string;
+  groupID: string;
+  count?: string;
+}
+
 export interface ScriptSaveFindDrugsRequest {
   groupID: string;
   brandIndicator?: string;
@@ -42,6 +61,11 @@ export interface ScriptSaveFindDrugsRequest {
   numPharm?: string;
   zipCode?: string;
   useUC?: string;
+}
+
+export interface ScriptSaveGetDrugFormStrengthRequest {
+  groupID: string;
+  gsn: string;
 }
 
 export interface ScriptSavePriceRequest {
@@ -76,8 +100,18 @@ export interface DsntDrugPricingItem {
 
 export type DsntPriceNpiResponse = DsntPriceResponse;
 
+export interface ScriptSaveAutoCompleteResponse {
+  DrugNames: ScriptSaveAutoCompleteItem[];
+}
+
+export interface ScriptSaveAutoCompleteItem {
+  DrugName: string;
+}
+
 export interface ScriptSaveFindDrugsResponse {
   Drugs: ScriptSaveDrugItem[];
+  Names: ScriptSaveNameItem[];
+  Forms: ScriptSaveFormItem[];
 }
 
 export interface ScriptSaveDrugItem {
@@ -108,6 +142,48 @@ export interface ScriptSaveDrugItem {
   GroupNum: string;
   GSN: string;
   Splittable: string;
+}
+
+export interface ScriptSaveNameItem {
+  DrugName: string;
+  BrandGeneric: string;
+  IsSelected: string;
+}
+
+export interface ScriptSaveFormItem {
+  GSN: string;
+  Form: string;
+  Ranking: string;
+  IsSelected: string;
+  LN: string;
+  CommonQty: string;
+  IsDiscontinued: string;
+  DiscontinuedDate: string;
+}
+
+export interface ScriptSaveStrengthItem {
+  GSN: string;
+  Strength: string;
+  Ranking: string;
+  IsSelected: string;
+  LN: string;
+  CommonQty: string;
+}
+
+export interface ScriptSaveQuantityItem {
+  GSN: string;
+  Quantity: string;
+  QuantityLabel: string;
+  Ranking: string;
+  IsSelected: string;
+}
+
+export interface ScriptSaveGetDrugFormStrengthResponse {
+  DrugName: string;
+  BrandGeneric: string;
+  Forms: ScriptSaveFormItem[];
+  Strengths: ScriptSaveStrengthItem[];
+  Quantities: ScriptSaveQuantityItem[];
 }
 
 export interface ScriptSavePriceResponse {

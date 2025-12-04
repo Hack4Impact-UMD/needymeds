@@ -1,38 +1,28 @@
-// return type
+import zipLatLonJson from '../data/zip_lat_lon.json';
+
 export interface Coordinates {
   lat: string;
   lon: string;
   error?: string;
 }
 
-// convert zipcode to coordinates
 export async function zipToCoords(zipcode: string): Promise<Coordinates> {
   const coords: Coordinates = {
     lat: '',
     lon: '',
-    error: '',
   };
 
-  const format = 'jsonv2';
-  const url = `https://nominatim.openstreetmap.org/search?postalcode=${zipcode}&format=${format}`;
+  const zipLatLon = zipLatLonJson as unknown as Record<string, [number, number]>;
 
-  // API request to Nominatim
-  const response = await fetch(url, {
-    headers: {
-      'User-Agent': 'NeedyMeds-App/1.0 (info@needymeds.org)',
-    },
-  });
-  if (!response.ok) {
-    throw new Error('Request to Nominatim failed.');
+  const result = zipLatLon[zipcode];
+
+  if (!result) {
+    coords.error = 'Zip code not found';
+    return coords;
   }
 
-  const data = await response.json();
-  if (!data || data.length === 0) {
-    throw new Error('No location results.');
-  }
-
-  coords.lat = data[0].lat;
-  coords.lon = data[0].lon;
+  coords.lat = result[0].toString();
+  coords.lon = result[1].toString();
 
   return coords;
 }

@@ -1,12 +1,14 @@
-// handling time out and errors for fetch requests
-export const API_BASE = process.env.EXPO_PUBLIC_API_BASE ?? 'http://localhost:3000';
+import Constants from 'expo-constants';
 
-async function handle<T>(res: Response): Promise<T> {
+export const API_BASE = Constants.expoConfig?.extra?.API_BASE;
+
+async function handle<T>(res: Response) {
   if (!res.ok) {
     const text = await res.text().catch(() => '');
     throw new Error(`HTTP ${res.status} ${text || res.statusText}`);
   }
-  return res.json() as Promise<T>;
+  const resJson = await res.json();
+  return resJson.data;
 }
 
 export async function apiGet<T>(path: string, params?: Record<string, any>) {

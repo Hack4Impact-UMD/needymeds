@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 
 export const Colors = {
   default: {
-    neutrallt: '#FFFFFF',
+    neutrallt: '#F6FAFE',
     primary: '#6E9FC0',
     secondary: '#3A6270',
     neutraldk: '#000000',

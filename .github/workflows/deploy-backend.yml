@@ -1,50 +1,41 @@
-name: Deploy Backend
+name: CI/CD Backend Deployment
 
 on:
   push:
-    branches: ['main']
+    branches:
+      - backend-cicd
 
 jobs:
   deploy:
+    name: Build, Push, and Deploy
     runs-on: ubuntu-latest
 
-    permissions:
-      id-token: write
-      contents: read
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Configure AWS Credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/github-actions-backend-deploy
-          aws-region: us-east-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Login to ECR
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Build & Push (ARM)
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend
-          push: true
-          platforms: linux/arm64
-          tags: <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/needymeds-backend:latest
-
-      - name: List EC2 instance IDs
-        id: ec2
+      - name: Log in to Amazon ECR
         run: |
-          ids=$(aws ec2 describe-instances \
-            --filters "Name=tag:Name,Values=needymeds-backend" \
-            --query "Reservations[*].Instances[*].InstanceId" --output text)
-          echo "INSTANCE_IDS=$ids" >> $GITHUB_ENV
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} \
+            | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
 
-      - name: Deploy via SSM SendCommand
+      - name: Build Docker image
         run: |
-          aws ssm send-command \
-            --instance-ids $INSTANCE_IDS \
-            --document-name "AWS-RunShellScript" \
-            --comment "Deploy backend" \
-            --parameters '{"commands":["/opt/deploy/deploy.sh"]}'
+          docker build -t ${{ secrets.ECR_REPOSITORY }}:latest .
+
+      - name: Push Docker image to ECR
+        run: |
+          docker push ${{ secrets.ECR_REPOSITORY }}:latest
+
+      - name: Trigger ASG Instance Refresh
+        run: |
+          aws autoscaling start-instance-refresh \
+            --auto-scaling-group-name ${{ secrets.ASG_NAME }} \
+            --preferences '{"MinHealthyPercentage":100,"InstanceWarmup":120}'
