@@ -1,9 +1,9 @@
 import { Colors } from '@/constants/theme';
+import BottomSheetModal from '../common/BottomSheetModal';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { useTranslation } from 'react-i18next';
 import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Modal from 'react-native-modal';
 import { Pharmacy } from '../../../api/types';
 
 type Props = {
@@ -59,22 +59,7 @@ export default function PharmacyDetailModal({ pharmacy, isOpen, onClose }: Props
   };
 
   return (
-    <Modal
-      isVisible={isOpen}
-      onSwipeComplete={onClose}
-      swipeDirection={['down']}
-      style={{ margin: 0, justifyContent: 'flex-end' }}
-      backdropColor="black"
-      backdropOpacity={0.7}
-      backdropTransitionInTiming={300}
-      backdropTransitionOutTiming={300}
-      onBackdropPress={onClose}
-      useNativeDriver={false}
-      animationIn="slideInUp"
-      animationOut="slideOutDown"
-      animationInTiming={300}
-      animationOutTiming={300}
-    >
+    <BottomSheetModal visible={isOpen} onClose={onClose} animationDuration={300}>
       <View style={styles.sheet}>
         <View style={styles.handle} />
 
@@ -131,12 +116,13 @@ export default function PharmacyDetailModal({ pharmacy, isOpen, onClose }: Props
           </View>
         </View>
       </View>
-    </Modal>
+    </BottomSheetModal>
   );
 }
 
 const styles = StyleSheet.create({
   sheet: {
+    width: '100%',
     backgroundColor: Colors.default.neutrallt,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,

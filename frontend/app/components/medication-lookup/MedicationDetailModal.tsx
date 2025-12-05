@@ -1,10 +1,10 @@
 import { Adjudicator, DrugSearchResult } from '@/api/types';
 import { Colors } from '@/constants/theme';
+import BottomSheetModal from '../common/BottomSheetModal';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { router } from 'expo-router';
 import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Modal from 'react-native-modal';
 
 interface MedicationDetailModalProps {
   drugName: string;
@@ -77,101 +77,79 @@ const MedicationDetailModal = ({
   };
 
   return (
-    <Modal
-      isVisible={isOpen}
-      onSwipeComplete={onClose}
-      swipeDirection={['down']}
-      style={{ margin: 0, justifyContent: 'flex-end' }}
-      backdropColor="black"
-      backdropOpacity={0.7}
-      backdropTransitionInTiming={300}
-      backdropTransitionOutTiming={300}
-      onBackdropPress={onClose}
-      useNativeDriver={false}
-      animationIn="slideInUp"
-      animationOut="slideOutDown"
-      animationInTiming={300}
-      animationOutTiming={300}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <View style={styles.dragHandleContainer}>
-            <View style={styles.dragHandle} />
-          </View>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{result.pharmacyName}</Text>
-            <TouchableOpacity onPress={onClose}>
-              <MaterialCommunityIcons name="close" size={24} color="#000" />
-            </TouchableOpacity>
-          </View>
+    <BottomSheetModal visible={isOpen} onClose={onClose} animationDuration={300}>
+      <View style={styles.modalContent}>
+        <View style={styles.dragHandleContainer}>
+          <View style={styles.dragHandle} />
+        </View>
+        <View style={styles.modalHeader}>
+          <Text style={styles.modalTitle}>{result.pharmacyName}</Text>
+          <TouchableOpacity onPress={onClose}>
+            <MaterialCommunityIcons name="close" size={24} color="#000" />
+          </TouchableOpacity>
+        </View>
 
-          <View style={styles.modalBody}>
-            {/* Address Section */}
-            <View style={styles.infoCard}>
-              <View style={styles.infoContent}>
-                <Text style={styles.infoText}>{result.pharmacyAddress}</Text>
-                <Text style={styles.infoSubtext}>{Number(result.distance).toFixed(1)}mi</Text>
-              </View>
-              <View style={styles.buttonGroup}>
-                <TouchableOpacity
-                  style={styles.iconButton}
-                  onPress={() => copyToClipboard(`${result.pharmacyAddress}`)}
-                >
-                  <MaterialCommunityIcons name="content-copy" size={20} color="#181C20" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.iconButtonUI}
-                  onPress={() => openMaps(result.pharmacyAddress)}
-                >
-                  <MaterialCommunityIcons name="directions" size={20} color="#004E60" />
-                </TouchableOpacity>
-              </View>
+        <View style={styles.modalBody}>
+          {/* Address Section */}
+          <View style={styles.infoCard}>
+            <View style={styles.infoContent}>
+              <Text style={styles.infoText}>{result.pharmacyAddress}</Text>
+              <Text style={styles.infoSubtext}>{Number(result.distance).toFixed(1)}mi</Text>
             </View>
-
-            {/* Phone Section */}
-            <View style={styles.infoCard}>
-              <Text style={styles.infoText}>{formattedPhoneNumber}</Text>
-              <View style={styles.buttonGroup}>
-                <TouchableOpacity
-                  style={styles.iconButton}
-                  onPress={() => copyToClipboard(formattedPhoneNumber)}
-                >
-                  <MaterialCommunityIcons name="content-copy" size={20} color="#181C20" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.iconButtonUI}
-                  onPress={() => makeCall(result.pharmacyPhone)}
-                >
-                  <MaterialCommunityIcons name="phone" size={20} color="#004E60" />
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Price Section */}
-            <View style={styles.priceCard}>
-              <Text style={styles.priceLabel}>
-                {result.labelName} {quantity} {form}
-              </Text>
-              <Text style={styles.priceAmount}>
-                ${(Number(result.price) * Number(quantity)).toFixed(2)}
-              </Text>
-              <TouchableOpacity style={styles.sendButtonIcon} onPress={openDDC}>
-                <MaterialIcons name="confirmation-number" size={22} color="white" />
+            <View style={styles.buttonGroup}>
+              <TouchableOpacity
+                style={styles.iconButton}
+                onPress={() => copyToClipboard(`${result.pharmacyAddress}`)}
+              >
+                <MaterialCommunityIcons name="content-copy" size={20} color="#181C20" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.iconButtonUI}
+                onPress={() => openMaps(result.pharmacyAddress)}
+              >
+                <MaterialCommunityIcons name="directions" size={20} color="#004E60" />
               </TouchableOpacity>
             </View>
           </View>
+
+          {/* Phone Section */}
+          <View style={styles.infoCard}>
+            <Text style={styles.infoText}>{formattedPhoneNumber}</Text>
+            <View style={styles.buttonGroup}>
+              <TouchableOpacity
+                style={styles.iconButton}
+                onPress={() => copyToClipboard(formattedPhoneNumber)}
+              >
+                <MaterialCommunityIcons name="content-copy" size={20} color="#181C20" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.iconButtonUI}
+                onPress={() => makeCall(result.pharmacyPhone)}
+              >
+                <MaterialCommunityIcons name="phone" size={20} color="#004E60" />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Price Section */}
+          <View style={styles.priceCard}>
+            <Text style={styles.priceLabel}>
+              {result.labelName} {quantity} {form}
+            </Text>
+            <Text style={styles.priceAmount}>
+              ${(Number(result.price) * Number(quantity)).toFixed(2)}
+            </Text>
+            <TouchableOpacity style={styles.sendButtonIcon} onPress={openDDC}>
+              <MaterialIcons name="confirmation-number" size={22} color="white" />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-    </Modal>
+    </BottomSheetModal>
   );
 };
 
 const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
   modalContent: {
     backgroundColor: Colors.default.neutrallt,
     borderTopLeftRadius: 24,
