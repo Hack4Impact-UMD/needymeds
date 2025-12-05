@@ -46,6 +46,12 @@ cd /opt/needymeds
 echo "Stopping and removing existing containers..."
 docker-compose --env-file /etc/environment down || true
 
+# Free up ports to avoid conflicts
+for port in 9000; do
+    docker ps -q --filter "publish=$port" | xargs -r docker stop
+    docker ps -a -q --filter "publish=$port" | xargs -r docker rm
+done
+
 # Clean up dangling images and containers
 docker system prune -af
 
