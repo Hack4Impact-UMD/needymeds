@@ -1,10 +1,10 @@
 import { Adjudicator } from '@/api/types';
+import BottomSheetModal from '../common/BottomSheetModal';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Asset } from 'expo-asset';
 import * as MediaLibrary from 'expo-media-library';
 import * as Sharing from 'expo-sharing';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Modal from 'react-native-modal';
 
 interface DDCShareModalProps {
   isOpen: boolean;
@@ -60,23 +60,7 @@ const DDCShareModal = ({ isOpen, onClose, adjudicator }: DDCShareModalProps) => 
   }
 
   return (
-    <Modal
-      isVisible={isOpen}
-      onSwipeComplete={onClose}
-      swipeDirection={['down']}
-      style={{ margin: 0, justifyContent: 'flex-end' }}
-      backdropColor="black"
-      backdropOpacity={0.7}
-      backdropTransitionInTiming={300}
-      backdropTransitionOutTiming={300}
-      onBackdropPress={onClose}
-      useNativeDriver={false}
-      animationIn="slideInUp"
-      animationOut="slideOutDown"
-      animationInTiming={300}
-      animationOutTiming={300}
-    >
-      {/* Bottom popup container */}
+    <BottomSheetModal visible={isOpen} onClose={onClose} animationDuration={300}>
       <View style={styles.bottomSheet}>
         <View style={styles.modalHandle} />
 
@@ -104,16 +88,13 @@ const DDCShareModal = ({ isOpen, onClose, adjudicator }: DDCShareModalProps) => 
           <Text style={styles.sheetText}>Download to device</Text>
         </TouchableOpacity>
       </View>
-    </Modal>
+    </BottomSheetModal>
   );
 };
 
 const styles = StyleSheet.create({
   bottomSheet: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
+    width: '100%',
     backgroundColor: '#FFF',
     paddingTop: 20,
     paddingBottom: 36,
