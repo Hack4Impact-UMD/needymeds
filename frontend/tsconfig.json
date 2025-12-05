@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "skipLibCheck": true,
+  "forceConsistentCasingInFileNames": true,
+  "extends": "expo/tsconfig.base"
+}
