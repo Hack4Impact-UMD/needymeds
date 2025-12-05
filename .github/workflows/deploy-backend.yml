@@ -45,7 +45,7 @@ jobs:
 
       - name: Update Launch Template with IMAGE_TAG
         run: |
-          # Load the base UserData template from your repo
+          # Load the base UserData template from the repo
           RAW_USER_DATA=$(cat backend/user-data.sh)
 
           # Replace placeholder with the actual tag
