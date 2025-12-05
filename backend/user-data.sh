@@ -22,9 +22,9 @@ chronyc tracking
 date
 
 # Install docker
-amazon-linux-extras install docker -y
-systemctl enable docker
-systemctl start docker
+sudo dnf install -y docker
+sudo systemctl enable docker
+sudo systemctl start docker
 
 # Install docker-compose
 curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" \
