@@ -1,10 +1,11 @@
 import { Adjudicator, DrugSearchResult } from '@/api/types';
 import { Colors } from '@/constants/theme';
-import BottomSheetModal from '../common/BottomSheetModal';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { router } from 'expo-router';
 import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import BottomSheetModal from '../common/BottomSheetModal';
 
 interface MedicationDetailModalProps {
   drugName: string;
@@ -25,16 +26,15 @@ const MedicationDetailModal = ({
   isOpen,
   onClose,
 }: MedicationDetailModalProps) => {
-  if (!result) {
-    return null;
-  }
+  const insets = useSafeAreaInsets();
+
+  if (!result) return null;
 
   const formatPhoneNumber = (phone: string) => {
     if (phone.length === PHONE_NUMBER_LENGTH) {
       return `(${phone.slice(0, 3)}) ${phone.slice(3, 6)}-${phone.slice(6, 10)}`;
-    } else {
-      return phone;
     }
+    return phone;
   };
 
   const formattedPhoneNumber = formatPhoneNumber(result.pharmacyPhone);
@@ -45,7 +45,7 @@ const MedicationDetailModal = ({
   };
 
   const openMaps = (address: string) => {
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${address}`;
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`;
     Linking.openURL(url);
   };
 
@@ -78,71 +78,77 @@ const MedicationDetailModal = ({
 
   return (
     <BottomSheetModal visible={isOpen} onClose={onClose} animationDuration={300}>
-      <View style={styles.modalContent}>
-        <View style={styles.dragHandleContainer}>
-          <View style={styles.dragHandle} />
-        </View>
-        <View style={styles.modalHeader}>
-          <Text style={styles.modalTitle}>{result.pharmacyName}</Text>
+      {/* Make this look/behave just like the working PharmacyDetailModal */}
+      <View
+        style={[
+          styles.sheet,
+          { paddingBottom: Math.max(insets.bottom + 8, 22) }, // tuck price row to bottom while clearing the home indicator
+        ]}
+      >
+        <View style={styles.handle} />
+
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>{result.pharmacyName}</Text>
           <TouchableOpacity onPress={onClose}>
             <MaterialCommunityIcons name="close" size={24} color="#000" />
           </TouchableOpacity>
         </View>
 
-        <View style={styles.modalBody}>
-          {/* Address Section */}
-          <View style={styles.infoCard}>
-            <View style={styles.infoContent}>
-              <Text style={styles.infoText}>{result.pharmacyAddress}</Text>
-              <Text style={styles.infoSubtext}>{Number(result.distance).toFixed(1)}mi</Text>
-            </View>
-            <View style={styles.buttonGroup}>
-              <TouchableOpacity
-                style={styles.iconButton}
-                onPress={() => copyToClipboard(`${result.pharmacyAddress}`)}
-              >
-                <MaterialCommunityIcons name="content-copy" size={20} color="#181C20" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.iconButtonUI}
-                onPress={() => openMaps(result.pharmacyAddress)}
-              >
-                <MaterialCommunityIcons name="directions" size={20} color="#004E60" />
-              </TouchableOpacity>
-            </View>
+        {/* Address card */}
+        <View style={styles.card}>
+          <View style={styles.cardText}>
+            <Text style={styles.cardTitle}>{result.pharmacyAddress}</Text>
+            <Text style={styles.cardSubtitle}>{Number(result.distance).toFixed(1)}mi</Text>
           </View>
-
-          {/* Phone Section */}
-          <View style={styles.infoCard}>
-            <Text style={styles.infoText}>{formattedPhoneNumber}</Text>
-            <View style={styles.buttonGroup}>
-              <TouchableOpacity
-                style={styles.iconButton}
-                onPress={() => copyToClipboard(formattedPhoneNumber)}
-              >
-                <MaterialCommunityIcons name="content-copy" size={20} color="#181C20" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.iconButtonUI}
-                onPress={() => makeCall(result.pharmacyPhone)}
-              >
-                <MaterialCommunityIcons name="phone" size={20} color="#004E60" />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Price Section */}
-          <View style={styles.priceCard}>
-            <Text style={styles.priceLabel}>
-              {result.labelName} {quantity} {form}
-            </Text>
-            <Text style={styles.priceAmount}>
-              ${(Number(result.price) * Number(quantity)).toFixed(2)}
-            </Text>
-            <TouchableOpacity style={styles.sendButtonIcon} onPress={openDDC}>
-              <MaterialIcons name="confirmation-number" size={22} color="white" />
+          <View style={styles.actions}>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() => copyToClipboard(result.pharmacyAddress)}
+            >
+              <MaterialCommunityIcons name="content-copy" size={20} color="#181C20" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.iconButton, styles.primaryAction]}
+              onPress={() => openMaps(result.pharmacyAddress)}
+            >
+              <MaterialCommunityIcons name="directions" size={20} color="#004E60" />
             </TouchableOpacity>
           </View>
+        </View>
+
+        {/* Phone card */}
+        <View style={styles.card}>
+          <View style={styles.cardText}>
+            <Text style={styles.phoneText}>{formattedPhoneNumber}</Text>
+          </View>
+          <View style={styles.actions}>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() => copyToClipboard(formattedPhoneNumber)}
+            >
+              <MaterialCommunityIcons name="content-copy" size={20} color="#181C20" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.iconButton, styles.primaryAction]}
+              onPress={() => makeCall(result.pharmacyPhone)}
+            >
+              <MaterialCommunityIcons name="phone" size={20} color="#004E60" />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Price row pinned to bottom of sheet */}
+        <View style={styles.priceRow}>
+          <Text style={styles.priceLabel}>
+            {result.labelName} {quantity} {form}
+          </Text>
+          <Text style={styles.priceAmount}>
+            ${(Number(result.price) * Number(quantity)).toFixed(2)}
+          </Text>
+          <TouchableOpacity style={styles.ticketButton} onPress={openDDC}>
+            <MaterialIcons name="confirmation-number" size={22} color="#fff" />
+          </TouchableOpacity>
         </View>
       </View>
     </BottomSheetModal>
@@ -150,125 +156,110 @@ const MedicationDetailModal = ({
 };
 
 const styles = StyleSheet.create({
-  modalContent: {
+  sheet: {
+    width: '100%',
     backgroundColor: Colors.default.neutrallt,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingBottom: 32,
-    maxHeight: '80%',
-    width: '100%',
-    maxWidth: 412,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingHorizontal: 22,
+    paddingTop: 16,
+    gap: 14,
+  },
+  handle: {
     alignSelf: 'center',
-  },
-  dragHandleContainer: {
-    width: '100%',
-    alignItems: 'center',
-    paddingTop: 12,
-    paddingBottom: 8,
-  },
-  dragHandle: {
-    width: 36,
-    height: 4,
-    backgroundColor: '#D1D5DB',
-    borderRadius: 2,
-  },
-  infoCard: {
+    width: 70,
+    height: 6,
     borderRadius: 12,
+    backgroundColor: '#71787E',
+    marginBottom: 8,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  title: {
+    maxWidth: '80%',
+    fontSize: 24,
+    fontWeight: '400',
+    fontFamily: 'Nunito Sans',
+    color: '#181C20',
+  },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: '#C1C7CE',
-    padding: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
   },
-  infoContent: {
+  cardText: {
     flex: 1,
+    maxWidth: '65%',
   },
-  infoText: {
+  cardTitle: {
     fontSize: 14,
+    fontWeight: '700',
     color: '#181C20',
-    marginBottom: 2,
     fontFamily: 'Open Sans',
   },
-  infoSubtext: {
-    fontSize: 13,
+  cardSubtitle: {
+    marginTop: 6,
+    fontSize: 12,
+    fontWeight: '700',
     color: '#181C20',
-    marginTop: 4,
     fontFamily: 'Open Sans',
   },
-  modalHeader: {
+  actions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  modalTitle: {
-    maxWidth: '80%',
-    fontSize: 18,
-    fontWeight: '600',
-    fontFamily: 'Open Sans',
-    color: '#111827',
-  },
-  modalBody: {
-    padding: 20,
-    gap: 8,
+    columnGap: 10,
   },
   iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    justifyContent: 'center',
+    width: 46,
+    height: 46,
+    borderRadius: 30,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  iconButtonUI: {
-    width: 40,
-    height: 40,
+  primaryAction: {
     backgroundColor: '#B6EBFF',
-    borderRadius: 28,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    justifyContent: 'center',
+  },
+  phoneText: {
+    fontSize: 16,
+    color: '#181C20',
+    fontFamily: 'Open Sans',
+  },
+  priceRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  buttonGroup: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  priceCard: {
-    backgroundColor: Colors.default.neutrallt,
-    borderWidth: 1,
-    borderTopColor: '#C1C7CE',
-    borderLeftColor: Colors.default.neutrallt,
-    borderRightColor: Colors.default.neutrallt,
-    borderBottomColor: Colors.default.neutrallt,
-    marginTop: 25,
-    padding: 10,
-    flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#C1C7CE',
+    columnGap: 12,
   },
   priceLabel: {
-    display: 'flex',
-    fontSize: 14,
+    flex: 1,
+    fontSize: 16,
     color: '#181C20',
     fontFamily: 'OpenSans-SemiBold',
-    width: '70%',
   },
   priceAmount: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#181C20',
     fontFamily: 'OpenSans-SemiBold',
   },
-  sendButtonIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 28,
-    justifyContent: 'center',
+  ticketButton: {
+    width: 46,
+    height: 46,
+    borderRadius: 30,
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#236488',
-    color: '#fff',
   },
 });
 
