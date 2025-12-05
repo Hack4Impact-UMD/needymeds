@@ -42,12 +42,21 @@ aws s3 cp s3://needymeds-infra-config/compose/production/docker-compose.yml \
 
 cd /opt/needymeds
 
-echo "Running docker-compose pull with IMAGE_TAG=$IMAGE_TAG"
+# Stop and remove any running containers to avoid port conflicts
+echo "Stopping and removing existing containers..."
+docker-compose --env-file /etc/environment down || true
+
+# Clean up dangling images and containers
+docker system prune -af
+
+echo "Pulling images with IMAGE_TAG=$IMAGE_TAG"
 docker-compose --env-file /etc/environment pull
 
-echo "Starting container"
+# Start the containers
+echo "Starting containers..."
 docker-compose --env-file /etc/environment up -d
 
+# Ensure docker is enabled on boot
 systemctl enable docker
 
 echo "===== UserData completed ====="
