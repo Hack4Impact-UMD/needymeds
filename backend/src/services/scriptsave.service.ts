@@ -1,11 +1,22 @@
 import axios from 'axios';
+import { randomUUID } from 'crypto';
 import { scriptSaveTokenManager } from '../auth/scriptsave.tokenManager';
 import { getScriptSaveSecret } from '../secrets/secrets';
+
+// Single instance id for this file's logs
+const instanceId = randomUUID().slice(0, 8);
+console.log(`[ScriptSaveClient:${instanceId}] Initialized`);
 
 async function client() {
   const { baseUrl, subscriptionKey } = await getScriptSaveSecret();
 
+  console.log(`[ScriptSaveClient:${instanceId}] Fetching JWT token...`);
   const JWToken = await scriptSaveTokenManager.getToken();
+
+  console.log(
+    `[ScriptSaveClient:${instanceId}] Creating axios client ` +
+      `(tokenPrefix=${JWToken.slice(0, 15)}..., baseUrl=${baseUrl})`
+  );
 
   return axios.create({
     baseURL: baseUrl,
@@ -22,14 +33,24 @@ async function client() {
 type httpMethod = 'GET' | 'POST';
 
 async function performRequest(method: httpMethod, path: string, params: Record<string, any>) {
-  const MAX_ATTEMPTS = 3; // for 5xx retries
+  const MAX_ATTEMPTS = 3;
   let lastError: any;
-  let retried401 = false; // only retry 401 once
+  let retried401 = false;
+
+  console.log(
+    `[ScriptSaveClient:${instanceId}] performRequest: method=${method}, path=${path}, params=${JSON.stringify(
+      params
+    )}`
+  );
 
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-    const c = await client(); // always fetch latest token
+    console.log(`[ScriptSaveClient:${instanceId}] Attempt ${attempt}/${MAX_ATTEMPTS} for ${path}`);
 
+    const c = await client();
+
+    const start = Date.now();
     let res;
+
     try {
       if (method === 'GET') {
         res = await c.get(path, { params });
@@ -40,29 +61,72 @@ async function performRequest(method: httpMethod, path: string, params: Record<s
       }
     } catch (err) {
       lastError = err;
+      console.error(
+        `[ScriptSaveClient:${instanceId}] Network/axios error on attempt ${attempt}:`,
+        err
+      );
       continue;
     }
 
-    if (res.status >= 200 && res.status < 300) return res.data;
+    const duration = Date.now() - start;
 
-    if (res.status === 401 && !retried401) {
-      retried401 = true;
-      await scriptSaveTokenManager.forceRefresh();
-      continue;
+    console.log(
+      `[ScriptSaveClient:${instanceId}] Response for ${path}: status=${res.status} (${duration}ms)`
+    );
+
+    // Successful response
+    if (res.status >= 200 && res.status < 300) {
+      console.log(`[ScriptSaveClient:${instanceId}] Success for ${path} on attempt ${attempt}`);
+      return res.data;
     }
 
+    // 401 handling (single retry)
+    if (res.status === 401) {
+      console.warn(
+        `[ScriptSaveClient:${instanceId}] 401 received for ${path} on attempt ${attempt}`
+      );
+
+      if (!retried401) {
+        retried401 = true;
+        console.warn(`[ScriptSaveClient:${instanceId}] Triggering FORCE token refresh due to 401`);
+        await scriptSaveTokenManager.forceRefresh();
+        continue;
+      }
+
+      console.error(`[ScriptSaveClient:${instanceId}] 401 received again, not retrying`);
+      const err: any = new Error(`ScriptSave returned 401`);
+      err.status = 401;
+      throw err;
+    }
+
+    // 4xx non-retryable
     if (res.status >= 400 && res.status < 500) {
+      console.error(
+        `[ScriptSaveClient:${instanceId}] Client error for ${path}: ${res.status}`,
+        res.data
+      );
       const err: any = new Error(`ScriptSave returned ${res.status}`);
       err.status = res.status;
       throw err;
     }
 
-    // 5xx -> retry unless last attempt
-    lastError = res;
-    if (attempt < MAX_ATTEMPTS) continue;
+    // 5xx server errors → retry unless on last attempt
+    if (res.status >= 500) {
+      console.warn(
+        `[ScriptSaveClient:${instanceId}] 5xx (${res.status}) on ${path}, attempt ${attempt}`
+      );
+      lastError = res;
+      if (attempt < MAX_ATTEMPTS) continue;
+      break;
+    }
   }
 
+  // No success after all attempts
   const res = lastError;
+  console.error(
+    `[ScriptSaveClient:${instanceId}] All attempts failed for ${path}, lastStatus=${res?.status}`
+  );
+
   const err: any = new Error(`ScriptSave returned ${res?.status ?? 'unknown'}`);
   err.status = res?.status ?? 500;
   throw err;
