@@ -6,12 +6,11 @@ on:
       - backend-cicd
 
 permissions:
-  id-token: write # Required for OIDC
-  contents: read # Required to checkout code
+  id-token: write
+  contents: read
 
 jobs:
   deploy:
-    name: Build, Push, and Deploy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -23,21 +22,53 @@ jobs:
           role-to-assume: arn:aws:iam::076301327489:role/H4I-GitHub-Actions-Deploy-Role
           aws-region: us-east-2
 
+      - name: Extract short SHA
+        id: vars
+        run: echo "SHORT_SHA=${GITHUB_SHA::12}" >> $GITHUB_ENV
+
       - name: Log in to Amazon ECR
         run: |
           aws ecr get-login-password --region us-east-2 \
             | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
 
-      - name: Build Docker image
+      - name: Build Docker image (immutable tag)
         run: |
-          docker build -t ${{ secrets.ECR_REPOSITORY }}:latest -f backend/Dockerfile backend
+          docker build \
+            -t ${{ secrets.ECR_REPOSITORY }}:${SHORT_SHA} \
+            -t ${{ secrets.ECR_REPOSITORY }}:latest \
+            -f backend/Dockerfile backend
 
-      - name: Push Docker image to ECR
+      - name: Push Docker images
         run: |
+          docker push ${{ secrets.ECR_REPOSITORY }}:${SHORT_SHA}
           docker push ${{ secrets.ECR_REPOSITORY }}:latest
+
+      - name: Update Launch Template with IMAGE_TAG
+        run: |
+          # Load the base UserData template from your repo
+          RAW_USER_DATA=$(cat backend/user-data.sh)
+
+          # Replace placeholder with the actual tag
+          UPDATED_USER_DATA=$(echo "$RAW_USER_DATA" | sed "s|__IMAGE_TAG__|${SHORT_SHA}|g")
+
+          # Base64 encode for AWS
+          B64_USER_DATA=$(echo "$UPDATED_USER_DATA" | base64 -w 0)
+
+          TEMPLATE_VERSION=$(aws ec2 create-launch-template-version \
+            --launch-template-name "${{ secrets.LAUNCH_TEMPLATE_NAME }}" \
+            --source-version '$Latest' \
+            --launch-template-data "{\"UserData\": \"$B64_USER_DATA\"}" \
+            --query 'LaunchTemplateVersion.VersionNumber' \
+            --output text)
+
+          echo "New Launch Template Version: $TEMPLATE_VERSION"
+
+          aws ec2 modify-launch-template \
+            --launch-template-name "${{ secrets.LAUNCH_TEMPLATE_NAME }}" \
+            --default-version "$TEMPLATE_VERSION"
 
       - name: Trigger ASG Instance Refresh
         run: |
           aws autoscaling start-instance-refresh \
-            --auto-scaling-group-name ${{ secrets.ASG_NAME }} \
-            --preferences '{"MinHealthyPercentage":100,"InstanceWarmup":120}'
+            --auto-scaling-group-name "${{ secrets.ASG_NAME }}" \
+            --preferences '{"MinHealthyPercentage": 100, "InstanceWarmup": 120}'
