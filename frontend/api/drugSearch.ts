@@ -51,6 +51,9 @@ export async function autoCompleteSearchDrug(drugPrefix: string): Promise<string
 }
 
 export async function initializeDrugSearch(drugName: string) {
+  genericVersion = '';
+  availableForms = [];
+
   // Find the drug’s NDC
   const findDrugsResponse: ScriptSaveFindDrugsResponse = await scriptSaveClient.getDrugsByName({
     drugName,
@@ -135,7 +138,11 @@ async function searchDrug(
 
   // Process DSNT results
   for (const dsntResult of dsntDrugResults.DrugPricing ?? []) {
-    if (!includeGeneric && dsntResult.labelName.toLowerCase().includes(genericVersion)) {
+    if (
+      !includeGeneric &&
+      genericVersion &&
+      dsntResult.labelName.toLowerCase().includes(genericVersion)
+    ) {
       continue;
     }
 
@@ -189,7 +196,11 @@ async function searchDrug(
 
   // Process ScriptSave results
   for (const scriptSaveResult of scriptSaveDrugResults.drugs ?? []) {
-    if (!includeGeneric && scriptSaveResult.ln.toLowerCase().includes(genericVersion)) {
+    if (
+      !includeGeneric &&
+      genericVersion &&
+      scriptSaveResult.ln.toLowerCase().includes(genericVersion)
+    ) {
       continue;
     }
 

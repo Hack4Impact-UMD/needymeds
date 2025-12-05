@@ -51,7 +51,7 @@ const PharmacyLocatorScreen = () => {
   const { pharmacies, loading, error } = useSearchPharmacies(zipCode, parseFloat(radius));
 
   useEffect(() => {
-    if (loading) return;
+    if (loading || pharmacies.length === 0) return;
 
     const filtered = !filterText
       ? pharmacies

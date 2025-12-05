@@ -28,6 +28,11 @@ import MedicationSearchbar from '../components/medication-lookup/MedicationSearc
 const ZIPCODE_LENGTH = 5;
 const GENERIC_NAME_TRUNCATE_CUTOFF = 6;
 
+interface GenericVersionAndForms {
+  genericVersion: string;
+  forms: string[];
+}
+
 const MedicationLookupSelectedScreen = () => {
   const { t } = useTranslation();
 
@@ -37,67 +42,93 @@ const MedicationLookupSelectedScreen = () => {
   ];
 
   const params = useLocalSearchParams<{ drugName: string }>();
-  const drugNameParam = Array.isArray(params.drugName) ? params.drugName[0] : params.drugName || '';
+  const drugNameParam = Array.isArray(params.drugName)
+    ? params.drugName[0]
+    : (params.drugName ?? '');
 
-  useFocusEffect(
-    useCallback(() => {
-      setDrugName(drugNameParam);
-    }, [drugNameParam])
-  );
+  useEffect(() => {
+    setDrugName(drugNameParam);
+  }, [drugNameParam]);
 
-  const [drugName, setDrugName] = useState(drugNameParam);
+  const [drugName, setDrugName] = useState('');
   const [form, setForm] = useState('');
   const [quantity, setQuantity] = useState('1');
   const [zipCode, setZipCode] = useState('');
   const [radius, setRadius] = useState('5');
   const [sortBy, setSortBy] = useState<'price' | 'distance'>('price');
   const [includeGeneric, setIncludeGeneric] = useState(true);
-  const [genericName, setGenericName] = useState('');
+  const [genericVersionAndForms, setGenericVersionAndForms] = useState<GenericVersionAndForms>({
+    genericVersion: '',
+    forms: [],
+  });
   const [selectedDrugResult, setSelectedDrugResult] = useState<DrugSearchResult | null>(null);
   const [zipFocused, setZipFocused] = useState(false);
   const [detectingZip, setDetectingZip] = useState(false);
   const [formOptions, setFormOptions] = useState<{ label: string; value: string }[]>([]);
   const [drugResults, setDrugResults] = useState<DrugSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const [errorType, setErrorType] = useState<ErrorStateType | null>(null);
+
+  const formattedGenericVersion = (genericVersion: string) => {
+    return genericVersion.length >= GENERIC_NAME_TRUNCATE_CUTOFF
+      ? `${genericVersion.slice(0, GENERIC_NAME_TRUNCATE_CUTOFF - 1)}..`
+      : genericVersion;
+  };
 
   useFocusEffect(
     useCallback(() => {
-      async function initializeSearch() {
-        try {
-          const { genericVersion, availableForms } = await initializeDrugSearch(drugName);
-
-          // Set generic name
-          if (!genericVersion) {
-            setGenericName('');
-          } else {
-            setGenericName(
-              genericVersion.length >= GENERIC_NAME_TRUNCATE_CUTOFF
-                ? `${genericVersion.slice(0, GENERIC_NAME_TRUNCATE_CUTOFF - 1)}..`
-                : genericVersion
-            );
-          }
-
-          // Map forms
-          const mappedForms = (availableForms || []).map((f) => ({
-            label: f,
-            value: f,
-          }));
-
-          setForm(mappedForms[0]?.value ?? '');
-          setFormOptions(mappedForms);
-        } catch (error: any) {
-          setErrorType('loading');
-        }
-      }
-
-      initializeSearch();
-    }, [drugName])
+      setIncludeGeneric(true);
+      setGenericVersionAndForms({
+        genericVersion: '',
+        forms: [],
+      });
+      setForm('');
+      setFormOptions([]);
+      setZipCode('');
+      setHasSearched(false);
+    }, [])
   );
+
+  useEffect(() => {
+    async function initializeSearch() {
+      try {
+        let { genericVersion, availableForms } = await initializeDrugSearch(drugName);
+
+        // Set generic name
+        if (!genericVersion) {
+          setGenericVersionAndForms({
+            genericVersion: '',
+            forms: availableForms,
+          });
+        } else {
+          setGenericVersionAndForms({
+            genericVersion: genericVersion,
+            forms: availableForms,
+          });
+        }
+
+        // Map forms
+        const mappedForms = (availableForms || []).map((f) => ({
+          label: f,
+          value: f,
+        }));
+
+        setForm(mappedForms[0]?.value ?? '');
+        setFormOptions(mappedForms);
+      } catch (error: any) {
+        setErrorType('loading');
+      }
+    }
+
+    initializeSearch();
+  }, [drugName]);
 
   useEffect(() => {
     if (!quantity || !radius || !zipCode || zipCode.length !== ZIPCODE_LENGTH) {
       setDrugResults([]);
+      setErrorType(null);
+      setHasSearched(false);
       return;
     }
 
@@ -124,6 +155,7 @@ const MedicationLookupSelectedScreen = () => {
           );
         }
         setDrugResults(drugSearchResults);
+        setHasSearched(true);
       } catch (error) {
         setErrorType('loading');
         setDrugResults([]);
@@ -133,7 +165,7 @@ const MedicationLookupSelectedScreen = () => {
     };
 
     fetchDrugSearchResults();
-  }, [drugName, sortBy, form, radius, includeGeneric, zipCode]);
+  }, [sortBy, form, radius, includeGeneric, zipCode]);
 
   const clearSearch = () => {
     router.push({
@@ -299,7 +331,7 @@ const MedicationLookupSelectedScreen = () => {
               </View>
 
               {/* Dropdown with "Detect my location" option */}
-              {zipFocused && zipCode.length !== ZIPCODE_LENGTH && drugResults.length === 0 && (
+              {zipFocused && zipCode.length !== ZIPCODE_LENGTH && !hasSearched && (
                 <TouchableOpacity
                   style={styles.detectLocationButton}
                   onPress={() => detectZipFromLocation()}
@@ -317,7 +349,7 @@ const MedicationLookupSelectedScreen = () => {
           </View>
 
           {/* Filter Options */}
-          {(drugResults.length > 0 || !includeGeneric) && !isLoading && (
+          {hasSearched && !isLoading && (
             <View style={styles.filterContainer}>
               <View style={{ marginRight: 8 }}>
                 <Dropdown
@@ -344,7 +376,7 @@ const MedicationLookupSelectedScreen = () => {
                   )}
                 />
               </View>
-              {genericName.length > 0 && (
+              {genericVersionAndForms.genericVersion.length > 0 && (
                 <TouchableOpacity
                   style={[styles.simpleFilterButton, includeGeneric && styles.filterButtonActive]}
                   onPress={() => setIncludeGeneric(!includeGeneric)}
@@ -361,7 +393,8 @@ const MedicationLookupSelectedScreen = () => {
                     <View style={{ width: 18, height: 18, marginRight: 7 }} />
                   )}
                   <Text style={[styles.filterText, includeGeneric && styles.filterTextActive]}>
-                    {t('FilterChipGenericPrefix')} ({genericName})
+                    {t('FilterChipGenericPrefix')} (
+                    {formattedGenericVersion(genericVersionAndForms.genericVersion)})
                   </Text>
                 </TouchableOpacity>
               )}
