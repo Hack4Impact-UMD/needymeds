@@ -1,9 +1,9 @@
 import { Colors } from '@/constants/theme';
-import BottomSheetModal from '../common/BottomSheetModal';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import BottomSheetModal from '../BottomSheetModal';
 
 interface EligibilityModalProps {
   showEligibilityModal: boolean;

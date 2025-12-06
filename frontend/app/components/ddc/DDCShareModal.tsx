@@ -1,10 +1,10 @@
 import { Adjudicator } from '@/api/types';
-import BottomSheetModal from '../common/BottomSheetModal';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Asset } from 'expo-asset';
 import * as MediaLibrary from 'expo-media-library';
 import * as Sharing from 'expo-sharing';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import BottomSheetModal from '../BottomSheetModal';
 
 interface DDCShareModalProps {
   isOpen: boolean;

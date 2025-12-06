@@ -122,7 +122,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    maxWidth: 412,
     alignSelf: 'center',
     backgroundColor: '#fff',
     zIndex: 1000,
