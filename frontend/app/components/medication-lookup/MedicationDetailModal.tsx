@@ -5,7 +5,7 @@ import * as Clipboard from 'expo-clipboard';
 import { router } from 'expo-router';
 import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import BottomSheetModal from '../common/BottomSheetModal';
+import BottomSheetModal from '../BottomSheetModal';
 
 interface MedicationDetailModalProps {
   drugName: string;

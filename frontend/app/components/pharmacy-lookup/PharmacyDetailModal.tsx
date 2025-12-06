@@ -1,10 +1,10 @@
 import { Colors } from '@/constants/theme';
-import BottomSheetModal from '../common/BottomSheetModal';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { useTranslation } from 'react-i18next';
 import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Pharmacy } from '../../../api/types';
+import BottomSheetModal from '../BottomSheetModal';
 
 type Props = {
   pharmacy: Pharmacy | null;

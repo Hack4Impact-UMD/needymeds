@@ -87,7 +87,6 @@ const styles = StyleSheet.create({
   mobileWrapper: {
     flex: 1,
     width: '100%',
-    maxWidth: 412,
     alignSelf: 'center',
     backgroundColor: Colors.default.neutrallt,
   },
