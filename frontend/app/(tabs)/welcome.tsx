@@ -1,21 +1,33 @@
 import { Colors } from '@/constants/theme';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Image, Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+  Image,
+  Linking,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const WelcomeScreen = () => {
   const { t, i18n } = useTranslation();
+  const { width, height } = useWindowDimensions();
+
+  // Adjust logo size dynamically
+  const logoWidth = Math.min(width * 0.7, 270);
+  const logoHeight = Math.min(height * 0.25, 220);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <View style={styles.blueSection}>
+        <View style={[styles.blueSection, { paddingTop: height * 0.08 }]}>
           <View style={styles.logoContainer}>
             <Image
               source={require('../assets/needymeds_logo.png')}
-              style={styles.logo}
+              style={{ width: logoWidth, height: logoHeight }}
               resizeMode="contain"
             />
           </View>
@@ -26,7 +38,7 @@ const WelcomeScreen = () => {
             <Text style={styles.description}>{t('InfoBody')}</Text>
           </View>
         </View>
-        <View style={styles.whiteSection}>
+        <View style={[styles.whiteSection, { paddingTop: height * 0.05 }]}>
           <View style={styles.actions}>
             <View style={styles.primaryButtonWrapper}>
               <Button
@@ -54,7 +66,6 @@ const WelcomeScreen = () => {
           </View>
           <View style={styles.footer}>
             <Text style={styles.footerText}>{t('FooterLinkCopyright')}</Text>
-
             <View style={styles.footerLinkContainer}>
               <Text
                 style={styles.footerLink}
@@ -62,9 +73,7 @@ const WelcomeScreen = () => {
               >
                 {t('FooterLinkTnC')}
               </Text>
-
               <Text style={styles.footerSeparator}> | </Text>
-
               <Text
                 style={styles.footerLink}
                 onPress={() => Linking.openURL('https://www.needymeds.org/privacy-policy')}
@@ -91,41 +100,32 @@ const styles = StyleSheet.create({
   },
   blueSection: {
     flex: 0.65,
-    paddingTop: 60,
-    paddingBottom: 20,
-    paddingHorizontal: 32,
+    paddingHorizontal: '5%',
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
   logoContainer: {
-    marginTop: 20,
-    marginBottom: 30,
+    marginVertical: 20,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  logo: {
-    width: 270,
-    height: 220,
   },
   content: {
     alignItems: 'center',
     gap: 16,
-    paddingHorizontal: 19,
+    paddingHorizontal: '5%',
   },
   title: {
     textAlign: 'center',
-    maxWidth: '100%',
-    fontWeight: 400,
     color: '#181C20',
     fontSize: 28,
     lineHeight: 36,
+    fontWeight: '400',
     fontFamily: 'Nunito Sans',
   },
   description: {
     fontFamily: 'Roboto',
     textAlign: 'center',
     lineHeight: 20,
-    maxWidth: '100%',
     color: '#181C20',
     fontSize: 14,
     paddingHorizontal: 8,
@@ -134,9 +134,8 @@ const styles = StyleSheet.create({
   },
   whiteSection: {
     flex: 0.35,
-    paddingTop: 40,
     paddingBottom: 32,
-    paddingHorizontal: 32,
+    paddingHorizontal: '5%',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
@@ -172,7 +171,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#41484D',
     fontSize: 13,
-    maxWidth: 280,
+    maxWidth: '90%',
     lineHeight: 18,
   },
   languageSwitcher: {
