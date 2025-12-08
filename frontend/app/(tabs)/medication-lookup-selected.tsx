@@ -143,7 +143,7 @@ const MedicationLookupSelectedScreen = () => {
             form,
             Number(radius),
             includeGeneric,
-            Number(zipCode)
+            zipCode
           );
         } else {
           drugSearchResults = await searchDrugByDistance(
@@ -151,7 +151,7 @@ const MedicationLookupSelectedScreen = () => {
             form,
             Number(radius),
             includeGeneric,
-            Number(zipCode)
+            zipCode
           );
         }
         setDrugResults(drugSearchResults);
