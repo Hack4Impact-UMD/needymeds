@@ -102,7 +102,7 @@ async function searchDrug(
   form: string,
   radius: number,
   includeGeneric: boolean,
-  zipCode: number
+  zipCode: string
 ): Promise<DrugSearchResult[]> {
   if (!ndc) {
     throw new Error('The NDC has not been initialized');
@@ -256,7 +256,7 @@ export async function searchDrugByPrice(
   form: string,
   radius: number,
   includeGeneric: boolean,
-  zipCode: number
+  zipCode: string
 ): Promise<DrugSearchResult[]> {
   const key = `${drugName.toLowerCase()}-${zipCode}-${radius}-${form}-${includeGeneric}`;
   const state = store.getState() as any;
@@ -287,7 +287,7 @@ export async function searchDrugByDistance(
   form: string,
   radius: number,
   includeGeneric: boolean,
-  zipCode: number
+  zipCode: string
 ): Promise<DrugSearchResult[]> {
   const key = `${drugName.toLowerCase()}-${zipCode}-${radius}-${form}-${includeGeneric}`;
   const state = store.getState() as any;
