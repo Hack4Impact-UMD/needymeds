@@ -60,6 +60,11 @@ const DDC = () => {
                         pathname: '/medication-lookup-selected',
                         params: {
                           drugName: params.drugName,
+                          form: params.form,
+                          strength: params.strength,
+                          quantity: params.quantity,
+                          zipCode: params.zipCode,
+                          radius: params.radius,
                         },
                       });
                     }}

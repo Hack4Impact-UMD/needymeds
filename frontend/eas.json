@@ -1,6 +1,7 @@
 {
   "cli": {
-    "version": ">= 3.16.0"
+    "version": ">= 3.16.0",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
@@ -24,9 +25,9 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": "YOUR_APPLE_ID",
-        "ascAppId": "YOUR_APP_STORE_CONNECT_APP_ID",
-        "appleTeamId": "YOUR_TEAM_ID"
+        "appleId": "samuel@needymeds.org",
+        "ascAppId": "6756268977",
+        "appleTeamId": "7GJF6E8SLJ"
       },
       "android": {
         "serviceAccountKeyPath": "./google-play-service-account.json",

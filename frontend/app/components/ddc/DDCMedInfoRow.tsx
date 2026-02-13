@@ -21,7 +21,7 @@ export default function DDCMedInfoRow({ result, quantity, form }: DDCMedInfoRowP
               {result.labelName}
             </Text>
             <Text variant="titleMedium" style={styles.price}>
-              {`$${Number(result.price) * Number(quantity)}`}
+              {`$${Number(result.price).toFixed(2)}`}
             </Text>
           </View>
           <View style={styles.subRow}>

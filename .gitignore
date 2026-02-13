@@ -43,4 +43,4 @@ app-example
 
 .env
 
-./google-play-service-account.json
+google-play-service-account.json
