@@ -12,6 +12,9 @@ interface MedicationDetailModalProps {
   result: DrugSearchResult | null;
   quantity: string;
   form: string;
+  strength: string;
+  zipCode: string;
+  radius: string;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -23,6 +26,9 @@ const MedicationDetailModal = ({
   result,
   quantity,
   form,
+  strength,
+  zipCode,
+  radius,
   isOpen,
   onClose,
 }: MedicationDetailModalProps) => {
@@ -62,6 +68,9 @@ const MedicationDetailModal = ({
         drugName,
         quantity,
         form,
+        strength,
+        zipCode,
+        radius,
         adjudicator: result.adjudicator as Adjudicator,
         pharmacyName: result.pharmacyName as string,
         pharmacyAddress: result.pharmacyAddress as string,
@@ -143,9 +152,7 @@ const MedicationDetailModal = ({
           <Text style={styles.priceLabel}>
             {result.labelName} {quantity} {form}
           </Text>
-          <Text style={styles.priceAmount}>
-            ${(Number(result.price) * Number(quantity)).toFixed(2)}
-          </Text>
+          <Text style={styles.priceAmount}>${Number(result.price).toFixed(2)}</Text>
           <TouchableOpacity style={styles.ticketButton} onPress={openDDC}>
             <MaterialIcons name="confirmation-number" size={22} color="#fff" />
           </TouchableOpacity>

@@ -156,7 +156,7 @@ export interface ScriptSaveFormItem {
   Ranking: string;
   IsSelected: string;
   LN: string;
-  CommonQty: string;
+  CommonQty: number;
   IsDiscontinued: string;
   DiscontinuedDate: string;
 }
@@ -167,7 +167,7 @@ export interface ScriptSaveStrengthItem {
   Ranking: string;
   IsSelected: string;
   LN: string;
-  CommonQty: string;
+  CommonQty: number;
 }
 
 export interface ScriptSaveQuantityItem {

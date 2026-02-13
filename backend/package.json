@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "^3.600.0",
-    "axios": "^1.7.2",
+    "axios": "^1.13.5",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^4.19.2",

@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "e2005741-b90d-4eb1-8dc0-258a31b215eb"
+      }
+    },
+    "android": {
+      "package": "com.samrulonmiller.needymeds"
+    },
+    "ios": {
+      "bundleIdentifier": "com.samrulonmiller.needymeds",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    }
+  }
+}

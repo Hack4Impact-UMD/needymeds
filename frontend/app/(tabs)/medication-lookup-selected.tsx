@@ -1,10 +1,17 @@
-import { initializeDrugSearch, searchDrugByDistance, searchDrugByPrice } from '@/api/drugSearch';
+import {
+  getStrengthsForForm,
+  initializeDrugSearch,
+  resetDrugSearch,
+  searchDrugByDistance,
+  searchDrugByPrice,
+  setActiveStrength,
+} from '@/api/drugSearch';
 import { DrugSearchResult } from '@/api/types';
 import getUserLocation from '@/api/userLocation';
 import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Alert,
@@ -41,17 +48,31 @@ const MedicationLookupSelectedScreen = () => {
     { label: t('FilterChipSortDist'), value: 'distance' },
   ];
 
-  const params = useLocalSearchParams<{ drugName: string }>();
+  const params = useLocalSearchParams<{
+    drugName: string;
+    zipCode?: string;
+    radius?: string;
+    form?: string;
+    strength?: string;
+    quantity?: string;
+  }>();
   const drugNameParam = Array.isArray(params.drugName)
     ? params.drugName[0]
     : (params.drugName ?? '');
 
   useEffect(() => {
     setDrugName(drugNameParam);
-  }, [drugNameParam]);
+    // Restore state from params when coming back from DDC
+    if (params.zipCode) setZipCode(params.zipCode);
+    if (params.radius) setRadius(params.radius);
+    if (params.form) setForm(params.form);
+    if (params.strength) setStrength(params.strength);
+    if (params.quantity) setQuantity(params.quantity);
+  }, [drugNameParam, params.zipCode, params.radius, params.form, params.strength, params.quantity]);
 
   const [drugName, setDrugName] = useState('');
   const [form, setForm] = useState('');
+  const [strength, setStrength] = useState('');
   const [quantity, setQuantity] = useState('1');
   const [zipCode, setZipCode] = useState('');
   const [radius, setRadius] = useState('5');
@@ -61,6 +82,8 @@ const MedicationLookupSelectedScreen = () => {
     genericVersion: '',
     forms: [],
   });
+  const [strengthOptions, setStrengthOptions] = useState<{ label: string; value: string }[]>([]);
+  const [strengthCommonQtyMap, setStrengthCommonQtyMap] = useState<Record<string, number>>({});
   const [selectedDrugResult, setSelectedDrugResult] = useState<DrugSearchResult | null>(null);
   const [zipFocused, setZipFocused] = useState(false);
   const [detectingZip, setDetectingZip] = useState(false);
@@ -76,24 +99,36 @@ const MedicationLookupSelectedScreen = () => {
       : genericVersion;
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      setIncludeGeneric(true);
-      setGenericVersionAndForms({
-        genericVersion: '',
-        forms: [],
-      });
-      setForm('');
-      setFormOptions([]);
-      setZipCode('');
-      setHasSearched(false);
-    }, [])
-  );
+  // Track the last initialized drugName to avoid re-initializing when coming back from DDC
+  const [lastInitializedDrug, setLastInitializedDrug] = useState('');
 
   useEffect(() => {
+    if (!drugName) return;
+    // Skip re-initialization if we already initialized for this drug
+    if (drugName === lastInitializedDrug) return;
+
+    let cancelled = false;
+
     async function initializeSearch() {
       try {
+        // Reset module state ONCE per drugName change
+        resetDrugSearch();
+
+        // Clear previous search state for new drug
+        setForm('');
+        setFormOptions([]);
+        setStrength('');
+        setStrengthOptions([]);
+        setHasSearched(false);
+        setDrugResults([]);
+        setErrorType(null);
+
         let { genericVersion, availableForms } = await initializeDrugSearch(drugName);
+
+        if (cancelled) return;
+
+        // Mark this drug as initialized
+        setLastInitializedDrug(drugName);
 
         // Set generic name
         if (!genericVersion) {
@@ -114,28 +149,101 @@ const MedicationLookupSelectedScreen = () => {
           value: f,
         }));
 
-        setForm(mappedForms[0]?.value ?? '');
+        const firstForm = mappedForms[0]?.value ?? '';
+        setForm(firstForm);
         setFormOptions(mappedForms);
+
+        // Don't set quantity here - wait for strength selection
+        // Reset strength-related state when drug changes
+        setStrength('');
+        setStrengthOptions([]);
       } catch (error: any) {
-        setErrorType('loading');
+        if (!cancelled) {
+          setErrorType('loading');
+        }
       }
     }
 
     initializeSearch();
-  }, [drugName]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [drugName, lastInitializedDrug]);
+
+  // Fetch strengths when form changes
+  useEffect(() => {
+    if (!form || !drugName) {
+      setStrengthOptions([]);
+      setStrength('');
+      return;
+    }
+
+    let cancelled = false;
+
+    async function fetchStrengths() {
+      try {
+        const { strengths, strengthCommonQtyMap } = await getStrengthsForForm(drugName, form);
+
+        if (cancelled) return;
+
+        const mappedStrengths = strengths.map((s) => ({
+          label: s,
+          value: s,
+        }));
+
+        setStrengthOptions(mappedStrengths);
+        setStrengthCommonQtyMap(strengthCommonQtyMap);
+
+        // Only auto-select first strength if no strength is currently selected
+        // This prevents issues when user manually changed the form
+        if (!strength && mappedStrengths.length > 0) {
+          const firstStrength = mappedStrengths[0]?.value ?? '';
+          setStrength(firstStrength);
+        } else if (strength && !mappedStrengths.find((s) => s.value === strength)) {
+          // If current strength doesn't exist in new options, select first
+          const firstStrength = mappedStrengths[0]?.value ?? '';
+          setStrength(firstStrength);
+        }
+      } catch (error: any) {
+        if (!cancelled) {
+          setErrorType('loading');
+        }
+      }
+    }
+
+    fetchStrengths();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [form, drugName]);
+
+  // Update quantity when strength changes
+  useEffect(() => {
+    if (strength && strengthCommonQtyMap[strength]) {
+      setQuantity(String(Math.round(strengthCommonQtyMap[strength])));
+    }
+  }, [strength, strengthCommonQtyMap]);
 
   useEffect(() => {
-    if (!quantity || !radius || !zipCode || zipCode.length !== ZIPCODE_LENGTH) {
+    if (!quantity || !radius || !zipCode || zipCode.length !== ZIPCODE_LENGTH || !strength) {
       setDrugResults([]);
       setErrorType(null);
       setHasSearched(false);
       return;
     }
 
+    let cancelled = false;
+
     const fetchDrugSearchResults = async () => {
       try {
         setIsLoading(true);
         setErrorType(null);
+
+        // Set the active strength before searching (no longer async)
+        setActiveStrength(drugName, form, strength, Number(quantity), includeGeneric);
+
         let drugSearchResults: DrugSearchResult[];
         if (sortBy === 'price') {
           drugSearchResults = await searchDrugByPrice(
@@ -154,18 +262,29 @@ const MedicationLookupSelectedScreen = () => {
             zipCode
           );
         }
+
+        if (cancelled) return;
+
         setDrugResults(drugSearchResults);
         setHasSearched(true);
       } catch (error) {
-        setErrorType('loading');
-        setDrugResults([]);
+        if (!cancelled) {
+          setErrorType('loading');
+          setDrugResults([]);
+        }
       } finally {
-        setIsLoading(false);
+        if (!cancelled) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchDrugSearchResults();
-  }, [sortBy, form, radius, includeGeneric, zipCode]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sortBy, form, strength, radius, includeGeneric, zipCode]);
 
   const clearSearch = () => {
     router.push({
@@ -252,8 +371,38 @@ const MedicationLookupSelectedScreen = () => {
                 />
               </View>
 
-              {/* How much? field */}
+              {/* Strength field */}
               <View style={styles.formField}>
+                <TextInput
+                  mode="outlined"
+                  label={t('StrengthInputLabel')}
+                  value={strength}
+                  render={() => (
+                    <Dropdown
+                      data={strengthOptions}
+                      placeholder={strengthOptions.length > 0 ? strengthOptions[0].label : ''}
+                      labelField="label"
+                      valueField="value"
+                      value={strength}
+                      onChange={(item: any) => setStrength(item.value)}
+                      style={styles.dropdownInner}
+                      selectedTextStyle={styles.dropdownText}
+                      itemTextStyle={styles.dropdownText}
+                      containerStyle={styles.dropdownContainer}
+                      disable={!form || strengthOptions.length === 0}
+                    />
+                  )}
+                  outlineStyle={{ borderRadius: 5 }}
+                  activeOutlineColor="#236488"
+                  textColor="#181C20"
+                  style={{ backgroundColor: Colors.default.neutrallt }}
+                />
+              </View>
+            </View>
+
+            <View style={styles.formRow}>
+              {/* How much? field */}
+              <View style={[styles.formField, { flex: 0.7 }]}>
                 <TextInput
                   mode="outlined"
                   label={t('QtyInputLabel')}
@@ -265,13 +414,11 @@ const MedicationLookupSelectedScreen = () => {
                   textColor="#181C20"
                   maxLength={3}
                   style={{ backgroundColor: Colors.default.neutrallt }}
+                  disabled={!strength}
                 />
               </View>
-            </View>
-
-            {/* ZIP Code field */}
-            <View style={styles.formRow}>
               <View style={styles.formField}>
+                {/* ZIP field */}
                 <TextInput
                   mode="outlined"
                   label={t('ZipInputLabel')}
@@ -283,17 +430,7 @@ const MedicationLookupSelectedScreen = () => {
                   textColor="#181C20"
                   style={{ backgroundColor: Colors.default.neutrallt }}
                   maxLength={5}
-                  left={
-                    <TextInput.Icon
-                      icon={() => (
-                        <MaterialCommunityIcons
-                          name="map-marker-outline"
-                          size={22}
-                          color="#41484D"
-                        />
-                      )}
-                    />
-                  }
+                  disabled={!strength}
                   right={
                     zipFocused ? (
                       <TextInput.Icon
@@ -311,6 +448,21 @@ const MedicationLookupSelectedScreen = () => {
                   onFocus={() => setZipFocused(true)}
                   onBlur={() => setZipFocused(false)}
                 />
+
+                {zipFocused && zipCode.length !== ZIPCODE_LENGTH && !hasSearched && (
+                  <TouchableOpacity
+                    style={styles.detectLocationButton}
+                    onPress={detectZipFromLocation}
+                    disabled={detectingZip}
+                  >
+                    {detectingZip && (
+                      <ActivityIndicator size="small" color="#3B82F6" style={{ marginRight: 6 }} />
+                    )}
+                    <Text style={styles.detectLocationText}>
+                      {detectingZip ? 'Detecting...' : 'Detect my location'}
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
 
               {/* Radius field */}
@@ -326,25 +478,10 @@ const MedicationLookupSelectedScreen = () => {
                   textColor="#181C20"
                   maxLength={4}
                   style={{ backgroundColor: Colors.default.neutrallt }}
+                  disabled={!strength}
                 />
                 <Text style={styles.radiusUnit}>miles</Text>
               </View>
-
-              {/* Dropdown with "Detect my location" option */}
-              {zipFocused && zipCode.length !== ZIPCODE_LENGTH && !hasSearched && (
-                <TouchableOpacity
-                  style={styles.detectLocationButton}
-                  onPress={() => detectZipFromLocation()}
-                  disabled={detectingZip}
-                >
-                  {detectingZip && (
-                    <ActivityIndicator size="small" color="#3B82F6" style={{ marginRight: 6 }} />
-                  )}
-                  <Text style={styles.detectLocationText}>
-                    {detectingZip ? 'Detecting...' : 'Detect my location'}
-                  </Text>
-                </TouchableOpacity>
-              )}
             </View>
           </View>
 
@@ -392,7 +529,10 @@ const MedicationLookupSelectedScreen = () => {
                   ) : (
                     <View style={{ width: 18, height: 18, marginRight: 7 }} />
                   )}
-                  <Text style={[styles.filterText, includeGeneric && styles.filterTextActive]}>
+                  <Text
+                    style={[styles.filterText, includeGeneric && styles.filterTextActive]}
+                    numberOfLines={1}
+                  >
                     {t('FilterChipGenericPrefix')} (
                     {formattedGenericVersion(genericVersionAndForms.genericVersion)})
                   </Text>
@@ -441,9 +581,7 @@ const MedicationLookupSelectedScreen = () => {
                           <Text style={styles.pharmacyLabel}>{result.labelName}</Text>
                           <Text style={styles.pharmacyName}>{result.pharmacyName}</Text>
                         </View>
-                        <Text style={styles.pharmacyPrice}>
-                          ${(Number(result.price) * Number(quantity)).toFixed(2)}
-                        </Text>
+                        <Text style={styles.pharmacyPrice}>${Number(result.price).toFixed(2)}</Text>
                       </View>
                     </View>
                     <View style={styles.pharmacyRight}>
@@ -467,6 +605,9 @@ const MedicationLookupSelectedScreen = () => {
         result={selectedDrugResult}
         quantity={quantity}
         form={form}
+        strength={strength}
+        zipCode={zipCode}
+        radius={radius}
         isOpen={!!selectedDrugResult}
         onClose={() => setSelectedDrugResult(null)}
       />
@@ -604,7 +745,6 @@ const styles = StyleSheet.create({
   },
   filterContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     paddingHorizontal: 10,
     paddingVertical: 14,
   },
@@ -785,6 +925,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderColor: '#6B7280',
     borderWidth: 1,
+    flex: 1,
   },
   pharmacyHeaderColumn: {
     flexDirection: 'column',

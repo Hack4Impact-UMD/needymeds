@@ -1,14 +1,14 @@
 {
   "expo": {
     "name": "NeedyMeds",
-    "slug": "frontend",
+    "slug": "ddc-app",
     "scheme": "needymeds",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/needymeds.png",
+    "icon": "./assets/needymeds-adaptive-icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/needymeds.png",
+      "image": "./assets/needymeds-adaptive-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#FFFFFF"
     },
@@ -16,10 +16,44 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "org.needymeds.ddcapp",
-      "buildNumber": "1.0.0",
+      "buildNumber": "1",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Location data helps identify nearby assistance programs.",
+        "NSLocationWhenInUseUsageDescription": "Location data helps identify nearby assistance programs and pharmacies.",
+        "NSPhotoLibraryAddUsageDescription": "Save your drug discount card to Photos for easy access at the pharmacy.",
+        "NSPhotoLibraryUsageDescription": "Access your photo library to save drug discount cards.",
         "ITSAppUsesNonExemptEncryption": false
+      },
+      "privacyManifests": {
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": ["CA92.1"]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": ["0A2A.1"]
+          }
+        ],
+        "NSPrivacyCollectedDataTypes": [
+          {
+            "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypePreciseLocation",
+            "NSPrivacyCollectedDataTypeLinked": false,
+            "NSPrivacyCollectedDataTypeTracking": false,
+            "NSPrivacyCollectedDataTypePurposes": [
+              "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+            ]
+          },
+          {
+            "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeCoarseLocation",
+            "NSPrivacyCollectedDataTypeLinked": false,
+            "NSPrivacyCollectedDataTypeTracking": false,
+            "NSPrivacyCollectedDataTypePurposes": [
+              "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+            ]
+          }
+        ],
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": []
       }
     },
     "android": {
@@ -32,9 +66,7 @@
       "permissions": [
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.READ_MEDIA_IMAGES",
-        "android.permission.READ_MEDIA_VIDEO",
-        "android.permission.READ_MEDIA_AUDIO"
+        "android.permission.READ_MEDIA_IMAGES"
       ]
     },
     "web": {
@@ -43,12 +75,12 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "8f383cc3-4987-4ea9-820f-d3f841ebc13f"
+        "projectId": "8aa50023-51cd-4394-824f-9e84c66c9407"
       },
-      "API_BASE": "http://needymeds-alb-2117627631.us-east-2.elb.amazonaws.com"
+      "API_BASE": "https://ddcapp-api.needymeds.org"
     },
     "updates": {
-      "url": "https://u.expo.dev/8f383cc3-4987-4ea9-820f-d3f841ebc13f"
+      "url": "https://u.expo.dev/8aa50023-51cd-4394-824f-9e84c66c9407"
     },
     "runtimeVersion": {
       "policy": "appVersion"
@@ -67,7 +99,14 @@
           }
         }
       ],
-      "expo-media-library"
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Save your drug discount card to Photos for easy access at the pharmacy.",
+          "savePhotosPermission": "Save your drug discount card to Photos for easy access at the pharmacy.",
+          "isAccessMediaLocationEnabled": true
+        }
+      ]
     ]
   }
 }
