@@ -64,9 +64,9 @@ export function useSavedMedications() {
     setError(null);
     try {
       await db.runAsync(
-        `INSERT INTO Saved_Medications (drug_name, pharmacy_name, pharmacy_npi, form, strength, quantity)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [med.drug_name, med.pharmacy_name ?? null, med.pharmacy_npi ?? null, med.form ?? null, med.strength ?? null, med.quantity ?? null]
+        `INSERT INTO Saved_Medications (drug_name, pharmacy_npi, form, strength, quantity)
+         VALUES (?, ?, ?, ?, ?)`,
+        [med.drug_name, med.pharmacy_npi ?? null, med.form ?? null, med.strength ?? null, med.quantity ?? null]
       );
       await loadMedications(db);
     } catch (err: any) {
