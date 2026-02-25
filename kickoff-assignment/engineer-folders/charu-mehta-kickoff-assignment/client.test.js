@@ -1,7 +1,7 @@
-import { getRandomMeowFact } from './client';
+import { getMeowFacts } from './client';
 
 test("fetches a random meow fact", async () => {
-  const fact = await getRandomMeowFact();
+  const fact = await getMeowFacts();
 
   expect(fact).toBeDefined();
   expect(typeof fact).toBe("string");

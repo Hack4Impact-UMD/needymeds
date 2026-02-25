@@ -3,7 +3,7 @@ import { ScrollView } from "react-native";
 import { getMeowFacts } from "../engineer-folders/charu-mehta-kickoff-assignment/client";
 import FactCard from "../engineer-folders/charu-mehta-kickoff-assignment/FactCard";
 
-export default function Charu() {
+function CharuPage() {
   const [facts, setFacts] = useState<string[]>([]);
 
   useEffect(() => {
@@ -23,3 +23,5 @@ export default function Charu() {
     </ScrollView>
   );
 }
+
+export default CharuPage;
