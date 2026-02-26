@@ -87,6 +87,16 @@ export default function NMEngineerDisplay() {
           email="eileendchen@gmail.com"
           profilePictureURL={require('../assets/images/eileen-chen.jpg')}
         />
+
+        <NMEngineer
+          name="Daniel Wang"
+          year="Junior"
+          position="Engineer"
+          linkedin="https://www.linkedin.com/in/daniel-e-wang/"
+          github="https://github.com/dwang8180"
+          email="dwang818@terpmail.umd.edu"
+          profilePictureURL={require('../assets/images/daniel-wang.jpg')}
+        />
       </ScrollView>
     </>
   );
