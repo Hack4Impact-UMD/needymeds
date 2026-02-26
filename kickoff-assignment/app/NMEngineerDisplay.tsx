@@ -87,6 +87,16 @@ export default function NMEngineerDisplay() {
           email="eileendchen@gmail.com"
           profilePictureURL={require('../assets/images/eileen-chen.jpg')}
         />
+
+        <NMEngineer
+          name="Reza Jalil"
+          year="Sophomore"
+          position="Engineer"
+          linkedin="https://www.linkedin.com/in/rezajalil/"
+          github="https://github.com/24rrj1"
+          email="24rrj1@gmail.com"
+          profilePictureURL={require('../assets/images/reza-jalil.jpg')}
+        />
       </ScrollView>
     </>
   );
