@@ -53,7 +53,7 @@ export function useSavedMedications() {
     }
   }
 
-  async function saveMedication(med: Omit<SavedMedication, 'id' | 'last_saved_date' | 'last_queried_date'>) {
+  async function saveMedication(med: Omit<SavedMedication, 'id' | 'last_saved_date'>) {
     const db = dbRef.current;
     if (!db) {
       setError('Database not initialized');
@@ -66,7 +66,14 @@ export function useSavedMedications() {
       await db.runAsync(
         `INSERT INTO Saved_Medications (drug_name, pharmacy_name, pharmacy_npi, form, strength, quantity)
          VALUES (?, ?, ?, ?, ?, ?)`,
-        [med.drug_name, med.pharmacy_name ?? null, med.pharmacy_npi ?? null, med.form ?? null, med.strength ?? null, med.quantity ?? null]
+        [
+          med.drug_name,
+          med.pharmacy_name ?? null,
+          med.pharmacy_npi ?? null,
+          med.form ?? null,
+          med.strength ?? null,
+          med.quantity ?? null,
+        ]
       );
       await loadMedications(db);
     } catch (err: any) {
@@ -104,5 +111,3 @@ export function useSavedMedications() {
     refreshMedications: () => loadMedications(),
   };
 }
-
-

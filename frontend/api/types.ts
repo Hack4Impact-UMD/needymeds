@@ -37,7 +37,6 @@ export interface SavedMedication {
   strength?: string;
   quantity?: number;
   last_saved_date?: string;
-  last_queried_date?: string;
 }
 
 /* Requests */
