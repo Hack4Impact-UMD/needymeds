@@ -9,6 +9,7 @@ export default function NMEngineerDisplay() {
     <>
       <Stack.Screen options={{ title: '🏆 NeedyMeds Engineer Display 🏆' }} />
       <ScrollView>
+        
         <NMEngineer
           name="Om Arya"
           year="Junior"
@@ -88,6 +89,16 @@ export default function NMEngineerDisplay() {
           profilePictureURL={require('../assets/images/eileen-chen.jpg')}
         />
 
+        <NMEngineer
+          name="Charu Mehta"
+          year="Junior"
+          position="Engineer"
+          linkedin="https://www.linkedin.com/in/charu-mehta1/"
+          github="https://github.com/charumehta1"
+          email="charu.a.mehta@gmail.com"
+          profilePictureURL={require('../assets/images/charu-mehta.png')}
+         />
+        
         <NMEngineer
           name="Reza Jalil"
           year="Sophomore"

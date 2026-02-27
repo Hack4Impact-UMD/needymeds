@@ -18,6 +18,7 @@ export default function HomeScreen() {
         <Link href="/eileen" style={styles.link}>Eileen's Page</Link>
         <Link href="/parsa" style={styles.link}>Parsa's Page</Link>
         <Link href="/samarth" style={styles.link}>Samarth's Page</Link>
+        <Link href="/charu" style={styles.link}>Charu's Page</Link>
         <Link href="/reza" style={styles.link}>Reza's Page</Link>
       </ScrollView>
     </>
