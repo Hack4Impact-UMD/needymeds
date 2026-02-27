@@ -1,12 +1,10 @@
-import { Text, ScrollView, StyleSheet } from "react-native";
-import { Link, Stack } from "expo-router";
+import { Link, Stack } from 'expo-router';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 
 export default function HomeScreen() {
   return (
     <>
-      <Stack.Screen
-        options={{ title: "Home" }}
-      />
+      <Stack.Screen options={{ title: 'Home' }} />
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Welcome to the NeedyMeds team!</Text>
 
@@ -21,6 +19,7 @@ export default function HomeScreen() {
         <Link href="/parsa" style={styles.link}>Parsa's Page</Link>
         <Link href="/samarth" style={styles.link}>Samarth's Page</Link>
         <Link href="/charu" style={styles.link}>Charu's Page</Link>
+        <Link href="/reza" style={styles.link}>Reza's Page</Link>
       </ScrollView>
     </>
   );
@@ -29,5 +28,5 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: { padding: 20 },
   title: { fontSize: 24, marginBottom: 20 },
-  link: { fontSize: 18, marginBottom: 15, color: "#1E90FF" },
+  link: { fontSize: 18, marginBottom: 15, color: '#1E90FF' },
 });

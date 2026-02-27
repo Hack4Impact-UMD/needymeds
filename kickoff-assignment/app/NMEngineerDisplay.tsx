@@ -96,8 +96,27 @@ export default function NMEngineerDisplay() {
           linkedin="https://www.linkedin.com/in/charu-mehta1/"
           github="https://github.com/charumehta1"
           email="charu.a.mehta@gmail.com"
-          // profilePictureURL={require('../assets/images/om-arya.jpg')}
           profilePictureURL={require('../assets/images/charu-mehta.png')}
+         />
+        
+        <NMEngineer
+          name="Reza Jalil"
+          year="Sophomore"
+          position="Engineer"
+          linkedin="https://www.linkedin.com/in/rezajalil/"
+          github="https://github.com/24rrj1"
+          email="24rrj1@gmail.com"
+          profilePictureURL={require('../assets/images/reza-jalil.jpg')}
+         />
+        
+        <NMEngineer
+          name="Daniel Wang"
+          year="Junior"
+          position="Engineer"
+          linkedin="https://www.linkedin.com/in/daniel-e-wang/"
+          github="https://github.com/dwang8180"
+          email="dwang818@terpmail.umd.edu"
+          profilePictureURL={require('../assets/images/daniel-wang.jpg')}
         />
       </ScrollView>
     </>
