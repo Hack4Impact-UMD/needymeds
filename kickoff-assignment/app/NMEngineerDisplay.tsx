@@ -89,6 +89,16 @@ export default function NMEngineerDisplay() {
         />
 
         <NMEngineer
+          name="Reza Jalil"
+          year="Sophomore"
+          position="Engineer"
+          linkedin="https://www.linkedin.com/in/rezajalil/"
+          github="https://github.com/24rrj1"
+          email="24rrj1@gmail.com"
+          profilePictureURL={require('../assets/images/reza-jalil.jpg')}
+         />
+        
+        <NMEngineer
           name="Daniel Wang"
           year="Junior"
           position="Engineer"
