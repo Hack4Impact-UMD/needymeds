@@ -11,8 +11,7 @@ export async function create_database() {
             form TEXT,
             strength TEXT,
             quantity INTEGER,
-            last_saved_date TEXT DEFAULT CURRENT_TIMESTAMP,
-            last_queried_date TEXT DEFAULT CURRENT_TIMESTAMP
+            last_saved_date TEXT DEFAULT CURRENT_TIMESTAMP
         ); 
     `);
   return db;

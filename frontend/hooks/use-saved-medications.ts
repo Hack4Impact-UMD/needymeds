@@ -1,4 +1,9 @@
 import { create_database } from '@/api/savedMedicationsDb';
+import {
+  getAllMedications,
+  saveMedication as saveMedicationDB,
+  deleteMedication as deleteMedicationDB,
+} from '@/api/savedMedsCRUD';
 import { SavedMedication } from '@/api/types';
 import { SQLiteDatabase } from 'expo-sqlite';
 import { useEffect, useRef, useState } from 'react';
@@ -42,9 +47,7 @@ export function useSavedMedications() {
     setLoading(true);
     setError(null);
     try {
-      const rows = await database.getAllAsync<SavedMedication>(
-        'SELECT * FROM Saved_Medications ORDER BY last_saved_date DESC'
-      );
+      const rows = await getAllMedications(database);
       setMedications(rows);
     } catch (err: any) {
       setError(err.message || 'Failed to load saved medications');
@@ -53,7 +56,7 @@ export function useSavedMedications() {
     }
   }
 
-  async function saveMedication(med: Omit<SavedMedication, 'id' | 'last_saved_date' | 'last_queried_date'>) {
+  async function saveMedication(med: Omit<SavedMedication, 'id' | 'last_saved_date'>) {
     const db = dbRef.current;
     if (!db) {
       setError('Database not initialized');
@@ -63,11 +66,7 @@ export function useSavedMedications() {
     setLoading(true);
     setError(null);
     try {
-      await db.runAsync(
-        `INSERT INTO Saved_Medications (drug_name, pharmacy_npi, form, strength, quantity)
-         VALUES (?, ?, ?, ?, ?)`,
-        [med.drug_name, med.pharmacy_npi ?? null, med.form ?? null, med.strength ?? null, med.quantity ?? null]
-      );
+      await saveMedicationDB(db, med);
       await loadMedications(db);
     } catch (err: any) {
       setError(err.message || 'Failed to save medication');
@@ -86,7 +85,10 @@ export function useSavedMedications() {
     setLoading(true);
     setError(null);
     try {
-      await db.runAsync('DELETE FROM Saved_Medications WHERE id = ?', [id]);
+      const deleted = await deleteMedicationDB(db, id);
+      if (!deleted) {
+        setError(`Medication with id ${id} was not found`);
+      }
       await loadMedications(db);
     } catch (err: any) {
       setError(err.message || 'Failed to delete medication');
@@ -104,5 +106,3 @@ export function useSavedMedications() {
     refreshMedications: () => loadMedications(),
   };
 }
-
-
