@@ -40,7 +40,7 @@ export async function saveMedication(
 export async function getAllMedications(db: SQLite.SQLiteDatabase): Promise<SavedMedication[]> {
   // get all rows
   const rows = await db.getAllAsync<SavedMedication>(
-    `SELECT * FROM Saved_Medications` // ORDER BY last_saved_date DESC if we want to sort it
+    `SELECT * FROM Saved_Medications ORDER BY last_saved_date DESC`
   );
 
   // returns back all saved meds in a list
