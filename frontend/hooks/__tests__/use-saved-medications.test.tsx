@@ -105,6 +105,7 @@ describe('useSavedMedications hook', () => {
       expect(latestHook?.loading).toBe(false);
     });
 
+    const callsBeforeSave = mockDb.getAllAsync.mock.calls.length;
     await act(async () => {
       await latestHook?.saveMedication({
         drug_name: 'Saved Drug',
@@ -117,9 +118,8 @@ describe('useSavedMedications hook', () => {
       ['Saved Drug', null, null, null, 5, expect.any(String)]
     );
 
-    expect(mockDb.getAllAsync).toHaveBeenCalled();
-
     await waitFor(() => {
+      expect(mockDb.getAllAsync.mock.calls.length).toBeGreaterThan(callsBeforeSave);
       expect(latestHook?.medications).toEqual(savedRows);
       expect(latestHook?.error).toBeNull();
     });
@@ -148,15 +148,15 @@ describe('useSavedMedications hook', () => {
       expect(latestHook?.medications).toEqual(initialRows);
     });
 
+    const callsBeforeDelete = mockDb.getAllAsync.mock.calls.length;
     await act(async () => {
       await latestHook?.deleteMedication(1);
     });
 
     expect(mockDb.runAsync).toHaveBeenCalledWith('DELETE FROM Saved_Medications WHERE id = ?', [1]);
 
-    expect(mockDb.getAllAsync).toHaveBeenCalled();
-
     await waitFor(() => {
+      expect(mockDb.getAllAsync.mock.calls.length).toBeGreaterThan(callsBeforeDelete);
       expect(latestHook?.medications).toEqual(afterDeleteRows);
     });
   });
