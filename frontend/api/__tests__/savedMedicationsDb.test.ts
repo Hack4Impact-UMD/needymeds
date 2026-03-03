@@ -8,7 +8,7 @@ import {
   searchMedications,
   deleteMedication,
   deleteAllMedications,
-} from '../savedMedsCRUD';
+} from '../savedMedicationsCRUD';
 
 jest.mock('expo-sqlite', () => ({
   openDatabaseAsync: jest.fn(),

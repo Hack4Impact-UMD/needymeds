@@ -3,7 +3,7 @@ import {
   getAllMedications,
   saveMedication as saveMedicationDB,
   deleteMedication as deleteMedicationDB,
-} from '@/api/savedMedsCRUD';
+} from '@/api/savedMedicationsCRUD';
 import { SavedMedication } from '@/api/types';
 import { SQLiteDatabase } from 'expo-sqlite';
 import { useEffect, useRef, useState } from 'react';
@@ -88,6 +88,7 @@ export function useSavedMedications() {
       const deleted = await deleteMedicationDB(db, id);
       if (!deleted) {
         setError(`Medication with id ${id} was not found`);
+        return;
       }
       await loadMedications(db);
     } catch (err: any) {
