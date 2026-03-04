@@ -7,7 +7,6 @@ export async function create_database() {
         CREATE TABLE IF NOT EXISTS Saved_Medications (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             drug_name TEXT NOT NULL,
-            pharmacy_name TEXT,
             pharmacy_npi TEXT,
             form TEXT,
             strength TEXT,

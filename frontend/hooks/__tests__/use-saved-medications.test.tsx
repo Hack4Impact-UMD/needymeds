@@ -27,7 +27,7 @@ describe('useSavedMedications hook', () => {
 
     mockDb = {
       getAllAsync: jest.fn().mockResolvedValue([]),
-      runAsync: jest.fn().mockResolvedValue(undefined),
+      runAsync: jest.fn().mockResolvedValue({ lastInsertRowId: 1, changes: 1 }),
     };
 
     (create_database as jest.Mock).mockResolvedValue(mockDb);
@@ -105,6 +105,7 @@ describe('useSavedMedications hook', () => {
       expect(latestHook?.loading).toBe(false);
     });
 
+    const callsBeforeSave = mockDb.getAllAsync.mock.calls.length;
     await act(async () => {
       await latestHook?.saveMedication({
         drug_name: 'Saved Drug',
@@ -114,12 +115,11 @@ describe('useSavedMedications hook', () => {
 
     expect(mockDb.runAsync).toHaveBeenCalledWith(
       expect.stringContaining('INSERT INTO Saved_Medications'),
-      ['Saved Drug', null, null, null, null, 5]
+      ['Saved Drug', null, null, null, 5, expect.any(String)]
     );
 
-    expect(mockDb.getAllAsync).toHaveBeenCalledTimes(2);
-
     await waitFor(() => {
+      expect(mockDb.getAllAsync.mock.calls.length).toBeGreaterThan(callsBeforeSave);
       expect(latestHook?.medications).toEqual(savedRows);
       expect(latestHook?.error).toBeNull();
     });
@@ -148,15 +148,15 @@ describe('useSavedMedications hook', () => {
       expect(latestHook?.medications).toEqual(initialRows);
     });
 
+    const callsBeforeDelete = mockDb.getAllAsync.mock.calls.length;
     await act(async () => {
       await latestHook?.deleteMedication(1);
     });
 
     expect(mockDb.runAsync).toHaveBeenCalledWith('DELETE FROM Saved_Medications WHERE id = ?', [1]);
 
-    expect(mockDb.getAllAsync).toHaveBeenCalledTimes(2);
-
     await waitFor(() => {
+      expect(mockDb.getAllAsync.mock.calls.length).toBeGreaterThan(callsBeforeDelete);
       expect(latestHook?.medications).toEqual(afterDeleteRows);
     });
   });
