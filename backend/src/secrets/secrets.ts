@@ -19,7 +19,12 @@ type UrlApiSecret = {
   xApiKey: string;
 };
 
-const region = 'us-east-2';
+type GoogleWalletSecret = {
+  privateKey: string;
+  clientEmail: string;
+};
+
+const region = 'us-east-1';
 
 const client = new SecretsManagerClient({ region });
 
@@ -27,9 +32,16 @@ let cache: {
   dsntSecret: DsntSecret | null;
   scriptSaveSecret: ScriptSaveSecret | null;
   urlApiSecret: UrlApiSecret | null;
+  googleWalletSecret: GoogleWalletSecret | null;
   exp: number;
 };
-cache = { dsntSecret: null, scriptSaveSecret: null, urlApiSecret: null, exp: 0 };
+cache = {
+  dsntSecret: null,
+  scriptSaveSecret: null,
+  urlApiSecret: null,
+  googleWalletSecret: null,
+  exp: 0,
+};
 const TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 export async function getDsntSecret(): Promise<DsntSecret> {
@@ -51,9 +63,8 @@ export async function getDsntSecret(): Promise<DsntSecret> {
   };
 
   cache = {
+    ...cache,
     dsntSecret: secret,
-    scriptSaveSecret: cache.scriptSaveSecret,
-    urlApiSecret: cache.urlApiSecret,
     exp: now + TTL_MS,
   };
   return secret;
@@ -80,9 +91,8 @@ export async function getScriptSaveSecret(): Promise<ScriptSaveSecret> {
   };
 
   cache = {
-    dsntSecret: cache.dsntSecret,
+    ...cache,
     scriptSaveSecret: secret,
-    urlApiSecret: cache.urlApiSecret,
     exp: now + TTL_MS,
   };
   return secret;
@@ -106,9 +116,33 @@ export async function getUrlApiSecret(): Promise<UrlApiSecret> {
   };
 
   cache = {
-    dsntSecret: cache.dsntSecret,
-    scriptSaveSecret: cache.scriptSaveSecret,
+    ...cache,
     urlApiSecret: secret,
+    exp: now + TTL_MS,
+  };
+  return secret;
+}
+
+export async function getGoogleWalletSecret(): Promise<GoogleWalletSecret> {
+  const now = Date.now();
+  if (cache.googleWalletSecret && cache.exp > now) return cache.googleWalletSecret;
+
+  const cmd = new GetSecretValueCommand({ SecretId: 'google-wallet-service-account-key' });
+  const res = await client.send(cmd);
+
+  const raw =
+    res.SecretString ?? (res.SecretBinary ? Buffer.from(res.SecretBinary).toString('utf-8') : '');
+  if (!raw) throw new Error('Empty Google Wallet secret');
+
+  const parsed = JSON.parse(raw);
+  const secret: GoogleWalletSecret = {
+    privateKey: parsed.private_key,
+    clientEmail: parsed.client_email,
+  };
+
+  cache = {
+    ...cache,
+    googleWalletSecret: secret,
     exp: now + TTL_MS,
   };
   return secret;
