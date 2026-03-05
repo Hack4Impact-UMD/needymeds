@@ -26,6 +26,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { ActivityIndicator, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useRecentSearches } from '@/hooks/use-recent-searches';
 import BottomNavBar from '../components/BottomNavBar';
 import ErrorState, { ErrorStateType } from '../components/ErrorState';
 import LanguageDropdown from '../components/LanguageDropdown';
@@ -101,6 +102,7 @@ const MedicationLookupSelectedScreen = () => {
 
   // Track the last initialized drugName to avoid re-initializing when coming back from DDC
   const [lastInitializedDrug, setLastInitializedDrug] = useState('');
+  const { addRecentSearch } = useRecentSearches();
 
   useEffect(() => {
     if (!drugName) return;
@@ -129,6 +131,9 @@ const MedicationLookupSelectedScreen = () => {
 
         // Mark this drug as initialized
         setLastInitializedDrug(drugName);
+
+        // Save to recent searches with generic name (null if no generic exists)
+        addRecentSearch(drugName, genericVersion ?? null);
 
         // Set generic name
         if (!genericVersion) {
