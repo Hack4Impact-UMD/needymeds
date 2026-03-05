@@ -38,6 +38,12 @@ export interface SavedMedication {
   last_saved_date?: string;
 }
 
+export interface SavedPharmacy {
+  npi: string;       
+  name: string;
+  address: string;
+}
+
 /* Requests */
 
 export interface DsntPriceRequest {
