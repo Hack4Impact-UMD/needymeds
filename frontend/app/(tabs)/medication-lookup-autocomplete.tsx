@@ -42,7 +42,7 @@ const MedicationLookupAutocompleteScreen = () => {
   const [errorType, setErrorType] = useState<ErrorStateType | null>(null);
 
   const inputRef = useRef<TextInput>(null);
-  const { recentSearches, removeRecentSearch, refreshRecentSearches } = useRecentSearches();
+  const { recentSearches, addRecentSearch, removeRecentSearch, clearAllRecentSearches, refreshRecentSearches } = useRecentSearches();
 
   useFocusEffect(
     useCallback(() => {
@@ -78,8 +78,9 @@ const MedicationLookupAutocompleteScreen = () => {
     }, [query])
   );
 
-  const handleSelectMed = (item: string) => {
+  const handleSelectMed = (item: string, knownGeneric?: string | null) => {
     Keyboard.dismiss();
+    addRecentSearch(item, knownGeneric ?? null);
     router.push({
       pathname: '/medication-lookup-selected',
       params: {
@@ -112,7 +113,12 @@ const MedicationLookupAutocompleteScreen = () => {
               recentSearches.length > 0 ? (
                 // Show recent searches
                 <>
-                  <Text style={styles.recentHeader}>Recent</Text>
+                  <View style={styles.recentHeaderRow}>
+                    <Text style={styles.recentHeader}>Recent</Text>
+                    <TouchableOpacity onPress={clearAllRecentSearches}>
+                      <Text style={styles.clearAllText}>Clear all</Text>
+                    </TouchableOpacity>
+                  </View>
                   <FlatList
                     data={recentSearches}
                     keyExtractor={(item) => String(item.id)}
@@ -121,7 +127,7 @@ const MedicationLookupAutocompleteScreen = () => {
                     renderItem={({ item }) => (
                       <TouchableOpacity
                         style={styles.resultItem}
-                        onPress={() => handleSelectMed(item.drug_name)}
+                        onPress={() => handleSelectMed(item.drug_name, item.generic_name)}
                         activeOpacity={0.7}
                       >
                         <MaterialCommunityIcons
@@ -226,14 +232,24 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.default.neutrallt,
   },
+  recentHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 4,
+  },
   recentHeader: {
     fontSize: 14,
     fontFamily: 'Open Sans',
     color: '#41484D',
     fontWeight: '600',
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 4,
+  },
+  clearAllText: {
+    fontSize: 13,
+    fontFamily: 'Open Sans',
+    color: '#236488',
   },
   emptyState: {
     maxWidth: '100%',

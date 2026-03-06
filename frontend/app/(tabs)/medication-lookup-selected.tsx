@@ -107,7 +107,10 @@ const MedicationLookupSelectedScreen = () => {
   useEffect(() => {
     if (!drugName) return;
     // Skip re-initialization if we already initialized for this drug
-    if (drugName === lastInitializedDrug) return;
+    if (drugName === lastInitializedDrug) {
+      addRecentSearch(drugName, genericVersionAndForms.genericVersion || null);
+      return;
+    }
 
     let cancelled = false;
 

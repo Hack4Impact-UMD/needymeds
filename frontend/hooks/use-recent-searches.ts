@@ -71,5 +71,13 @@ export function useRecentSearches() {
     await loadRecent(db);
   }
 
-  return { recentSearches, addRecentSearch, removeRecentSearch, refreshRecentSearches: () => loadRecent() };
+  async function clearAllRecentSearches() {
+    const db = dbRef.current;
+    if (!db) return;
+
+    await db.runAsync('DELETE FROM Recent_Searches');
+    await loadRecent(db);
+  }
+
+  return { recentSearches, addRecentSearch, removeRecentSearch, clearAllRecentSearches, refreshRecentSearches: () => loadRecent() };
 }
