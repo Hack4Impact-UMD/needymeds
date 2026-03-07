@@ -1,11 +1,5 @@
 /* Data */
 
-export interface SavedPharmacy {
-  npi: string; // primary key
-  pharmacy_name: string;
-  address: string;
-}
-
 export type Adjudicator = 'DSNT' | 'ScriptSave';
 
 export interface DrugSearchResult {
@@ -32,6 +26,22 @@ export interface Pharmacy {
   longitude: number;
   distance?: number;
   phoneNumber: string;
+}
+
+export interface SavedMedication {
+  id?: number;
+  drug_name: string;
+  pharmacy_npi?: string;
+  form?: string;
+  strength?: string;
+  quantity?: number;
+  last_saved_date?: string;
+}
+
+export interface SavedPharmacy {
+  npi: string;       
+  name: string;
+  address: string;
 }
 
 /* Requests */

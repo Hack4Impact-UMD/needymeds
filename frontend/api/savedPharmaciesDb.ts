@@ -1,14 +1,22 @@
 import * as SQLite from 'expo-sqlite';
 
-const DB_NAME = 'needymeds.db';
-
-export async function create_database(): Promise<SQLite.SQLiteDatabase> {
-  const db = await SQLite.openDatabaseAsync(DB_NAME);
+export async function create_database() {
+  const db = await SQLite.openDatabaseAsync('saved_data.db');
 
   await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS Saved_Medications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      drug_name TEXT NOT NULL,
+      pharmacy_npi TEXT,
+      form TEXT,
+      strength TEXT,
+      quantity INTEGER,
+      last_saved_date TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE TABLE IF NOT EXISTS Saved_Pharmacies (
-      npi TEXT PRIMARY KEY NOT NULL,
-      pharmacy_name TEXT NOT NULL,
+      npi TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
       address TEXT NOT NULL
     );
   `);
