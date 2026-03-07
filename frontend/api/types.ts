@@ -1,5 +1,11 @@
 /* Data */
 
+export interface SavedPharmacy {
+  npi: string; // primary key
+  pharmacy_name: string;
+  address: string;
+}
+
 export type Adjudicator = 'DSNT' | 'ScriptSave';
 
 export interface DrugSearchResult {
