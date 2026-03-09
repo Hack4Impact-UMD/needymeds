@@ -4,7 +4,14 @@ import { getGoogleWalletSecret } from '../secrets/secrets';
 const ISSUER_ID = '3388000000023089438';
 const CLASS_ID = '3388000000023089438.needymeds_drug_discount_card';
 
-export const generateGoogleWalletJwt = async (cardData: any) => {
+export interface GoogleWalletCardData {
+  ndc: string;
+  labelName: string;
+  pharmacyName: string;
+  price: string;
+}
+
+export const generateGoogleWalletJwt = async (cardData: GoogleWalletCardData) => {
   const secret = await getGoogleWalletSecret();
 
   const payload = {
