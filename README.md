@@ -63,4 +63,4 @@ For inquiries about this project, contact our Tech Leads:
 | Name | Email |
 | ----------- | ---------------------- |
 | Om Arya | omarya@umd.edu |
-| Adyasha Mishra | adyasha9@umd.edu |
+| Annie Nguyen | annie251@umd.edu |
