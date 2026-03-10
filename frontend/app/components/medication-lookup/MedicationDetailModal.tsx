@@ -249,6 +249,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginTop: 50,
     paddingTop: 16,
     borderTopWidth: 1,
     borderTopColor: '#C1C7CE',
@@ -268,6 +269,7 @@ const styles = StyleSheet.create({
   ticketButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    alignContent: 'center',
     marginLeft: 'auto',
     justifyContent: 'space-around',
     width: 140,
