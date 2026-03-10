@@ -13,34 +13,34 @@ describe('scriptSaveClient', () => {
     jest.clearAllMocks();
   });
 
-  it('calls /findDrugsUsingDrugName with params and returns data', async () => {
+  it('calls /api/scriptsave/findDrugsUsingDrugName with params and returns data', async () => {
     mockApiGet.mockResolvedValueOnce({ ok: 1, type: 'findDrugs' } as any);
 
     const params: ScriptSaveFindDrugsRequest = {
-      groupID,
+      groupID: String(groupID),
       drugName: 'atorvastatin',
     };
 
     const res = await scriptSaveClient.getDrugsByName(params);
 
-    expect(mockApiGet).toHaveBeenCalledWith('/findDrugsUsingDrugName', params);
+    expect(mockApiGet).toHaveBeenCalledWith('/api/scriptsave/findDrugsUsingDrugName', params);
     expect(res).toEqual({ ok: 1, type: 'findDrugs' });
   });
 
-  it('calls /priceDrugs with params and returns data', async () => {
+  it('calls /api/scriptsave//priceDrugs with params and returns data', async () => {
     mockApiGet.mockResolvedValueOnce({ ok: 1, type: 'priceDrugs' } as any);
 
     const params: ScriptSavePriceRequest = {
       ndc: '1234',
-      groupID,
-      quantity: 1,
-      numResults: 10,
-      zipCode: 12345,
+      groupID: String(groupID),
+      quantity: '1',
+      numResults: '10',
+      zipCode: '12345',
     };
 
     const res = await scriptSaveClient.getDrugPrices(params);
 
-    expect(mockApiGet).toHaveBeenCalledWith('/priceDrugs', params);
+    expect(mockApiGet).toHaveBeenCalledWith('/api/scriptsave/priceDrugs', params);
     expect(res).toEqual({ ok: 1, type: 'priceDrugs' });
   });
 
