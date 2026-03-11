@@ -28,6 +28,16 @@ export interface Pharmacy {
   phoneNumber: string;
 }
 
+export interface SavedMedication {
+  id?: number;
+  drug_name: string;
+  pharmacy_npi?: string;
+  form?: string;
+  strength?: string;
+  quantity?: number;
+  last_saved_date?: string;
+}
+
 /* Requests */
 
 export interface DsntPriceRequest {

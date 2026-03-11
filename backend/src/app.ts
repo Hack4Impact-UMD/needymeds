@@ -3,6 +3,7 @@ import express from 'express';
 import helmet from 'helmet';
 import appleWalletRouter from './routes/applewallet.route';
 import dsntRouter from './routes/dsnt.route';
+import googleWalletRouter from './routes/googleWallet.route';
 import scriptSaveRouter from './routes/scriptsave.route';
 import urlRouter from './routes/urlapi.route';
 
@@ -19,6 +20,7 @@ app.get('/test', (_req, res) => res.status(200).json({ ok: true, route: 'root' }
 app.use('/api/dsnt', dsntRouter);
 app.use('/api/scriptsave', scriptSaveRouter);
 app.use('/api/urlapi', urlRouter);
+app.use('/api/wallet', googleWalletRouter);
 app.use('/api/applewallet', appleWalletRouter);
 
 app.use((err: any, _req: any, res: any, _next: any) => {

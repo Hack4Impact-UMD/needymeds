@@ -28,20 +28,19 @@ export async function apiGet<T>(path: string, params?: Record<string, any>) {
   }
 }
 
-export async function apiPost<T>(
-  path: string,
-  params?: Record<string, string | number | undefined>
-) {
+export async function apiPost<T>(path: string, body?: any) {
   const url = new URL(path, API_BASE);
-  if (params) {
-    for (const [k, v] of Object.entries(params)) {
-      if (v !== undefined) url.searchParams.set(k, String(v));
-    }
-  }
   const ctl = new AbortController();
   const id = setTimeout(() => ctl.abort(), 12_000);
   try {
-    const res = await fetch(url.toString(), { signal: ctl.signal });
+    const res = await fetch(url.toString(), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+      signal: ctl.signal,
+    });
     return await handle<T>(res);
   } finally {
     clearTimeout(id);

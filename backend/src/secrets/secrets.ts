@@ -20,6 +20,11 @@ type UrlApiSecret = {
   xApiKey: string;
 };
 
+type GoogleWalletSecret = {
+  privateKey: string;
+  clientEmail: string;
+};
+
 type AppleWalletSecret = {
   //certificate: Buffer;
   //password: string;
@@ -39,18 +44,18 @@ let cache: {
   dsntSecret: DsntSecret | null;
   scriptSaveSecret: ScriptSaveSecret | null;
   urlApiSecret: UrlApiSecret | null;
+  googleWalletSecret: GoogleWalletSecret | null;
   appleWalletSecret: AppleWalletSecret | null;
   appleWalletWWDRSecret: AppleWalletWWDRSecret | null;
-
   exp: number;
 };
 cache = {
   dsntSecret: null,
   scriptSaveSecret: null,
   urlApiSecret: null,
+  googleWalletSecret: null,
   appleWalletSecret: null,
   appleWalletWWDRSecret: null,
-
   exp: 0,
 };
 const TTL_MS = 5 * 60 * 1000; // 5 minutes
@@ -74,6 +79,7 @@ export async function getDsntSecret(): Promise<DsntSecret> {
   };
 
   cache = {
+    ...cache,
     dsntSecret: secret,
     scriptSaveSecret: cache.scriptSaveSecret,
     urlApiSecret: cache.urlApiSecret,
@@ -105,7 +111,7 @@ export async function getScriptSaveSecret(): Promise<ScriptSaveSecret> {
   };
 
   cache = {
-    dsntSecret: cache.dsntSecret,
+    ...cache,
     scriptSaveSecret: secret,
     urlApiSecret: cache.urlApiSecret,
     appleWalletSecret: cache.appleWalletSecret,
@@ -133,8 +139,7 @@ export async function getUrlApiSecret(): Promise<UrlApiSecret> {
   };
 
   cache = {
-    dsntSecret: cache.dsntSecret,
-    scriptSaveSecret: cache.scriptSaveSecret,
+    ...cache,
     urlApiSecret: secret,
     appleWalletSecret: cache.appleWalletSecret,
     appleWalletWWDRSecret: cache.appleWalletWWDRSecret,
@@ -198,6 +203,7 @@ export async function getAppleWalletSecret(): Promise<AppleWalletSecret> {
     dsntSecret: cache.dsntSecret,
     scriptSaveSecret: cache.scriptSaveSecret,
     urlApiSecret: cache.urlApiSecret,
+    googleWalletSecret: cache.googleWalletSecret,
     appleWalletSecret: secret,
     appleWalletWWDRSecret: cache.appleWalletWWDRSecret,
     exp: now + TTL_MS,
@@ -225,8 +231,34 @@ export async function getAppleWalletWWDRSecret(): Promise<AppleWalletWWDRSecret>
     dsntSecret: cache.dsntSecret,
     scriptSaveSecret: cache.scriptSaveSecret,
     urlApiSecret: cache.urlApiSecret,
+    googleWalletSecret: cache.googleWalletSecret,
     appleWalletSecret: cache.appleWalletSecret,
     appleWalletWWDRSecret: secret,
+    exp: now + TTL_MS,
+  };
+  return secret;
+}
+
+export async function getGoogleWalletSecret(): Promise<GoogleWalletSecret> {
+  const now = Date.now();
+  if (cache.googleWalletSecret && cache.exp > now) return cache.googleWalletSecret;
+
+  const cmd = new GetSecretValueCommand({ SecretId: 'google-wallet-service-account-key' });
+  const res = await client.send(cmd);
+
+  const raw =
+    res.SecretString ?? (res.SecretBinary ? Buffer.from(res.SecretBinary).toString('utf-8') : '');
+  if (!raw) throw new Error('Empty Google Wallet secret');
+
+  const parsed = JSON.parse(raw);
+  const secret: GoogleWalletSecret = {
+    privateKey: parsed.private_key,
+    clientEmail: parsed.client_email,
+  };
+
+  cache = {
+    ...cache,
+    googleWalletSecret: secret,
     exp: now + TTL_MS,
   };
   return secret;
