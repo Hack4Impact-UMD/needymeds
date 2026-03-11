@@ -10,7 +10,7 @@ type PassInput = {
 export async function createPass({ serial, number }: PassInput) {
   /*Gets the secret from AWS*/
   const secret = await getAppleWalletSecret();
-  console.log('Apple Wallet certificate length:', secret.certificate.length);
+  console.log('Apple Wallet certificate length:', secret.signerCert.length);
 
   const wwdr_secret = await getAppleWalletWWDRSecret();
   console.log('WWDR certificate length:', wwdr_secret.wwdr.length);
@@ -19,9 +19,8 @@ export async function createPass({ serial, number }: PassInput) {
     {
       model: path.join(process.cwd(), '../backend/src/wallet-pass'),
       certificates: {
-        signerCert: secret.certificate,
-        signerKey: secret.certificate,
-        signerKeyPassphrase: secret.password,
+        signerCert: secret.signerCert,
+        signerKey: secret.signerKey,
         wwdr: wwdr_secret.wwdr,
       },
     },

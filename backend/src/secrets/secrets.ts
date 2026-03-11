@@ -1,4 +1,5 @@
 import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
+import forge from 'node-forge';
 
 type DsntSecret = {
   baseUrl: string;
@@ -20,8 +21,10 @@ type UrlApiSecret = {
 };
 
 type AppleWalletSecret = {
-  certificate: Buffer;
-  password: string;
+  //certificate: Buffer;
+  //password: string;
+  signerCert: string;
+  signerKey: string;
 };
 
 type AppleWalletWWDRSecret = {
@@ -153,16 +156,42 @@ export async function getAppleWalletSecret(): Promise<AppleWalletSecret> {
 
   const parsed = JSON.parse(raw);
   console.log('Parsed Apple Wallet secret:', parsed);
-  // const secret: AppleWalletSecret = {
-  //   certificate: Buffer.from(parsed.certificate, 'base64'),
-  //   password: parsed.password,
-  // };
 
+  //const p12Buffer = Buffer.from(parsed.certificate, 'base64');
+  //const password = parsed.password;
+
+  //Delete below once aws is fixed
   const [certificateBase64, password_ob] = Object.entries(parsed)[0];
   const password = password_ob as string;
+  const p12Buffer = Buffer.from(certificateBase64, 'base64');
+
+  // Convert P12 -> forge object
+  const p12Der = forge.util.createBuffer(p12Buffer.toString('binary'));
+  const p12Asn1 = forge.asn1.fromDer(p12Der);
+  const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, password);
+
+  let signerCert = '';
+  let signerKey = '';
+
+  for (const safeContents of p12.safeContents) {
+    for (const safeBag of safeContents.safeBags) {
+      if (safeBag.type === forge.pki.oids.certBag) {
+        signerCert = forge.pki.certificateToPem(safeBag.cert!);
+      }
+
+      if (safeBag.type === forge.pki.oids.pkcs8ShroudedKeyBag) {
+        signerKey = forge.pki.privateKeyToPem(safeBag.key!);
+      }
+    }
+  }
+
+  if (!signerCert || !signerKey) {
+    throw new Error('Failed to extract certificate or key from p12');
+  }
+
   const secret: AppleWalletSecret = {
-    certificate: Buffer.from(certificateBase64, 'base64'),
-    password,
+    signerCert,
+    signerKey,
   };
 
   cache = {
