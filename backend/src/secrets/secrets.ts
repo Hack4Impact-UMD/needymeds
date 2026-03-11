@@ -162,13 +162,8 @@ export async function getAppleWalletSecret(): Promise<AppleWalletSecret> {
   const parsed = JSON.parse(raw);
   console.log('Parsed Apple Wallet secret:', parsed);
 
-  //const p12Buffer = Buffer.from(parsed.certificate, 'base64');
-  //const password = parsed.password;
-
-  //Delete below once aws is fixed
-  const [certificateBase64, password_ob] = Object.entries(parsed)[0];
-  const password = password_ob as string;
-  const p12Buffer = Buffer.from(certificateBase64, 'base64');
+  const p12Buffer = Buffer.from(parsed.certificate, 'base64');
+  const password = parsed.password;
 
   // Convert P12 -> forge object
   const p12Der = forge.util.createBuffer(p12Buffer.toString('binary'));
