@@ -214,14 +214,12 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 14,
-    fontWeight: '700',
     color: '#181C20',
     fontFamily: 'Open Sans',
   },
   cardSubtitle: {
     marginTop: 6,
     fontSize: 12,
-    fontWeight: '700',
     color: '#181C20',
     fontFamily: 'Open Sans',
   },
