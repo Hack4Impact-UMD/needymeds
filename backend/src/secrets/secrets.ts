@@ -26,8 +26,6 @@ type GoogleWalletSecret = {
 };
 
 type AppleWalletSecret = {
-  //certificate: Buffer;
-  //password: string;
   signerCert: string;
   signerKey: string;
 };
