@@ -5,7 +5,7 @@ const router = Router();
 
 router.post('/', async (req, res, next) => {
   try {
-    const /*{*/ cardNumber /*}*/ = '90MA019309343023'; //req.body;
+    const cardNumber = '90MA019309343023';
 
     const pkpass = await createPass({
       serial: cardNumber,

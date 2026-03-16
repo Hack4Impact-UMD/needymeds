@@ -17,7 +17,7 @@ export async function createPass({ serial, number }: PassInput) {
 
   const pass = await PKPass.from(
     {
-      model: path.join(process.cwd(), '../backend/src/wallet-pass'),
+      model: path.join(__dirname, '../wallet-pass'),
       certificates: {
         signerCert: secret.signerCert,
         signerKey: secret.signerKey,
@@ -29,11 +29,18 @@ export async function createPass({ serial, number }: PassInput) {
     }
   );
 
-  pass.primaryFields.push({
-    key: 'cardNumber',
-    label: 'Card #',
-    value: number,
-  });
+  // Replace existing cardNumber field if present
+  const existingFieldIndex = pass.primaryFields.findIndex((f: any) => f.key === 'cardNumber');
+
+  if (existingFieldIndex !== -1) {
+    pass.primaryFields[existingFieldIndex].value = number;
+  } else {
+    pass.primaryFields.push({
+      key: 'cardNumber',
+      label: 'Card #',
+      value: number,
+    });
+  }
 
   pass.setBarcodes({
     message: number,

@@ -160,7 +160,6 @@ export async function getAppleWalletSecret(): Promise<AppleWalletSecret> {
   if (!raw) throw new Error('Empty Apple Wallet secret');
 
   const parsed = JSON.parse(raw);
-  console.log('Parsed Apple Wallet secret:', parsed);
 
   const p12Buffer = Buffer.from(parsed.certificate, 'base64');
   const password = parsed.password;
