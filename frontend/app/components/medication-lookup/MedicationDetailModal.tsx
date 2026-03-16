@@ -1,6 +1,6 @@
 import { Adjudicator, DrugSearchResult } from '@/api/types';
 import { Colors } from '@/constants/theme';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { router } from 'expo-router';
 import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -153,10 +153,11 @@ const MedicationDetailModal = ({
             {result.labelName} {quantity} {form}
           </Text>
           <Text style={styles.priceAmount}>${Number(result.price).toFixed(2)}</Text>
-          <TouchableOpacity style={styles.ticketButton} onPress={openDDC}>
-            <MaterialIcons name="confirmation-number" size={22} color="#fff" />
-          </TouchableOpacity>
         </View>
+        <TouchableOpacity style={styles.ticketButton} onPress={openDDC}>
+          <Text style={styles.couponButton}>Get Coupon</Text>
+          <MaterialCommunityIcons name="ticket-confirmation-outline" size={22} color="#fff" />
+        </TouchableOpacity>
       </View>
     </BottomSheetModal>
   );
@@ -193,6 +194,10 @@ const styles = StyleSheet.create({
     fontFamily: 'Nunito Sans',
     color: '#181C20',
   },
+  couponButton: {
+    color: 'white',
+    fontSize: 14,
+  },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -209,14 +214,12 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 14,
-    fontWeight: '700',
     color: '#181C20',
     fontFamily: 'Open Sans',
   },
   cardSubtitle: {
     marginTop: 6,
     fontSize: 12,
-    fontWeight: '700',
     color: '#181C20',
     fontFamily: 'Open Sans',
   },
@@ -244,6 +247,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginTop: 50,
     paddingTop: 16,
     borderTopWidth: 1,
     borderTopColor: '#C1C7CE',
@@ -251,21 +255,25 @@ const styles = StyleSheet.create({
   },
   priceLabel: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 14,
     color: '#181C20',
     fontFamily: 'OpenSans-SemiBold',
   },
   priceAmount: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#181C20',
     fontFamily: 'OpenSans-SemiBold',
   },
   ticketButton: {
-    width: 46,
-    height: 46,
-    borderRadius: 30,
+    flexDirection: 'row',
     alignItems: 'center',
+    marginLeft: 'auto',
     justifyContent: 'center',
+    columnGap: 8,
+    width: 140,
+    minHeight: 44,
+    paddingHorizontal: 10,
+    borderRadius: 30,
     backgroundColor: '#236488',
   },
 });
