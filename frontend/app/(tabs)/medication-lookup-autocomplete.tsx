@@ -1,6 +1,6 @@
 import { autoCompleteSearchDrug } from '@/api/drugSearch';
-import { useRecentSearches } from '@/hooks/use-recent-searches';
 import { Colors } from '@/constants/theme';
+import { useRecentSearches } from '@/hooks/use-recent-searches';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
@@ -144,6 +144,8 @@ const MedicationLookupAutocompleteScreen = () => {
                         </View>
                         <TouchableOpacity
                           onPress={() => removeRecentSearch(item.id)}
+                          accessibilityRole='button'
+                          accessibilityLabel={t('RecentSearchRemove', { drugName: item.drug_name })}
                           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                         >
                           <MaterialCommunityIcons name="close" size={18} color="#9CA3AF" />
