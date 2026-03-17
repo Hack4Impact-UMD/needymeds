@@ -123,5 +123,8 @@
   "DSTCardBack": "DDC back details",
   "ScriptSaveCardFront": "DDC details front",
   "ScriptSaveCardBack": "DDC back details",
-  "closeIcon5": "Close and go back"
+  "closeIcon5": "Close and go back",
+  "Recent": "Recent",
+  "ClearAll": "Clear all",
+  "NA": "n/a"
 }

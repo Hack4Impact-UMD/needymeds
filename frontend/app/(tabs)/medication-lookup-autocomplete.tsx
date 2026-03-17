@@ -114,9 +114,9 @@ const MedicationLookupAutocompleteScreen = () => {
                 // Show recent searches
                 <>
                   <View style={styles.recentHeaderRow}>
-                    <Text style={styles.recentHeader}>Recent</Text>
+                    <Text style={styles.recentHeader}>{t('Recent')}</Text>
                     <TouchableOpacity onPress={clearAllRecentSearches}>
-                      <Text style={styles.clearAllText}>Clear all</Text>
+                      <Text style={styles.clearAllText}>{t('ClearAll')}</Text>
                     </TouchableOpacity>
                   </View>
                   <FlatList
@@ -139,7 +139,7 @@ const MedicationLookupAutocompleteScreen = () => {
                         <View style={styles.resultContent}>
                           <Text style={styles.resultName}>{item.drug_name}</Text>
                           <Text style={styles.resultGeneric}>
-                            / {item.generic_name ?? 'n/a'}
+                            / {item.generic_name ?? t('NA')}
                           </Text>
                         </View>
                         <TouchableOpacity

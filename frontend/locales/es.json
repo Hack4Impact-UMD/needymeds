@@ -123,5 +123,8 @@
   "DSTCardBack": "Detalles posteriores de la DDC",
   "ScriptSaveCardFront": "Detalles frontales de la DDC",
   "ScriptSaveCardBack": "Detalles posteriores de la DDC",
-  "closeIcon5": "Cerrar y regresar"
+  "closeIcon5": "Cerrar y regresar",
+  "Recent": "Reciente",
+  "ClearAll": "Borrar todo",
+  "NA": "n/a"
 }
