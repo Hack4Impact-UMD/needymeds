@@ -115,7 +115,11 @@ const MedicationLookupAutocompleteScreen = () => {
                 <>
                   <View style={styles.recentHeaderRow}>
                     <Text style={styles.recentHeader}>{t('Recent')}</Text>
-                    <TouchableOpacity onPress={clearAllRecentSearches}>
+                    <TouchableOpacity
+                      onPress={clearAllRecentSearches}
+                      accessibilityRole="button"
+                      accessibilityLabel={t('ClearAll')}
+                    >
                       <Text style={styles.clearAllText}>{t('ClearAll')}</Text>
                     </TouchableOpacity>
                   </View>

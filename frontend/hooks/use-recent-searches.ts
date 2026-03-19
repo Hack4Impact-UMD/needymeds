@@ -15,23 +15,17 @@ export interface RecentSearch {
  * Custom hook to manage recent medication searches in the local SQLite database.
  */
 export function useRecentSearches() {
-  const dbRef = useRef<SQLiteDatabase | null>(null);
+  const dbReadyPromise = useRef<Promise<SQLiteDatabase>>(create_database());
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
 
   useEffect(() => {
     let isCancelled = false;
 
-    async function init() {
-      try {
-        const db = await create_database();
-        if (!isCancelled) {
-          dbRef.current = db;
-          await loadRecent(db);
-        }
-      } catch {}
-    }
-
-    init();
+    dbReadyPromise.current.then(async (db) => {
+      if (!isCancelled) {
+        await loadRecent(db);
+      }
+    });
 
     return () => {
       isCancelled = true;
@@ -39,8 +33,7 @@ export function useRecentSearches() {
   }, []);
 
   async function loadRecent(db?: SQLiteDatabase) {
-    const database = db ?? dbRef.current;
-    if (!database) return;
+    const database = db ?? (await dbReadyPromise.current);
 
     const rows = await database.getAllAsync<RecentSearch>(
       `SELECT * FROM Recent_Searches ORDER BY searched_at DESC LIMIT ${MAX_RECENT_SEARCHES}`
@@ -49,8 +42,7 @@ export function useRecentSearches() {
   }
 
   async function addRecentSearch(drugName: string, genericName: string | null) {
-    const db = dbRef.current;
-    if (!db) return;
+    const db = await dbReadyPromise.current;
 
     await db.runAsync(
       `INSERT INTO Recent_Searches (drug_name, generic_name, searched_at)
@@ -64,20 +56,24 @@ export function useRecentSearches() {
   }
 
   async function removeRecentSearch(id: number) {
-    const db = dbRef.current;
-    if (!db) return;
+    const db = await dbReadyPromise.current;
 
     await db.runAsync('DELETE FROM Recent_Searches WHERE id = ?', [id]);
     await loadRecent(db);
   }
 
   async function clearAllRecentSearches() {
-    const db = dbRef.current;
-    if (!db) return;
+    const db = await dbReadyPromise.current;
 
     await db.runAsync('DELETE FROM Recent_Searches');
     await loadRecent(db);
   }
 
-  return { recentSearches, addRecentSearch, removeRecentSearch, clearAllRecentSearches, refreshRecentSearches: () => loadRecent() };
+  return {
+    recentSearches,
+    addRecentSearch,
+    removeRecentSearch,
+    clearAllRecentSearches,
+    refreshRecentSearches: () => loadRecent(),
+  };
 }
