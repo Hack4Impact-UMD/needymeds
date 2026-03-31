@@ -1,5 +1,6 @@
 import * as SQLite from 'expo-sqlite';
 
+import { create_database } from '../savedDB';
 import {
   deleteAllPharmacies,
   deletePharmacy,
@@ -8,7 +9,6 @@ import {
   savePharmacy,
   searchPharmacies,
 } from '../savedPharmaciesCRUD';
-import { create_database } from '../savedPharmaciesDb';
 
 jest.mock('expo-sqlite', () => ({
   openDatabaseAsync: jest.fn(),

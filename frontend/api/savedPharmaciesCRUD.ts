@@ -7,7 +7,7 @@ export async function savePharmacy(
   pharmacy: SavedPharmacy
 ): Promise<SavedPharmacy> {
   await db.runAsync(
-    `INSERT INTO Saved_Pharmacies (npi, name, address)
+    `INSERT or REPLACE INTO Saved_Pharmacies (npi, name, address)
      VALUES (?, ?, ?)`,
     [pharmacy.npi, pharmacy.name, pharmacy.address]
   );
@@ -16,12 +16,8 @@ export async function savePharmacy(
 }
 
 // retrieve all saved pharmacies
-export async function getAllPharmacies(
-  db: SQLite.SQLiteDatabase
-): Promise<SavedPharmacy[]> {
-  const rows = await db.getAllAsync<SavedPharmacy>(
-    `SELECT * FROM Saved_Pharmacies`
-  );
+export async function getAllPharmacies(db: SQLite.SQLiteDatabase): Promise<SavedPharmacy[]> {
+  const rows = await db.getAllAsync<SavedPharmacy>(`SELECT * FROM Saved_Pharmacies`);
 
   return rows;
 }
@@ -56,14 +52,8 @@ export async function searchPharmacies(
 }
 
 // delete one pharmacy by npi
-export async function deletePharmacy(
-  db: SQLite.SQLiteDatabase,
-  npi: string
-): Promise<boolean> {
-  const result = await db.runAsync(
-    `DELETE FROM Saved_Pharmacies WHERE npi = ?`,
-    [npi]
-  );
+export async function deletePharmacy(db: SQLite.SQLiteDatabase, npi: string): Promise<boolean> {
+  const result = await db.runAsync(`DELETE FROM Saved_Pharmacies WHERE npi = ?`, [npi]);
 
   // returns true if the row was deleted,
   // false if it wasn't found by npi
@@ -72,9 +62,7 @@ export async function deletePharmacy(
 
 // deletes all saved pharmacies
 // returns number of rows removed from table
-export async function deleteAllPharmacies(
-  db: SQLite.SQLiteDatabase
-): Promise<number> {
+export async function deleteAllPharmacies(db: SQLite.SQLiteDatabase): Promise<number> {
   const result = await db.runAsync(`DELETE FROM Saved_Pharmacies`);
 
   return result.changes;

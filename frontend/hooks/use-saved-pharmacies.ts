@@ -1,4 +1,4 @@
-import { create_database } from '@/api/savedPharmaciesDb';
+import { create_database } from '@/api/savedDB';
 import { SavedPharmacy } from '@/api/types';
 import { SQLiteDatabase } from 'expo-sqlite';
 import { useEffect, useRef, useState } from 'react';
@@ -43,7 +43,7 @@ export function useSavedPharmacies() {
     setError(null);
     try {
       const rows = await database.getAllAsync<SavedPharmacy>(
-        'SELECT * FROM Saved_Pharmacies ORDER BY pharmacy_name ASC'
+        'SELECT * FROM Saved_Pharmacies ORDER BY name ASC'
       );
       setPharmacies(rows);
     } catch (err: any) {
@@ -64,7 +64,7 @@ export function useSavedPharmacies() {
     setError(null);
     try {
       await db.runAsync(
-        `INSERT OR REPLACE INTO Saved_Pharmacies (npi, pharmacy_name, address)
+        `INSERT OR REPLACE INTO Saved_Pharmacies (npi, name, address)
          VALUES (?, ?, ?)`,
         [pharmacy.npi, pharmacy.name, pharmacy.address]
       );

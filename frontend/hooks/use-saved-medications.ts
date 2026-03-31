@@ -1,8 +1,8 @@
-import { create_database } from '@/api/savedMedicationsDb';
+import { create_database } from '@/api/savedDB';
 import {
+  deleteMedication as deleteMedicationDB,
   getAllMedications,
   saveMedication as saveMedicationDB,
-  deleteMedication as deleteMedicationDB,
 } from '@/api/savedMedicationsCRUD';
 import { SavedMedication } from '@/api/types';
 import { SQLiteDatabase } from 'expo-sqlite';

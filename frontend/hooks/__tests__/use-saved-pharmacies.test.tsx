@@ -1,6 +1,6 @@
 import { act, render, waitFor } from '@testing-library/react-native';
 
-import { create_database } from '@/api/savedPharmaciesDb';
+import { create_database } from '@/api/savedDB';
 import { SavedPharmacy } from '@/api/types';
 import { useSavedPharmacies } from '../use-saved-pharmacies';
 

@@ -27,7 +27,7 @@ describe('scriptSaveClient', () => {
     expect(res).toEqual({ ok: 1, type: 'findDrugs' });
   });
 
-  it('calls /api/scriptsave//priceDrugs with params and returns data', async () => {
+  it('calls /api/scriptsave/priceDrugs with params and returns data', async () => {
     mockApiGet.mockResolvedValueOnce({ ok: 1, type: 'priceDrugs' } as any);
 
     const params: ScriptSavePriceRequest = {

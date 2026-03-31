@@ -1,9 +1,8 @@
-import React from 'react';
-import { render, waitFor, act } from '@testing-library/react-native';
+import { act, render, waitFor } from '@testing-library/react-native';
 
+import { create_database } from '@/api/savedDB';
 import { SavedMedication } from '@/api/types';
 import { useSavedMedications } from '../use-saved-medications';
-import { create_database } from '@/api/savedMedicationsDb';
 
 jest.mock('@/api/savedMedicationsDb', () => ({
   create_database: jest.fn(),
