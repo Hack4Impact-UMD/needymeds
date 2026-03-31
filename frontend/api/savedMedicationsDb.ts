@@ -19,6 +19,16 @@ export async function create_database() {
             generic_name TEXT,
             searched_at TEXT DEFAULT CURRENT_TIMESTAMP
         );
+        CREATE TABLE IF NOT EXISTS Saved_Pharmacies (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            pharmacy_name TEXT NOT NULL,
+            street TEXT NOT NULL,
+            city TEXT NOT NULL,
+            state TEXT NOT NULL,
+            zip_code TEXT NOT NULL,
+            phone_number TEXT,
+            last_saved_date TEXT DEFAULT CURRENT_TIMESTAMP
+        );
     `);
   return db;
 }
