@@ -12,7 +12,13 @@ export async function create_database() {
             strength TEXT,
             quantity INTEGER,
             last_saved_date TEXT DEFAULT CURRENT_TIMESTAMP
-        ); 
+        );
+        CREATE TABLE IF NOT EXISTS Recent_Searches (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            drug_name TEXT NOT NULL UNIQUE,
+            generic_name TEXT,
+            searched_at TEXT DEFAULT CURRENT_TIMESTAMP
+        );
     `);
   return db;
 }

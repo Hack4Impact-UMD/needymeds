@@ -166,6 +166,7 @@ const DDC = () => {
         isOpen={showShareModal}
         onClose={() => setShowShareModal(false)}
         adjudicator={result.adjudicator}
+        result={result}
       />
     </SafeAreaView>
   );
