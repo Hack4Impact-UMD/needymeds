@@ -4,7 +4,7 @@ import { create_database } from '@/api/savedDB';
 import { SavedMedication } from '@/api/types';
 import { useSavedMedications } from '../use-saved-medications';
 
-jest.mock('@/api/savedMedicationsDb', () => ({
+jest.mock('@/api/savedDB', () => ({
   create_database: jest.fn(),
 }));
 

@@ -110,9 +110,8 @@ describe('getUserLocation', () => {
     mockFetch.mockResolvedValue({ ok: false });
 
     const promise = getUserLocation();
-
+    jest.runAllTimersAsync();
     await expect(promise).rejects.toThrow('Nominatim API request failed after retries.');
-    await jest.runAllTimersAsync();
     expect(mockDispatch).toHaveBeenCalledWith(setLoading(false));
 
     jest.useRealTimers();

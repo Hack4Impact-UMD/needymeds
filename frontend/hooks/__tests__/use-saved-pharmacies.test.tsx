@@ -4,7 +4,7 @@ import { create_database } from '@/api/savedDB';
 import { SavedPharmacy } from '@/api/types';
 import { useSavedPharmacies } from '../use-saved-pharmacies';
 
-jest.mock('@/api/savedPharmaciesDb', () => ({
+jest.mock('@/api/savedDB', () => ({
   create_database: jest.fn(),
 }));
 
@@ -51,7 +51,7 @@ describe('useSavedPharmacies hook', () => {
 
     expect(create_database).toHaveBeenCalled();
     expect(mockDb.getAllAsync).toHaveBeenCalledWith(
-      'SELECT * FROM Saved_Pharmacies ORDER BY pharmacy_name ASC'
+      'SELECT * FROM Saved_Pharmacies ORDER BY name ASC'
     );
   });
 

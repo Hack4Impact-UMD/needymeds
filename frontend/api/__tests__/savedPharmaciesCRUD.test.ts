@@ -67,7 +67,7 @@ describe('savePharmacy', () => {
 
     expect(db.runAsync).toHaveBeenCalledTimes(1);
     const sql = db.runAsync.mock.calls[0][0] as string;
-    expect(sql).toContain('INSERT INTO Saved_Pharmacies');
+    expect(sql).toContain('INSERT or REPLACE INTO Saved_Pharmacies');
 
     expect(result.npi).toBe('1234567890');
     expect(result.name).toBe('CVS Pharmacy');
