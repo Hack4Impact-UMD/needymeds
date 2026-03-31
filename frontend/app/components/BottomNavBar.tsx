@@ -100,7 +100,7 @@ function BottomNavBar() {
             variant="labelMedium"
             style={[styles.navLabel, isFavoritesActive && styles.navLabelActive]}
           >
-            Favorites
+            {t('FavoritesTab')}
           </Text>
         </TouchableOpacity>
 

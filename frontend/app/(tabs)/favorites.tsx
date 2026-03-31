@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useNavigation } from 'expo-router';
 import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Card, Divider, Icon } from 'react-native-paper';
+import { Divider, Icon } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Colors } from '@/constants/theme';
@@ -9,21 +10,25 @@ import DefaultHeader from '../components/DefaultHeader';
 import MedicationCard from '../components/favorite-page/MedicationCard';
 import PharmacyCard from '../components/favorite-page/PharmacyCard';
 
-import { SavedMedication } from '@/api/types';
-import { getAllMedications, deleteMedication } from '@/api/savedMedicationsCRUD';
-
 import { useSavedMedications } from '@/hooks/use-saved-medications';
-// import { useSavedPharmacies } from '@/hooks/use-saved-pharmacies';
+import { useSavedPharmacies } from '@/hooks/use-saved-pharmacies';
 
 const FavoritesScreen = () => {
-  // initialize the database
-  // load saved medications and pharmacies
-  const { medications, loading: medsLoading, deleteMedication } = useSavedMedications();
+  const navigation = useNavigation();
+  const { pharmacies: savedPharmacies, deletePharmacy, refreshPharmacies } = useSavedPharmacies();
   const {
-    medications: pharmacies,
-    loading: pharmsLoading,
-    deleteMedication: deletePharmacy,
+    medications: savedMedications,
+    deleteMedication,
+    refreshMedications,
   } = useSavedMedications();
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      refreshPharmacies();
+      refreshMedications();
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -37,16 +42,17 @@ const FavoritesScreen = () => {
 
         {/* favorite pharmacy */}
         <Text style={styles.headers}>Favorite Pharmacy</Text>
-        {/* display favorite pharmacy cards or none */}
-        {pharmsLoading ? null : pharmacies.length > 0 ? (
-          pharmacies.map((p) => <PharmacyCard key={p.id} pharmacy={p} onUnsave={deletePharmacy} />)
+        {savedPharmacies.length > 0 ? (
+          savedPharmacies.map((pharmacy) => (
+            <PharmacyCard key={pharmacy.id} pharmacy={pharmacy} onUnsave={deletePharmacy} />
+          ))
         ) : (
           <View
             style={{
               justifyContent: 'center',
               alignContent: 'center',
               alignItems: 'center',
-              marginVertical: 30,
+              marginVertical: 20,
             }}
           >
             <Icon source="store-plus-outline" color="#41484D" size={56} />
@@ -54,7 +60,7 @@ const FavoritesScreen = () => {
               No Favorite Pharmacy Yet!
             </Text>
             <Text style={{ margin: 2, fontSize: 12, color: '#41484D' }}>
-              Click Pharmacies to save one.
+              {`Click 'Pharmacies' to save one.`}
             </Text>
           </View>
         )}
@@ -63,9 +69,9 @@ const FavoritesScreen = () => {
 
         {/* favorite medications */}
         <Text style={styles.headers}>Favorite Medications</Text>
-        {/* display medication cards */}
-        {medsLoading ? null : medications.length > 0 ? (
-          medications.map((med) => (
+
+        {savedMedications.length > 0 ? (
+          savedMedications.map((med) => (
             <MedicationCard key={med.id} medication={med} onUnsave={deleteMedication} />
           ))
         ) : (
@@ -74,7 +80,7 @@ const FavoritesScreen = () => {
               justifyContent: 'center',
               alignContent: 'center',
               alignItems: 'center',
-              marginVertical: 50,
+              marginVertical: 80,
             }}
           >
             <Icon source="ticket-confirmation-outline" color="#41484D" size={56} />
@@ -82,7 +88,7 @@ const FavoritesScreen = () => {
               No Favorite Medications Yet!
             </Text>
             <Text style={{ margin: 2, fontSize: 12, color: '#41484D' }}>
-              Click Drug Prices to find medications.
+              {`Click 'Drug Prices' to find medications.`}
             </Text>
           </View>
         )}
@@ -129,13 +135,18 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderColor: '#C1C7CE',
   },
-  pharmacy_card_title: {
-    minHeight: 60,
-    paddingRight: 16,
+  findPharmacyButton: {
+    borderRadius: 100,
+    marginTop: 16,
+    width: '100%',
   },
-  med_card_title: {
-    minHeight: 36,
-    paddingRight: 16,
+  findPharmacyButtonContent: {
+    height: 48,
+  },
+  findPharmacyButtonLabel: {
+    fontSize: 16,
+    fontFamily: 'Open Sans',
+    fontWeight: '400',
   },
 });
 

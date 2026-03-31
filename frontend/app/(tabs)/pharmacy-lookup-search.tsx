@@ -1,5 +1,6 @@
 import { Colors } from '@/constants/theme';
 import { useSearchPharmacies } from '@/hooks/use-search-pharmacies';
+import { useSavedPharmacies } from '@/hooks/use-saved-pharmacies';
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -13,7 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { ActivityIndicator, Text, TextInput } from 'react-native-paper';
+import { ActivityIndicator, Divider, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Pharmacy } from '../../api/types';
 import getUserLocation from '../../api/userLocation';
@@ -22,7 +23,6 @@ import BottomNavBar from '../components/BottomNavBar';
 import DefaultHeader from '../components/DefaultHeader';
 import ErrorState, { ErrorStateType } from '../components/ErrorState';
 import PharmacyDetailModal from '../components/pharmacy-lookup/PharmacyDetailModal';
-import PharmacySearchResult from '../components/pharmacy-lookup/PharmacySearchResult';
 
 const ZIPCODE_LENGTH = 5;
 
@@ -47,6 +47,43 @@ const PharmacyLocatorScreen = () => {
   const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(null);
   const [filteredPharmacies, setFilteredPharmacies] = useState<Pharmacy[]>([]);
   const [errorType, setErrorType] = useState<ErrorStateType | null>(null);
+
+  const { pharmacies: savedPharmacies, savePharmacy, deletePharmacy } = useSavedPharmacies();
+
+  const isSaved = (pharmacy: Pharmacy) => {
+    return savedPharmacies.some(
+      (sp) =>
+        sp.pharmacy_name === pharmacy.pharmacyName &&
+        sp.street === pharmacy.pharmacyStreet1 &&
+        sp.city === pharmacy.pharmacyCity
+    );
+  };
+
+  const getSavedId = (pharmacy: Pharmacy) => {
+    const found = savedPharmacies.find(
+      (sp) =>
+        sp.pharmacy_name === pharmacy.pharmacyName &&
+        sp.street === pharmacy.pharmacyStreet1 &&
+        sp.city === pharmacy.pharmacyCity
+    );
+    return found?.id;
+  };
+
+  const toggleStar = (pharmacy: Pharmacy) => {
+    if (isSaved(pharmacy)) {
+      const id = getSavedId(pharmacy);
+      if (id) deletePharmacy(id);
+    } else {
+      savePharmacy({
+        pharmacy_name: pharmacy.pharmacyName,
+        street: pharmacy.pharmacyStreet1,
+        city: pharmacy.pharmacyCity,
+        state: pharmacy.pharmacyState,
+        zip_code: pharmacy.pharmacyZipCode,
+        phone_number: pharmacy.phoneNumber,
+      });
+    }
+  };
 
   const { pharmacies, loading, error } = useSearchPharmacies(zipCode, parseFloat(radius));
 
@@ -242,15 +279,45 @@ const PharmacyLocatorScreen = () => {
                 iconName={errorType === 'noPharmacies' ? 'store-outline' : undefined}
               />
             ) : (
-              filteredPharmacies.map((pharmacy) => (
-                <PharmacySearchResult
-                  key={`${pharmacy.pharmacyName}, ${pharmacy.pharmacyStreet1}, ${pharmacy.pharmacyCity}`}
-                  name={pharmacy.pharmacyName}
-                  address={`${pharmacy.pharmacyStreet1}, ${pharmacy.pharmacyCity}`}
-                  distance={pharmacy.distance!}
-                  onPress={() => setSelectedPharmacy(pharmacy)}
-                />
-              ))
+              filteredPharmacies.map((pharmacy) => {
+                const key = `${pharmacy.pharmacyName}, ${pharmacy.pharmacyStreet1}, ${pharmacy.pharmacyCity}`;
+                const isStarred = isSaved(pharmacy);
+                return (
+                  <TouchableOpacity
+                    key={key}
+                    onPress={() => setSelectedPharmacy(pharmacy)}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.resultRow}>
+                      <TouchableOpacity
+                        onPress={() => toggleStar(pharmacy)}
+                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                      >
+                        <MaterialCommunityIcons
+                          name={isStarred ? 'star' : 'star-outline'}
+                          size={24}
+                          color="#004E60"
+                        />
+                      </TouchableOpacity>
+                      <View style={styles.resultText}>
+                        <Text style={styles.resultTitle} numberOfLines={1}>
+                          {pharmacy.pharmacyName}
+                        </Text>
+                        <Text style={styles.resultSubtitle} numberOfLines={2}>
+                          {pharmacy.pharmacyStreet1}, {pharmacy.pharmacyCity}
+                        </Text>
+                      </View>
+                      <View style={styles.resultRight}>
+                        <Text style={styles.resultMiles}>
+                          {Number(pharmacy.distance).toFixed(1)}mi
+                        </Text>
+                        <MaterialCommunityIcons name="chevron-right" size={24} color="#41484D" />
+                      </View>
+                    </View>
+                    <Divider style={styles.divider} />
+                  </TouchableOpacity>
+                );
+              })
             )}
           </ScrollView>
         </View>
@@ -351,5 +418,41 @@ const styles = StyleSheet.create({
     color: '#41484D',
     textAlign: 'center',
     lineHeight: 22,
+  },
+  resultRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 12,
+  },
+  resultText: {
+    flex: 1,
+  },
+  resultTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    lineHeight: 24,
+    color: '#181C20',
+  },
+  resultSubtitle: {
+    fontSize: 14,
+    fontWeight: '400',
+    lineHeight: 20,
+    color: '#41484D',
+  },
+  resultRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  resultMiles: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#41484D',
+    fontFamily: 'Roboto',
+  },
+  divider: {
+    marginHorizontal: 16,
+    backgroundColor: '#C1C7CE',
   },
 });
