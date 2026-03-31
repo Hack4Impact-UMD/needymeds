@@ -108,7 +108,9 @@ describe('getUserLocation', () => {
 
     mockFetch.mockResolvedValue({ ok: false });
 
-    await expect(getUserLocation()).rejects.toThrow('Nominatim API request failed after retries.');
+    const promise = getUserLocation();
+    await jest.runAllTimersAsync();
+    await expect(promise).rejects.toThrow('Nominatim API request failed after retries.');
 
     expect(mockDispatch).toHaveBeenCalledWith(setLoading(false));
   });
@@ -131,5 +133,7 @@ describe('getUserLocation', () => {
     await expect(getUserLocation()).rejects.toThrow('Zip code not found in address result.');
 
     expect(mockDispatch).toHaveBeenCalledWith(setLoading(false));
+
+    jest.useRealTimers();
   });
 });
