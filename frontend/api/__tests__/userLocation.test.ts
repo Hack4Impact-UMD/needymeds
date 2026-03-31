@@ -99,6 +99,7 @@ describe('getUserLocation', () => {
   });
 
   it('should throw if API request fails after retries', async () => {
+    jest.useFakeTimers();
     (Location.requestForegroundPermissionsAsync as jest.Mock).mockResolvedValueOnce({
       status: 'granted',
     });
@@ -108,9 +109,12 @@ describe('getUserLocation', () => {
 
     mockFetch.mockResolvedValue({ ok: false });
 
-    await expect(getUserLocation()).rejects.toThrow('Nominatim API request failed after retries.');
-
+    const promise = getUserLocation();
+    jest.runAllTimersAsync();
+    await expect(promise).rejects.toThrow('Nominatim API request failed after retries.');
     expect(mockDispatch).toHaveBeenCalledWith(setLoading(false));
+
+    jest.useRealTimers();
   });
 
   it('should throw if zip code not found in response', async () => {

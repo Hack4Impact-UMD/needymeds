@@ -13,7 +13,7 @@ describe('dsnt api', () => {
     mockApiGet.mockReset();
   });
 
-  it('calls /api/price with params and returns data', async () => {
+  it('calls /api/dsnt/price with params and returns data', async () => {
     mockApiGet.mockResolvedValueOnce({ ok: 1, type: 'ndc' } as any);
 
     const params: DsntPriceRequest = {
@@ -25,16 +25,16 @@ describe('dsnt api', () => {
 
     const res = await dsntClient.getPriceByNdc(params);
 
-    expect(mockApiGet).toHaveBeenCalledWith('/api/price', params);
+    expect(mockApiGet).toHaveBeenCalledWith('/api/dsnt/price', params);
     expect(res).toEqual({ ok: 1, type: 'ndc' });
   });
 
-  it('calls /api/price-ndc-npi with params and returns data', async () => {
+  it('calls /api/dsnt/price-ndc-npi with params and returns data', async () => {
     mockApiGet.mockResolvedValueOnce({ ok: 1, type: 'ndc-npi' } as any);
 
     const params: DsntPriceNpiRequest = {
       npilist: '1326064445',
-      quantity: 100,
+      quantity: '100',
       ndc: '59148000713',
       radius: '100',
       zipCode: '10002',
@@ -42,7 +42,7 @@ describe('dsnt api', () => {
 
     const res = await dsntClient.getPriceByNdcAndNpi(params);
 
-    expect(mockApiGet).toHaveBeenCalledWith('/api/price-ndc-npi', params);
+    expect(mockApiGet).toHaveBeenCalledWith('/api/dsnt/price-ndc-npi', params);
     expect(res).toEqual({ ok: 1, type: 'ndc-npi' });
   });
 

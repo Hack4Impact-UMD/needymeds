@@ -1,13 +1,13 @@
 import * as SQLite from 'expo-sqlite';
 
-import { create_database } from '../savedMedicationsDb';
+import { create_database } from '../savedDB';
 import {
-  saveMedication,
+  deleteAllMedications,
+  deleteMedication,
   getAllMedications,
   getMedicationByID,
+  saveMedication,
   searchMedications,
-  deleteMedication,
-  deleteAllMedications,
 } from '../savedMedicationsCRUD';
 
 jest.mock('expo-sqlite', () => ({

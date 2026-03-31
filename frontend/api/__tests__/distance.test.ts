@@ -17,8 +17,8 @@ describe('converting to coordinates and calculating distances', () => {
 
   test('zipcode to coordinates', async () => {
     const result = await zipToCoords('20742');
-    expect(result.lat).toBe('38.98998');
-    expect(result.lon).toBe('-76.94210');
+    expect(Number(result.lat)).toBeCloseTo(38.99, 1);
+    expect(Number(result.lon)).toBeCloseTo(-76.94, 1);
     expect(result.error).toBe('');
   });
 

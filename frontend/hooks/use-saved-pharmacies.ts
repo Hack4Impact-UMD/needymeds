@@ -1,16 +1,15 @@
 import { create_database } from '@/api/savedDB';
-import {
-  deleteMedication as deleteMedicationDB,
-  getAllMedications,
-  saveMedication as saveMedicationDB,
-} from '@/api/savedMedicationsCRUD';
-import { SavedMedication } from '@/api/types';
+import { SavedPharmacy } from '@/api/types';
 import { SQLiteDatabase } from 'expo-sqlite';
 import { useEffect, useRef, useState } from 'react';
 
-export function useSavedMedications() {
+/**
+ * Custom hook to manage saved pharmacies in the local SQLite database.
+ * Provides state and methods for storing, retrieving, and deleting saved pharmacies.
+ */
+export function useSavedPharmacies() {
   const dbRef = useRef<SQLiteDatabase | null>(null);
-  const [medications, setMedications] = useState<SavedMedication[]>([]);
+  const [pharmacies, setPharmacies] = useState<SavedPharmacy[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,7 +21,7 @@ export function useSavedMedications() {
         const db = await create_database();
         if (!isCancelled) {
           dbRef.current = db;
-          await loadMedications(db);
+          await loadPharmacies(db);
         }
       } catch (err: any) {
         if (!isCancelled) setError(err.message || 'Failed to initialize database');
@@ -36,23 +35,25 @@ export function useSavedMedications() {
     };
   }, []);
 
-  async function loadMedications(db?: SQLiteDatabase) {
+  async function loadPharmacies(db?: SQLiteDatabase) {
     const database = db ?? dbRef.current;
     if (!database) return;
 
     setLoading(true);
     setError(null);
     try {
-      const rows = await getAllMedications(database);
-      setMedications(rows);
+      const rows = await database.getAllAsync<SavedPharmacy>(
+        'SELECT * FROM Saved_Pharmacies ORDER BY name ASC'
+      );
+      setPharmacies(rows);
     } catch (err: any) {
-      setError(err.message || 'Failed to load saved medications');
+      setError(err.message || 'Failed to load saved pharmacies');
     } finally {
       setLoading(false);
     }
   }
 
-  async function saveMedication(med: Omit<SavedMedication, 'id' | 'last_saved_date'>) {
+  async function savePharmacy(pharmacy: SavedPharmacy) {
     const db = dbRef.current;
     if (!db) {
       setError('Database not initialized');
@@ -62,16 +63,20 @@ export function useSavedMedications() {
     setLoading(true);
     setError(null);
     try {
-      await saveMedicationDB(db, med);
-      await loadMedications(db);
+      await db.runAsync(
+        `INSERT OR REPLACE INTO Saved_Pharmacies (npi, name, address)
+         VALUES (?, ?, ?)`,
+        [pharmacy.npi, pharmacy.name, pharmacy.address]
+      );
+      await loadPharmacies(db);
     } catch (err: any) {
-      setError(err.message || 'Failed to save medication');
+      setError(err.message || 'Failed to save pharmacy');
     } finally {
       setLoading(false);
     }
   }
 
-  async function deleteMedication(id: number) {
+  async function deletePharmacy(npi: string) {
     const db = dbRef.current;
     if (!db) {
       setError('Database not initialized');
@@ -81,25 +86,21 @@ export function useSavedMedications() {
     setLoading(true);
     setError(null);
     try {
-      const deleted = await deleteMedicationDB(db, id);
-      if (!deleted) {
-        setError(`Medication with id ${id} was not found`);
-        return;
-      }
-      await loadMedications(db);
+      await db.runAsync('DELETE FROM Saved_Pharmacies WHERE npi = ?', [npi]);
+      await loadPharmacies(db);
     } catch (err: any) {
-      setError(err.message || 'Failed to delete medication');
+      setError(err.message || 'Failed to delete pharmacy');
     } finally {
       setLoading(false);
     }
   }
 
   return {
-    medications,
+    pharmacies,
     loading,
     error,
-    saveMedication,
-    deleteMedication,
-    refreshMedications: () => loadMedications(),
+    savePharmacy,
+    deletePharmacy,
+    refreshPharmacies: () => loadPharmacies(),
   };
 }
