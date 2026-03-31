@@ -2,8 +2,8 @@ import { Colors } from '@/constants/theme';
 import { useSearchPharmacies } from '@/hooks/use-search-pharmacies';
 import { useSavedPharmacies } from '@/hooks/use-saved-pharmacies';
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { router, useLocalSearchParams, useNavigation } from 'expo-router';
+import { use, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Alert,
@@ -48,7 +48,20 @@ const PharmacyLocatorScreen = () => {
   const [filteredPharmacies, setFilteredPharmacies] = useState<Pharmacy[]>([]);
   const [errorType, setErrorType] = useState<ErrorStateType | null>(null);
 
-  const { pharmacies: savedPharmacies, savePharmacy, deletePharmacy } = useSavedPharmacies();
+  const navigation = useNavigation();
+  const {
+    pharmacies: savedPharmacies,
+    savePharmacy,
+    deletePharmacy,
+    refreshPharmacies,
+  } = useSavedPharmacies();
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      refreshPharmacies();
+    });
+    return unsubscribe;
+  }, [navigation, refreshPharmacies]);
 
   const isSaved = (pharmacy: Pharmacy) => {
     return savedPharmacies.some(

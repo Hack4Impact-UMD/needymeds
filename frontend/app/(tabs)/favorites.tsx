@@ -28,7 +28,7 @@ const FavoritesScreen = () => {
       refreshMedications();
     });
     return unsubscribe;
-  }, [navigation]);
+  }, [navigation, refreshPharmacies, refreshMedications]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -69,7 +69,6 @@ const FavoritesScreen = () => {
 
         {/* favorite medications */}
         <Text style={styles.headers}>Favorite Medications</Text>
-
         {savedMedications.length > 0 ? (
           savedMedications.map((med) => (
             <MedicationCard key={med.id} medication={med} onUnsave={deleteMedication} />
@@ -120,20 +119,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Open Sans',
     color: '#181C20',
-  },
-  pharmacy_cards: {
-    marginVertical: 8,
-    width: '100%',
-    fontFamily: 'Open Sans',
-    backgroundColor: '#C7E7FF',
-    borderColor: '#C1C7CE',
-  },
-  med_cards: {
-    marginVertical: 8,
-    width: '100%',
-    fontFamily: 'Open Sans',
-    backgroundColor: 'transparent',
-    borderColor: '#C1C7CE',
   },
   findPharmacyButton: {
     borderRadius: 100,
