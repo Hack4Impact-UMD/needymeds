@@ -66,7 +66,7 @@ export function useSavedPharmacies() {
       await db.runAsync(
         `INSERT OR REPLACE INTO Saved_Pharmacies (npi, pharmacy_name, address)
          VALUES (?, ?, ?)`,
-        [pharmacy.npi, pharmacy.pharmacy_name, pharmacy.address]
+        [pharmacy.npi, pharmacy.name, pharmacy.address]
       );
       await loadPharmacies(db);
     } catch (err: any) {
