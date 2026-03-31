@@ -72,6 +72,11 @@ describe('savePharmacy', () => {
     expect(result.npi).toBe('1234567890');
     expect(result.name).toBe('CVS Pharmacy');
     expect(result.address).toBe('123 Sycamore St');
+
+    expect(db.runAsync).toHaveBeenCalledWith(
+      expect.stringContaining('INSERT or REPLACE INTO Saved_Pharmacies'),
+      ['1234567890', 'CVS Pharmacy', '123 Sycamore St']
+    );
   });
 });
 
@@ -124,6 +129,11 @@ describe('searchPharmacies', () => {
     const db = makeMockDb({ getAllAsync: jest.fn().mockResolvedValue(mockRows) });
 
     const result = await searchPharmacies(db as any, 'cvs');
+
+    expect(db.getAllAsync).toHaveBeenCalledWith(
+      expect.stringContaining('LOWER(name) LIKE LOWER(?)'),
+      ['%cvs%']
+    );
 
     const values = db.getAllAsync.mock.calls[0][1] as any[];
     expect(values[0]).toBe('%cvs%');
