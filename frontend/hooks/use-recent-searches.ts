@@ -1,4 +1,4 @@
-import { create_database } from '@/api/savedMedicationsDb';
+import { create_database } from '@/api/savedDB';
 import { SQLiteDatabase } from 'expo-sqlite';
 import { useEffect, useRef, useState } from 'react';
 

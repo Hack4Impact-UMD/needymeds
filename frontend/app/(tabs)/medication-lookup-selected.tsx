@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Alert,
   Keyboard,
+  Linking,
   Platform,
   ScrollView,
   StyleSheet,
@@ -604,6 +605,16 @@ const MedicationLookupSelectedScreen = () => {
           </ScrollView>
         </View>
       </View>
+      <TouchableOpacity
+        style={styles.availableCouponsButton}
+        onPress={() =>
+          Linking.openURL('https://www.needymeds.org/search-programs?initialSearchTab=coupons')
+        }
+        activeOpacity={0.85}
+      >
+        <Text style={styles.availableCouponsText}>Available Coupons </Text>
+        <MaterialIcons name="open-in-new" size={16} color="#004E60" style={{ marginRight: 6 }} />
+      </TouchableOpacity>
       <BottomNavBar />
 
       {/* Medication Lookup Result Modal */}
@@ -938,6 +949,28 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'flex-start',
     gap: 4,
+  },
+  availableCouponsButton: {
+    position: 'absolute',
+    bottom: 80,
+    right: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#B6EBFF',
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 26,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  availableCouponsText: {
+    color: '#004E60',
+    fontSize: 15,
+    fontFamily: 'Open Sans',
+    fontWeight: '500',
   },
 });
 
