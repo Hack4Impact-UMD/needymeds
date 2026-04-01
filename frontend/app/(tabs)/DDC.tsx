@@ -54,7 +54,7 @@ const DDC = () => {
       const { url } = await getGoogleWalletUrl(result);
       await Linking.openURL(url);
     } catch {
-      Alert.alert('Error', 'Could not add to Google Wallet.');
+      Alert.alert(t('DDCError'), t('DDCGoogleWalletError'));
     }
   }
 
@@ -134,38 +134,47 @@ const DDC = () => {
                 </View>
               </View>
 
-              <View style={styles.actionRow}>
-                <Pressable
-                  style={styles.actionButton}
-                  onPress={() => {
-                    router.push({
-                      pathname: '/ddc-expand',
-                      params: {
-                        drugName: params.drugName,
-                        quantity: params.quantity,
-                        form: params.form,
-                        adjudicator: result.adjudicator,
-                        pharmacyName: params.pharmacyName,
-                        pharmacyAddress: params.pharmacyAddress,
-                        pharmacyPhone: params.pharmacyPhone,
-                        ndc: params.ndc,
-                        labelName: params.labelName,
-                        price: params.price,
-                        latitude: params.latitude,
-                        longitude: params.longitude,
-                        distance: params.distance,
-                      },
-                    });
-                  }}
-                >
-                  <MaterialCommunityIcons name="aspect-ratio" size={20} color="white" />
-                  <Text style={styles.buttonText}>{t('ButtonLabel1')}</Text>
-                </Pressable>
+              <View style={styles.actionButtonsWrap}>
+                <View style={styles.actionRow}>
+                  <Pressable
+                    style={styles.actionButton}
+                    onPress={() => {
+                      router.push({
+                        pathname: '/ddc-expand',
+                        params: {
+                          drugName: params.drugName,
+                          quantity: params.quantity,
+                          form: params.form,
+                          adjudicator: result.adjudicator,
+                          pharmacyName: params.pharmacyName,
+                          pharmacyAddress: params.pharmacyAddress,
+                          pharmacyPhone: params.pharmacyPhone,
+                          ndc: params.ndc,
+                          labelName: params.labelName,
+                          price: params.price,
+                          latitude: params.latitude,
+                          longitude: params.longitude,
+                          distance: params.distance,
+                        },
+                      });
+                    }}
+                  >
+                    <MaterialCommunityIcons name="aspect-ratio" size={20} color="white" />
+                    <Text style={styles.buttonText}>{t('ButtonLabel1')}</Text>
+                  </Pressable>
 
-                <Pressable style={styles.actionButton} onPress={() => setShowShareModal(true)}>
-                  <MaterialIcons name="share" size={20} color="white" />
-                  <Text style={styles.buttonText}>{t('ButtonLabel2')}</Text>
-                </Pressable>
+                  <Pressable style={styles.actionButton} onPress={() => setShowShareModal(true)}>
+                    <MaterialIcons name="share" size={20} color="white" />
+                    <Text style={styles.buttonText}>{t('ButtonLabel2')}</Text>
+                  </Pressable>
+                </View>
+
+                {Platform.OS === 'android' && (
+                  <Pressable style={styles.actionButtonFull} onPress={handleAddToGoogleWallet}>
+                    <MaterialCommunityIcons name="google-wallet" size={20} color="white" />
+                    <Text style={styles.buttonText}>{t('DDCAddToWallet')}</Text>
+                  </Pressable>
+                )}
               </View>
 
               <View style={styles.footerNote}>
