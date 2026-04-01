@@ -1,8 +1,18 @@
+import { getGoogleWalletUrl } from '@/api/wallet';
 import { Colors } from '@/constants/theme';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import {
+  Alert,
+  Image,
+  Linking,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Adjudicator, DrugSearchResult } from '../../api/types';
@@ -38,6 +48,15 @@ const DDC = () => {
 
   const [showFAQ, setShowFAQ] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+
+  async function handleAddToGoogleWallet() {
+    try {
+      const { url } = await getGoogleWalletUrl(result);
+      await Linking.openURL(url);
+    } catch {
+      Alert.alert('Error', 'Could not add to Google Wallet.');
+    }
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -231,14 +250,27 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 180,
   },
+  actionButtonsWrap: {
+    gap: 12,
+    marginBottom: 25,
+  },
   actionRow: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 25,
     justifyContent: 'center',
   },
   actionButton: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#236488',
+    borderRadius: 999,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  actionButtonFull: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
