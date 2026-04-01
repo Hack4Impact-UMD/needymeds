@@ -3,7 +3,7 @@ import { createPass } from '../services/applewallet.service';
 
 const router = Router();
 
-router.post('/', async (req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
     const cardNumber = '90MA019309343023';
 
@@ -15,7 +15,7 @@ router.post('/', async (req, res, next) => {
     res.setHeader('Content-Type', 'application/vnd.apple.pkpass');
     res.setHeader('Content-Disposition', 'attachment; filename=needymeds.pkpass');
 
-    res.status(200).send(pkpass);
+    res.status(200).end(pkpass);
   } catch (error) {
     next(error);
   }
