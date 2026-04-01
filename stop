@@ -1,0 +1,331 @@
+[33mcommit 1860567a3f238a6dc9d722422442bf7b87fb43e0[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Om Arya <om.arya0577@gmail.com>
+Date:   Fri Feb 13 09:30:33 2026 -0500
+
+    Sync changes from NeedyMeds repository (#41)
+    
+    * Create frontend files
+    
+    * Update technical architecture diagram
+    
+    * Set up Express.js backend and test Husky
+    
+    * Tweak frontend configurations
+    
+    * Delete unnecessary .gitignore
+    
+    * Delete unnecessary Expo README
+    
+    * Remove splash screen dark mode
+    
+    * Add NeedyMeds color palette to theme.ts
+    
+    * Consolidate .vscode settings
+    
+    * set up docker file and docker compose
+    
+    * get current location and began reverse geocoding
+    
+    * added nominatim api call'
+    
+    * fetched zipcode
+    
+    * added a formatted address
+    
+    * starter code for redux storage
+    
+    * "starter code for redux"
+    
+    * starter code for redux
+    
+    * Modified to store address and zip code in redux store
+    
+    * added api setup
+    
+    * fixed service with both endpoints
+    
+    * fix dsnt routes
+    
+    * fix type issue in service
+    
+    * Deploy frontend on EAS
+    
+    * fix es module issue
+    
+    * converted UserLocation to a function returning zip and address
+    
+    * folder for JEST testing files
+    
+    * working on addign Jest but errors with setup.js
+    
+    * commiting for review - frontend api and tests
+    
+    * dsnt-branch
+    
+    * had a couple merge conflicts that were resulting in failing jest testing
+    
+    * testing dsnt using curl
+    
+    * Converted user_location to a pure async function and created appropriate Jest test
+    
+    * Updated to match ones used for pure async function
+    
+    * Set up React Native Paper (from dev branch)
+    
+    * Fixed issues with react versions and location of expo dependency in package files
+    
+    * Moved user_location to hooks and renamed to useUserLocation. Updated accompanying Jest test suite and added some additional tests for edge cases/errors. Need to update to accept dispatch as an argument rather than directly importing it.
+    
+    * Add dark mode support for RN Paper usage
+    
+    * Move useColorScheme hook usage to inside function
+    
+    * Added useUserLocation to hooks directory
+    
+    * removed old code to sync with Dhanya's branch
+    
+    * Implement ScriptSave 003, 004, 005 endpoints (no validation or testing yet)
+    
+    * Implement last 5 ScriptSave endpoints (unfunctional due to no secrets/token management yet)
+    
+    * Updated useUserLocation() to include a UserAgent header in the Nominatim API request
+    
+    * Distance function progress
+    
+    * tested distance function with jest
+    
+    * Implement ScriptSave secrets and JWToken management
+    
+    * Begin implementation for remaining ScriptSave functions
+    
+    * added tests and interface types
+    
+    * (almost) finish MVP backend implementation (needs proper optional fields and validation)
+    
+    * removed address to coordinates function
+    
+    * added distance function and conversion for just zip to coordinates
+    
+    * Implement search function (todo: integrate distance functions)
+    
+    * Refactor redux files
+    
+    * Finish MVP backend implementation (needs more testing, tests don't run due to missing Secrets Manager perms)
+    
+    * PR changes: rename, move files, change meters to miles
+    
+    * Improve tests and types
+    
+    * Refine secrets management
+    
+    * Implement getUrlApiSecret and delete .env
+    
+    * Fix NDC validator (DSNT and ScriptSave services)
+    
+    * Finish fixing ndc validator
+    
+    * inital navigation skeleton and page files
+    
+    * added NDC-validated url-lookup route and tests
+    
+    * Finish implementing MVP backend (need to manually test every endpoint)
+    
+    * Finalize MVP backend after manual testing
+    
+    * Make backend port configurable
+    
+    * Converts local csv file of pharmacies to sqlite3 db. No value is replaced with null for numbers and empty string for text
+    
+    * Add secrets mocking to backend tests
+    
+    * Revert package-lock.json
+    
+    * search page almost done
+    
+    * added expo router
+    
+    * stash
+    
+    * implemented med lookup
+    
+    * fixed med lookup page
+    
+    * added logo
+    
+    * added pharmacy cards
+    
+    * Finish implementing search functions; improve useUserLocation with retry logic and proper caching; fix config and update tests
+    
+    * Use proper coordinates for distanceBetweenCoordinates calls in search functions
+    
+    * Add radius and includeGeneric filters to search functions; fix zipCode resolution logic
+    
+    * added navbar component, added welcome screen
+    
+    * Updated code per coderabbit feedback (error handling mostly)
+    
+    * updated parseInt statements
+    
+    * Refactor drug search and user location files
+    
+    * Strengthen frontend typing (strict strings instead of unions)
+    
+    * Improve drugSearch/userLocation type checking and error handling
+    
+    * Lower MAX_SCRIPTSAVE_NUMRESULTS to 100
+    
+    * Update drugSearch/userLocation cache keying (getUserLocation returns zip only)
+    
+    * Throw errors in zipToCoords instead of internal handling
+    
+    * Include lat and lon in userLocation caching for proper utilization
+    
+    * Removed database existence check
+    
+    * pharmacy search setup
+    
+    * add actual db with integration tests
+    
+    * base for first education page
+    
+    * added prescription savings tips page
+    
+    * Added pharmacy database .env file to gitignore
+    
+    * Added error reporting for missing .env file or required variables
+    
+    * Updated ingestion script to add phone number and zip code of pharmacies
+    
+    * Fixed swapped rows for loadData()
+    
+    * Updated formatData() with codeRabbit feedback
+    
+    * Configure Expo app publish files (app.json and eas.json)
+    
+    * Revert Expo start scripts
+    
+    * education tips page cone
+    
+    * deleted savings fixed navbar
+    
+    * Add ./google-play-service-account.json to .gitignore
+    
+    * Add Android location permissions to app.json
+    
+    * Remove .env from tracking
+    
+    * Add generic '.env' to .gitignore
+    
+    * Add generic '.env' to .gitignore
+    
+    * Update pharmacy sheet (Oct. 2025)
+    
+    * added component for med info
+    
+    * Fixed some styling for educational resources and tips page
+    
+    * ui wip
+    
+    * back button functionality
+    
+    * assume lat and long always given, add phone
+    
+    * add phoneNumber to types and remove irrelevant test
+    
+    * remove zip code test
+    
+    * setup for new branch
+    
+    * set up drug search result prop and sample
+    
+    * fix file structure
+    
+    * dynamically render dst vs scirptsave cards
+    
+    * Turned header into component and fixed more styling
+    
+    * pass in drug result prop through router
+    
+    * Incorporated DDC FAQs page into the DDC card page
+    
+    * Added navigation to DDC page from BottomNavBar and implemented popup sheet for Share options. Still needs some extra details and redirection once an option is actually selected. No error reporting yet and also no implementation for Expand.
+    
+    * Fixed icons in share sheet
+    
+    * Set up i18next and convert EN/ES translation sheet to JSON
+    
+    * Remove '\n's and '\r's from locales files
+    
+    * fixed the bottom navbar and the tips page styling
+    
+    * Implemented welcome screen + medication lookup page UIs.
+    
+    * finished most of params typing page
+    
+    * Finish welcome screen + begin API integration
+    
+    * Finish main medication lookup page
+    
+    * create component setup
+    
+    * ui wip
+    
+    * Created the empty results UI for pharmacy locator
+    
+    * Added back arrow functionality from search to paramstyping
+    
+    * added search result component, copied in some files from development branch to start use the pharmacy
+    Search function
+    
+    * Tweak welcome + medication lookup styling to match hi-fi Figma designs
+    
+    * Fix mobile styling issues
+    
+    * Refactor medication lookup
+    
+    * Use JSON file for zip to lat/lon conversion
+    
+    * Created the expand functionality
+    
+    * completed zipcode fix on both pharm search
+    
+    * Finish Error messages
+    
+    * Integrate sortBy and form drug search params
+    
+    * Integrate drug search initialization
+    
+    * Include label name in drug search results
+    
+    * Begin DDC integration
+    
+    * Refactor pharmacy lookup files
+    
+    * Finish medication lookup API integration
+    
+    * Implement welcome screen EN->ES translations
+    
+    * Finish implementing EN->ES translations
+    
+    * Make default header consistent across pages
+    
+    * Improve UIs and API integration
+    
+    * Improve medication lookup UI
+    
+    * Complete MVP frontend for alpha testing (#33)
+    
+    * Sync changes from NeedyMeds repository
+    
+    ---------
+    
+    Co-authored-by: samarth212 <95194221+samarth212@users.noreply.github.com>
+    Co-authored-by: eileendchen <eileendchen@gmail.com>
+    Co-authored-by: ango06 <ngoangela6@gmail.com>
+    Co-authored-by: Ayaan Hussain <azh13@terpmail.umd.edu>
+    Co-authored-by: ayaanh-03 <ayaanzh13@gmail.com>
+    Co-authored-by: Samarth Kolanupaka <samarth212@gmail.com>
+    Co-authored-by: dhanyades <dhanya.desai@gmail.com>
+    Co-authored-by: Parsa Sedghi <psedghi@umd.edu>
+    Co-authored-by: Adyasha Mishra <42711369+adyasha9@users.noreply.github.com>
+    Co-authored-by: Bhavya Tanugula <bhavya.tanugula@gmail.com>

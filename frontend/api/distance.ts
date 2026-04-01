@@ -24,6 +24,8 @@ export async function zipToCoords(zipcode: string): Promise<Coordinates> {
   coords.lat = result[0].toString();
   coords.lon = result[1].toString();
 
+  coords.error = '';
+
   return coords;
 }
 

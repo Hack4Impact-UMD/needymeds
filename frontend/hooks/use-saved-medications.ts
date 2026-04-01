@@ -1,17 +1,13 @@
-import { create_database } from '@/api/savedMedicationsDb';
+import { create_database } from '@/api/savedDB';
 import {
+  deleteMedication as deleteMedicationDB,
   getAllMedications,
   saveMedication as saveMedicationDB,
-  deleteMedication as deleteMedicationDB,
 } from '@/api/savedMedicationsCRUD';
 import { SavedMedication } from '@/api/types';
 import { SQLiteDatabase } from 'expo-sqlite';
 import { useEffect, useRef, useState } from 'react';
 
-/**
- * Custom hook to manage saved medications in the local SQLite database.
- * Provides state and methods for storing, retrieving, and deleting saved medications.
- */
 export function useSavedMedications() {
   const dbRef = useRef<SQLiteDatabase | null>(null);
   const [medications, setMedications] = useState<SavedMedication[]>([]);

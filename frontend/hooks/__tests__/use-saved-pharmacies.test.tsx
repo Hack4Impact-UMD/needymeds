@@ -1,23 +1,23 @@
 import { act, render, waitFor } from '@testing-library/react-native';
 
 import { create_database } from '@/api/savedDB';
-import { SavedMedication } from '@/api/types';
-import { useSavedMedications } from '../use-saved-medications';
+import { SavedPharmacy } from '@/api/types';
+import { useSavedPharmacies } from '../use-saved-pharmacies';
 
 jest.mock('@/api/savedDB', () => ({
   create_database: jest.fn(),
 }));
 
-describe('useSavedMedications hook', () => {
+describe('useSavedPharmacies hook', () => {
   let mockDb: {
     getAllAsync: jest.Mock;
     runAsync: jest.Mock;
   };
 
-  let latestHook: ReturnType<typeof useSavedMedications> | undefined;
+  let latestHook: ReturnType<typeof useSavedPharmacies> | undefined;
 
   function TestComponent() {
-    latestHook = useSavedMedications();
+    latestHook = useSavedPharmacies();
     return null;
   }
 
@@ -26,20 +26,16 @@ describe('useSavedMedications hook', () => {
 
     mockDb = {
       getAllAsync: jest.fn().mockResolvedValue([]),
-      runAsync: jest.fn().mockResolvedValue({ lastInsertRowId: 1, changes: 1 }),
+      runAsync: jest.fn().mockResolvedValue({ changes: 1 }),
     };
 
     (create_database as jest.Mock).mockResolvedValue(mockDb);
     latestHook = undefined;
   });
 
-  it('initializes the database and loads medications', async () => {
-    const rows: SavedMedication[] = [
-      {
-        id: 1,
-        drug_name: 'Test Drug',
-        quantity: 10,
-      },
+  it('initializes the database and loads pharmacies', async () => {
+    const rows: SavedPharmacy[] = [
+      { npi: '1111111111', name: 'CVS Pharmacy', address: '123 Sycamore St' },
     ];
 
     mockDb.getAllAsync.mockResolvedValueOnce(rows);
@@ -49,13 +45,13 @@ describe('useSavedMedications hook', () => {
     await waitFor(() => {
       expect(latestHook).toBeDefined();
       expect(latestHook?.loading).toBe(false);
-      expect(latestHook?.medications).toEqual(rows);
+      expect(latestHook?.pharmacies).toEqual(rows);
       expect(latestHook?.error).toBeNull();
     });
 
     expect(create_database).toHaveBeenCalled();
     expect(mockDb.getAllAsync).toHaveBeenCalledWith(
-      'SELECT * FROM Saved_Medications ORDER BY last_saved_date DESC'
+      'SELECT * FROM Saved_Pharmacies ORDER BY name ASC'
     );
   });
 
@@ -70,7 +66,7 @@ describe('useSavedMedications hook', () => {
     });
   });
 
-  it('handles errors when loading medications', async () => {
+  it('handles errors when loading pharmacies', async () => {
     mockDb.getAllAsync.mockRejectedValueOnce(new Error('load failed'));
 
     render(<TestComponent />);
@@ -79,18 +75,14 @@ describe('useSavedMedications hook', () => {
       expect(latestHook).toBeDefined();
       expect(latestHook?.loading).toBe(false);
       expect(latestHook?.error).toBe('load failed');
-      expect(latestHook?.medications).toEqual([]);
+      expect(latestHook?.pharmacies).toEqual([]);
     });
   });
 
-  it('saves a medication and reloads the list', async () => {
-    const initialRows: SavedMedication[] = [];
-    const savedRows: SavedMedication[] = [
-      {
-        id: 1,
-        drug_name: 'Saved Drug',
-        quantity: 5,
-      },
+  it('saves a pharmacy and reloads the list', async () => {
+    const initialRows: SavedPharmacy[] = [];
+    const savedRows: SavedPharmacy[] = [
+      { npi: '1111111111', name: 'CVS Pharmacy', address: '123 Sycamore St' },
     ];
 
     mockDb.getAllAsync
@@ -106,34 +98,30 @@ describe('useSavedMedications hook', () => {
 
     const callsBeforeSave = mockDb.getAllAsync.mock.calls.length;
     await act(async () => {
-      await latestHook?.saveMedication({
-        drug_name: 'Saved Drug',
-        quantity: 5,
+      await latestHook?.savePharmacy({
+        npi: '1111111111',
+        name: 'CVS Pharmacy',
+        address: '123 Sycamore St',
       });
     });
 
     expect(mockDb.runAsync).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT INTO Saved_Medications'),
-      ['Saved Drug', null, null, null, 5, expect.any(String)]
+      expect.stringContaining('INSERT OR REPLACE INTO Saved_Pharmacies'),
+      expect.any(Array)
     );
 
     await waitFor(() => {
       expect(mockDb.getAllAsync.mock.calls.length).toBeGreaterThan(callsBeforeSave);
-      expect(latestHook?.medications).toEqual(savedRows);
+      expect(latestHook?.pharmacies).toEqual(savedRows);
       expect(latestHook?.error).toBeNull();
     });
   });
 
-  it('deletes a medication and reloads the list', async () => {
-    const initialRows: SavedMedication[] = [
-      {
-        id: 1,
-        drug_name: 'Existing Drug',
-        quantity: 1,
-      },
+  it('deletes a pharmacy and reloads the list', async () => {
+    const initialRows: SavedPharmacy[] = [
+      { npi: '1111111111', name: 'CVS Pharmacy', address: '123 Sycamore St' },
     ];
-
-    const afterDeleteRows: SavedMedication[] = [];
+    const afterDeleteRows: SavedPharmacy[] = [];
 
     mockDb.getAllAsync
       .mockResolvedValueOnce(initialRows) // initial load
@@ -144,19 +132,21 @@ describe('useSavedMedications hook', () => {
     await waitFor(() => {
       expect(latestHook).toBeDefined();
       expect(latestHook?.loading).toBe(false);
-      expect(latestHook?.medications).toEqual(initialRows);
+      expect(latestHook?.pharmacies).toEqual(initialRows);
     });
 
     const callsBeforeDelete = mockDb.getAllAsync.mock.calls.length;
     await act(async () => {
-      await latestHook?.deleteMedication(1);
+      await latestHook?.deletePharmacy('1111111111');
     });
 
-    expect(mockDb.runAsync).toHaveBeenCalledWith('DELETE FROM Saved_Medications WHERE id = ?', [1]);
+    expect(mockDb.runAsync).toHaveBeenCalledWith('DELETE FROM Saved_Pharmacies WHERE npi = ?', [
+      '1111111111',
+    ]);
 
     await waitFor(() => {
       expect(mockDb.getAllAsync.mock.calls.length).toBeGreaterThan(callsBeforeDelete);
-      expect(latestHook?.medications).toEqual(afterDeleteRows);
+      expect(latestHook?.pharmacies).toEqual(afterDeleteRows);
     });
   });
 });

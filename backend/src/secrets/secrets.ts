@@ -34,7 +34,7 @@ type AppleWalletWWDRSecret = {
   wwdr: Buffer;
 };
 
-const region = 'us-east-1';
+const region = 'us-east-2';
 
 const client = new SecretsManagerClient({ region });
 

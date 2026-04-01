@@ -39,14 +39,9 @@ export interface SavedMedication {
 }
 
 export interface SavedPharmacy {
-  id?: number;
-  pharmacy_name: string;
-  street: string;
-  city: string;
-  state: string;
-  zip_code: string;
-  phone_number: string;
-  last_saved_date?: string;
+  npi: string;
+  name: string;
+  address: string;
 }
 
 /* Requests */
