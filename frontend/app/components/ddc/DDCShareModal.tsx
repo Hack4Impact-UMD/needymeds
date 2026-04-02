@@ -1,18 +1,20 @@
-import { Adjudicator } from '@/api/types';
-import { MaterialIcons } from '@expo/vector-icons';
+import { Adjudicator, DrugSearchResult } from '@/api/types';
+import { getGoogleWalletUrl } from '@/api/wallet';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { Asset } from 'expo-asset';
 import * as MediaLibrary from 'expo-media-library';
 import * as Sharing from 'expo-sharing';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Modal from 'react-native-modal';
+import { Alert, Linking, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import BottomSheetModal from '../BottomSheetModal';
 
 interface DDCShareModalProps {
   isOpen: boolean;
   onClose: () => void;
   adjudicator: Adjudicator;
+  result: DrugSearchResult;
 }
 
-const DDCShareModal = ({ isOpen, onClose, adjudicator }: DDCShareModalProps) => {
+const DDCShareModal = ({ isOpen, onClose, adjudicator, result }: DDCShareModalProps) => {
   async function ensureAssetUri(): Promise<string> {
     const ddcImage =
       adjudicator === 'DSNT'
@@ -59,24 +61,17 @@ const DDCShareModal = ({ isOpen, onClose, adjudicator }: DDCShareModalProps) => 
     }
   }
 
+  async function handleGoogleWallet() {
+    try {
+      const { url } = await getGoogleWalletUrl(result);
+      await Linking.openURL(url);
+    } catch (error) {
+      Alert.alert('Error', 'Could not add to Google Wallet.');
+    }
+  }
+
   return (
-    <Modal
-      isVisible={isOpen}
-      onSwipeComplete={onClose}
-      swipeDirection={['down']}
-      style={{ margin: 0, justifyContent: 'flex-end' }}
-      backdropColor="black"
-      backdropOpacity={0.7}
-      backdropTransitionInTiming={300}
-      backdropTransitionOutTiming={300}
-      onBackdropPress={onClose}
-      useNativeDriver={false}
-      animationIn="slideInUp"
-      animationOut="slideOutDown"
-      animationInTiming={300}
-      animationOutTiming={300}
-    >
-      {/* Bottom popup container */}
+    <BottomSheetModal visible={isOpen} onClose={onClose} animationDuration={300}>
       <View style={styles.bottomSheet}>
         <View style={styles.modalHandle} />
 
@@ -103,17 +98,26 @@ const DDCShareModal = ({ isOpen, onClose, adjudicator }: DDCShareModalProps) => 
           </View>
           <Text style={styles.sheetText}>Download to device</Text>
         </TouchableOpacity>
+
+        {Platform.OS === 'android' && (
+          <>
+            <View style={styles.separator} />
+            <TouchableOpacity style={styles.sheetRow} onPress={handleGoogleWallet}>
+              <View style={styles.iconCircle}>
+                <MaterialCommunityIcons name="wallet" size={24} color="#fff" />
+              </View>
+              <Text style={styles.sheetText}>Add to Google Wallet</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
-    </Modal>
+    </BottomSheetModal>
   );
 };
 
 const styles = StyleSheet.create({
   bottomSheet: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
+    width: '100%',
     backgroundColor: '#FFF',
     paddingTop: 20,
     paddingBottom: 36,

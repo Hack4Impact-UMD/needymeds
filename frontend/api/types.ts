@@ -28,6 +28,22 @@ export interface Pharmacy {
   phoneNumber: string;
 }
 
+export interface SavedMedication {
+  id?: number;
+  drug_name: string;
+  pharmacy_npi?: string;
+  form?: string;
+  strength?: string;
+  quantity?: number;
+  last_saved_date?: string;
+}
+
+export interface SavedPharmacy {
+  npi: string;       
+  name: string;
+  address: string;
+}
+
 /* Requests */
 
 export interface DsntPriceRequest {
@@ -156,7 +172,7 @@ export interface ScriptSaveFormItem {
   Ranking: string;
   IsSelected: string;
   LN: string;
-  CommonQty: string;
+  CommonQty: number;
   IsDiscontinued: string;
   DiscontinuedDate: string;
 }
@@ -167,7 +183,7 @@ export interface ScriptSaveStrengthItem {
   Ranking: string;
   IsSelected: string;
   LN: string;
-  CommonQty: string;
+  CommonQty: number;
 }
 
 export interface ScriptSaveQuantityItem {

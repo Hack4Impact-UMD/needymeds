@@ -11,6 +11,8 @@ import {
   priceDrugsByNCPDP,
 } from '../services/scriptsave.service';
 
+import { scriptSaveTokenManager } from '../auth/scriptsave.tokenManager';
+
 const host: string = process.env.SCRIPTSAVE_BASE_URL || '';
 
 jest.mock('../secrets/secrets', () => ({
@@ -20,6 +22,15 @@ jest.mock('../secrets/secrets', () => ({
     password: 'placeholder',
   }),
 }));
+
+beforeEach(() => {
+  jest.spyOn(scriptSaveTokenManager, 'getToken').mockResolvedValue('mock-token');
+});
+
+afterEach(() => {
+  nock.cleanAll();
+  jest.restoreAllMocks();
+});
 
 describe('scriptsave.service', () => {
   afterEach(() => nock.cleanAll());

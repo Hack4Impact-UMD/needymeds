@@ -1,4 +1,5 @@
 import nock from 'nock';
+import { scriptSaveTokenManager } from '../auth/scriptsave.tokenManager';
 import { autoComplete, findDrugsUsingNDC11, priceDrug } from '../services/scriptsave.service';
 
 const host: string = process.env.SCRIPTSAVE_BASE_URL || '';
@@ -10,6 +11,15 @@ jest.mock('../secrets/secrets', () => ({
     password: 'placeholder',
   }),
 }));
+
+beforeEach(() => {
+  jest.spyOn(scriptSaveTokenManager, 'getToken').mockResolvedValue('mock-token');
+});
+
+afterEach(() => {
+  nock.cleanAll();
+  jest.restoreAllMocks();
+});
 
 describe('ScriptSave service endpoints', () => {
   afterEach(() => nock.cleanAll());

@@ -1,4 +1,5 @@
 import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
+import forge from 'node-forge';
 
 type DsntSecret = {
   baseUrl: string;
@@ -19,6 +20,20 @@ type UrlApiSecret = {
   xApiKey: string;
 };
 
+type GoogleWalletSecret = {
+  privateKey: string;
+  clientEmail: string;
+};
+
+type AppleWalletSecret = {
+  signerCert: string;
+  signerKey: string;
+};
+
+type AppleWalletWWDRSecret = {
+  wwdr: Buffer;
+};
+
 const region = 'us-east-2';
 
 const client = new SecretsManagerClient({ region });
@@ -27,9 +42,20 @@ let cache: {
   dsntSecret: DsntSecret | null;
   scriptSaveSecret: ScriptSaveSecret | null;
   urlApiSecret: UrlApiSecret | null;
+  googleWalletSecret: GoogleWalletSecret | null;
+  appleWalletSecret: AppleWalletSecret | null;
+  appleWalletWWDRSecret: AppleWalletWWDRSecret | null;
   exp: number;
 };
-cache = { dsntSecret: null, scriptSaveSecret: null, urlApiSecret: null, exp: 0 };
+cache = {
+  dsntSecret: null,
+  scriptSaveSecret: null,
+  urlApiSecret: null,
+  googleWalletSecret: null,
+  appleWalletSecret: null,
+  appleWalletWWDRSecret: null,
+  exp: 0,
+};
 const TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 export async function getDsntSecret(): Promise<DsntSecret> {
@@ -51,9 +77,12 @@ export async function getDsntSecret(): Promise<DsntSecret> {
   };
 
   cache = {
+    ...cache,
     dsntSecret: secret,
     scriptSaveSecret: cache.scriptSaveSecret,
     urlApiSecret: cache.urlApiSecret,
+    appleWalletSecret: cache.appleWalletSecret,
+    appleWalletWWDRSecret: cache.appleWalletWWDRSecret,
     exp: now + TTL_MS,
   };
   return secret;
@@ -80,9 +109,11 @@ export async function getScriptSaveSecret(): Promise<ScriptSaveSecret> {
   };
 
   cache = {
-    dsntSecret: cache.dsntSecret,
+    ...cache,
     scriptSaveSecret: secret,
     urlApiSecret: cache.urlApiSecret,
+    appleWalletSecret: cache.appleWalletSecret,
+    appleWalletWWDRSecret: cache.appleWalletWWDRSecret,
     exp: now + TTL_MS,
   };
   return secret;
@@ -106,9 +137,120 @@ export async function getUrlApiSecret(): Promise<UrlApiSecret> {
   };
 
   cache = {
+    ...cache,
+    urlApiSecret: secret,
+    appleWalletSecret: cache.appleWalletSecret,
+    appleWalletWWDRSecret: cache.appleWalletWWDRSecret,
+    exp: now + TTL_MS,
+  };
+  return secret;
+}
+
+export async function getAppleWalletSecret(): Promise<AppleWalletSecret> {
+  const now = Date.now();
+  if (cache.appleWalletSecret && cache.exp > now) return cache.appleWalletSecret;
+
+  const cmd = new GetSecretValueCommand({ SecretId: 'apple-wallet-pass-certificate' });
+  const res = await client.send(cmd);
+
+  const raw =
+    res.SecretString ?? (res.SecretBinary ? Buffer.from(res.SecretBinary).toString('utf-8') : '');
+  if (!raw) throw new Error('Empty Apple Wallet secret');
+
+  const parsed = JSON.parse(raw);
+
+  const p12Buffer = Buffer.from(parsed.certificate, 'base64');
+  const password = parsed.password;
+
+  // Convert P12 -> forge object
+  const p12Der = forge.util.createBuffer(p12Buffer.toString('binary'));
+  const p12Asn1 = forge.asn1.fromDer(p12Der);
+  const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, password);
+
+  let signerCert = '';
+  let signerKey = '';
+
+  for (const safeContents of p12.safeContents) {
+    for (const safeBag of safeContents.safeBags) {
+      if (safeBag.type === forge.pki.oids.certBag) {
+        signerCert = forge.pki.certificateToPem(safeBag.cert!);
+      }
+
+      if (safeBag.type === forge.pki.oids.pkcs8ShroudedKeyBag) {
+        signerKey = forge.pki.privateKeyToPem(safeBag.key!);
+      }
+    }
+  }
+
+  if (!signerCert || !signerKey) {
+    throw new Error('Failed to extract certificate or key from p12');
+  }
+
+  const secret: AppleWalletSecret = {
+    signerCert,
+    signerKey,
+  };
+
+  cache = {
     dsntSecret: cache.dsntSecret,
     scriptSaveSecret: cache.scriptSaveSecret,
-    urlApiSecret: secret,
+    urlApiSecret: cache.urlApiSecret,
+    googleWalletSecret: cache.googleWalletSecret,
+    appleWalletSecret: secret,
+    appleWalletWWDRSecret: cache.appleWalletWWDRSecret,
+    exp: now + TTL_MS,
+  };
+  return secret;
+}
+
+export async function getAppleWalletWWDRSecret(): Promise<AppleWalletWWDRSecret> {
+  const now = Date.now();
+  if (cache.appleWalletWWDRSecret && cache.exp > now) return cache.appleWalletWWDRSecret;
+
+  const cmd = new GetSecretValueCommand({ SecretId: 'apple-wallet-wwdr' });
+  const res = await client.send(cmd);
+
+  const raw =
+    res.SecretString ?? (res.SecretBinary ? Buffer.from(res.SecretBinary).toString('utf-8') : '');
+  if (!raw) throw new Error('Empty WWDR secret');
+
+  const parsed = JSON.parse(raw);
+  const secret: AppleWalletWWDRSecret = {
+    wwdr: Buffer.from(parsed.wwdr, 'base64'),
+  };
+
+  cache = {
+    dsntSecret: cache.dsntSecret,
+    scriptSaveSecret: cache.scriptSaveSecret,
+    urlApiSecret: cache.urlApiSecret,
+    googleWalletSecret: cache.googleWalletSecret,
+    appleWalletSecret: cache.appleWalletSecret,
+    appleWalletWWDRSecret: secret,
+    exp: now + TTL_MS,
+  };
+  return secret;
+}
+
+export async function getGoogleWalletSecret(): Promise<GoogleWalletSecret> {
+  const now = Date.now();
+  if (cache.googleWalletSecret && cache.exp > now) return cache.googleWalletSecret;
+
+  const cmd = new GetSecretValueCommand({ SecretId: 'google-wallet-service-account-key' });
+  const res = await client.send(cmd);
+
+  const raw =
+    res.SecretString ?? (res.SecretBinary ? Buffer.from(res.SecretBinary).toString('utf-8') : '');
+  if (!raw) throw new Error('Empty Google Wallet secret');
+
+  const parsed = JSON.parse(raw);
+  const secret: GoogleWalletSecret = {
+    privateKey: parsed.private_key,
+    clientEmail: parsed.client_email,
+  };
+
+  cache = {
+    ...cache,
+    googleWalletSecret: secret,
     exp: now + TTL_MS,
   };
   return secret;

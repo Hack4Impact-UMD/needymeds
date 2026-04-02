@@ -15,7 +15,9 @@ class ScriptSaveTokenManager {
     this.instanceId = randomUUID().slice(0, 8);
 
     console.log(`[TokenManager:${this.instanceId}] Initialized`);
-    this.startAutoRefresh();
+    if (process.env.NODE_ENV !== 'test') {
+      this.startAutoRefresh();
+    }
   }
 
   // Public method to get the current valid token

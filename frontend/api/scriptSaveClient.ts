@@ -24,6 +24,15 @@ class ScriptSaveClient {
     return apiGet<ScriptSaveFindDrugsResponse>('/api/scriptsave/findDrugsUsingDrugName', q);
   }
 
+  getDrugsByGSN(
+    q: Omit<ScriptSaveFindDrugsRequest, 'drugName'> & { gsn: string; referencedBN?: string }
+  ) {
+    return apiGet<ScriptSaveFindDrugsResponse>(
+      '/api/scriptsave/findDrugsUsingGSNAndReferencedBN',
+      q
+    );
+  }
+
   getDrugFormStrength(q: ScriptSaveGetDrugFormStrengthRequest) {
     return apiGet<ScriptSaveGetDrugFormStrengthResponse>('/api/scriptsave/getDrugFormStrength', q);
   }

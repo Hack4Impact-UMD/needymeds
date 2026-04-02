@@ -1,5 +1,6 @@
 import { autoCompleteSearchDrug } from '@/api/drugSearch';
 import { Colors } from '@/constants/theme';
+import { useRecentSearches } from '@/hooks/use-recent-searches';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
@@ -41,6 +42,13 @@ const MedicationLookupAutocompleteScreen = () => {
   const [errorType, setErrorType] = useState<ErrorStateType | null>(null);
 
   const inputRef = useRef<TextInput>(null);
+  const { recentSearches, addRecentSearch, removeRecentSearch, clearAllRecentSearches, refreshRecentSearches } = useRecentSearches();
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshRecentSearches();
+    }, [])
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -70,8 +78,9 @@ const MedicationLookupAutocompleteScreen = () => {
     }, [query])
   );
 
-  const handleSelectMed = (item: string) => {
+  const handleSelectMed = (item: string, knownGeneric?: string | null) => {
     Keyboard.dismiss();
+    addRecentSearch(item, knownGeneric ?? null);
     router.push({
       pathname: '/medication-lookup-selected',
       params: {
@@ -98,13 +107,64 @@ const MedicationLookupAutocompleteScreen = () => {
             <LanguageDropdown />
           </View>
 
-          {/* Results or Empty State */}
+          {/* Results or Recent or Empty State */}
           <View style={styles.resultsContainer} onTouchStart={Keyboard.dismiss}>
             {query.length < MIN_QUERY_LENGTH ? (
-              // Show placeholder message when no search
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyText}>{t('EmptyMsg')}</Text>
-              </View>
+              recentSearches.length > 0 ? (
+                // Show recent searches
+                <>
+                  <View style={styles.recentHeaderRow}>
+                    <Text style={styles.recentHeader}>{t('Recent')}</Text>
+                    <TouchableOpacity
+                      onPress={clearAllRecentSearches}
+                      accessibilityRole="button"
+                      accessibilityLabel={t('ClearAll')}
+                    >
+                      <Text style={styles.clearAllText}>{t('ClearAll')}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <FlatList
+                    data={recentSearches}
+                    keyExtractor={(item) => String(item.id)}
+                    keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        style={styles.resultItem}
+                        onPress={() => handleSelectMed(item.drug_name, item.generic_name)}
+                        activeOpacity={0.7}
+                      >
+                        <MaterialCommunityIcons
+                          name="magnify"
+                          size={20}
+                          color="#9CA3AF"
+                          style={styles.searchIcon}
+                        />
+                        <View style={styles.resultContent}>
+                          <Text style={styles.resultName}>{item.drug_name}</Text>
+                          <Text style={styles.resultGeneric}>
+                            / {item.generic_name ?? t('NA')}
+                          </Text>
+                        </View>
+                        <TouchableOpacity
+                          onPress={() => removeRecentSearch(item.id)}
+                          accessibilityRole='button'
+                          accessibilityLabel={t('RecentSearchRemove', { drugName: item.drug_name })}
+                          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                        >
+                          <MaterialCommunityIcons name="close" size={18} color="#9CA3AF" />
+                        </TouchableOpacity>
+                      </TouchableOpacity>
+                    )}
+                    contentContainerStyle={styles.listContent}
+                  />
+                </>
+              ) : (
+                // No recents — show placeholder
+                <View style={styles.emptyState}>
+                  <Text style={styles.emptyText}>{t('EmptyMsg')}</Text>
+                </View>
+              )
             ) : isLoading ? (
               // Show loading state
               <ActivityIndicator size="large" style={{ marginTop: 200 }} color="#236488" />
@@ -112,7 +172,7 @@ const MedicationLookupAutocompleteScreen = () => {
               // Show error state
               <ErrorState type={errorType} />
             ) : (
-              // Show results list
+              // Show API autocomplete results
               <FlatList
                 data={results}
                 keyExtractor={(item) => item}
@@ -124,6 +184,12 @@ const MedicationLookupAutocompleteScreen = () => {
                     onPress={() => handleSelectMed(item)}
                     activeOpacity={0.7}
                   >
+                    <MaterialCommunityIcons
+                      name="magnify"
+                      size={20}
+                      color="#9CA3AF"
+                      style={styles.searchIcon}
+                    />
                     <View style={styles.resultContent}>
                       <Text style={styles.resultName}>{item}</Text>
                     </View>
@@ -156,7 +222,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     maxWidth: 412,
-    paddingBottom: Platform.OS === 'ios' ? 84 : 68, // bottom navbar height
+    paddingBottom: Platform.OS === 'ios' ? 84 : 68,
     backgroundColor: Colors.default.neutrallt,
   },
   searchContainer: {
@@ -171,6 +237,25 @@ const styles = StyleSheet.create({
   resultsContainer: {
     flex: 1,
     backgroundColor: Colors.default.neutrallt,
+  },
+  recentHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 4,
+  },
+  recentHeader: {
+    fontSize: 14,
+    fontFamily: 'Open Sans',
+    color: '#41484D',
+    fontWeight: '600',
+  },
+  clearAllText: {
+    fontSize: 13,
+    fontFamily: 'Open Sans',
+    color: '#236488',
   },
   emptyState: {
     maxWidth: '100%',
@@ -204,6 +289,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#F3F4F6',
   },
+  searchIcon: {
+    marginRight: 12,
+  },
   resultContent: {
     flex: 1,
     marginRight: 12,
@@ -214,6 +302,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Open Sans',
     color: '#181C20',
     lineHeight: 22,
+  },
+  resultGeneric: {
+    fontSize: 13,
+    fontFamily: 'Open Sans',
+    color: '#9CA3AF',
+    marginTop: 2,
   },
 });
 

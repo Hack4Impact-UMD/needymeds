@@ -25,8 +25,9 @@
   "InfoLink": "What is eligible?",
   "EmptyMsg": "Type the first three letters to start searching.",
   "FormInputLabel": "Form",
+  "StrengthInputLabel": "Strength",
   "QtyInputLabel": "How much?",
-  "ZipInputLabel": "ZIP Code",
+  "ZipInputLabel": "ZIP",
   "ZipDetectOpt": "Detect my location",
   "ZipErrorText": "Your ZIP Code should be a 5-digit number.",
   "RadiusInputLabel": "Radius",
@@ -122,5 +123,8 @@
   "DSTCardBack": "DDC back details",
   "ScriptSaveCardFront": "DDC details front",
   "ScriptSaveCardBack": "DDC back details",
-  "closeIcon5": "Close and go back"
+  "closeIcon5": "Close and go back",
+  "Recent": "Recent",
+  "ClearAll": "Clear all",
+  "NA": "n/a"
 }
