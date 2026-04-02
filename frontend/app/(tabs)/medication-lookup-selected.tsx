@@ -952,7 +952,7 @@ const styles = StyleSheet.create({
   },
   availableCouponsButton: {
     position: 'absolute',
-    bottom: 80,
+    bottom: 100,
     right: 16,
     flexDirection: 'row',
     alignItems: 'center',
