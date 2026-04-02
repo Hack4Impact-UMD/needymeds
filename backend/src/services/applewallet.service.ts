@@ -1,3 +1,4 @@
+console.log('applewallet.service.ts loaded');
 import { PKPass } from 'passkit-generator';
 import path from 'path';
 import { getAppleWalletSecret, getAppleWalletWWDRSecret } from '../secrets/secrets';
@@ -9,6 +10,7 @@ type PassInput = {
 
 export async function createPass({ serial, number }: PassInput) {
   /*Gets the secret from AWS*/
+  console.log('Reached the Create Pass function');
   const secret = await getAppleWalletSecret();
   console.log('Apple Wallet certificate length:', secret.signerCert.length);
 
@@ -17,7 +19,7 @@ export async function createPass({ serial, number }: PassInput) {
 
   const pass = await PKPass.from(
     {
-      model: path.join(__dirname, '../wallet-pass'),
+      model: path.join(process.cwd(), 'wallet-pass.pass'),
       certificates: {
         signerCert: secret.signerCert,
         signerKey: secret.signerKey,
