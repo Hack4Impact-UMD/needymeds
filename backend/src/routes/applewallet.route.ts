@@ -3,7 +3,7 @@ import { createPass } from '../services/applewallet.service';
 
 const router = Router();
 
-router.post('/', async (req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
     const cardNumber = '90MA019309343023';
 
