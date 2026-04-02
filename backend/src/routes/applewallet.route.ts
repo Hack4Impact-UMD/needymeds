@@ -4,7 +4,7 @@ import { createPass } from '../services/applewallet.service';
 
 const router = Router();
 
-router.post('/', async (req, res, next) => {
+router.get('/', async (req, res, next) => {
   console.log('Route hit');
   try {
     console.log('About to call createPass');
