@@ -44,7 +44,7 @@ const FavoritesScreen = () => {
         <Text style={styles.headers}>Favorite Pharmacy</Text>
         {savedPharmacies.length > 0 ? (
           savedPharmacies.map((pharmacy) => (
-            <PharmacyCard key={pharmacy.id} pharmacy={pharmacy} onUnsave={deletePharmacy} />
+            <PharmacyCard key={pharmacy.npi} pharmacy={pharmacy} onUnsave={deletePharmacy} />
           ))
         ) : (
           <View

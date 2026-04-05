@@ -36,12 +36,14 @@ export interface SavedMedication {
   strength?: string;
   quantity?: number;
   last_saved_date?: string;
+  price: string;
 }
 
 export interface SavedPharmacy {
   npi: string;
   name: string;
   address: string;
+  phoneNumber: string;
 }
 
 /* Requests */

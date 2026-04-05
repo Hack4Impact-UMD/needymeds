@@ -64,9 +64,9 @@ export function useSavedPharmacies() {
     setError(null);
     try {
       await db.runAsync(
-        `INSERT OR REPLACE INTO Saved_Pharmacies (npi, name, address)
-         VALUES (?, ?, ?)`,
-        [pharmacy.npi, pharmacy.name, pharmacy.address]
+        `INSERT OR REPLACE INTO Saved_Pharmacies (npi, name, address, phoneNumber)
+         VALUES (?, ?, ?, ?)`,
+        [pharmacy.npi, pharmacy.name, pharmacy.address, pharmacy.phoneNumber ?? null]
       );
       await loadPharmacies(db);
     } catch (err: any) {

@@ -11,13 +11,15 @@ export async function create_database() {
       form TEXT,
       strength TEXT,
       quantity INTEGER,
-      last_saved_date TEXT DEFAULT CURRENT_TIMESTAMP
+      last_saved_date TEXT DEFAULT CURRENT_TIMESTAMP,
+      price DECIMAL(10, 2)
     );
 
     CREATE TABLE IF NOT EXISTS Saved_Pharmacies (
       npi TEXT PRIMARY KEY,
       name TEXT NOT NULL,
-      address TEXT NOT NULL
+      address TEXT NOT NULL,
+      phoneNumber TEXT NOT NULL
     );
   `);
 

@@ -8,9 +8,9 @@ export async function savePharmacy(
 ): Promise<SavedPharmacy> {
   await db.runAsync(
     `DELETE FROM Saved_Pharmacies; 
-      INSERT INTO Saved_Pharmacies (npi, name, address)
-      VALUES (?, ?, ?)`,
-    [pharmacy.npi, pharmacy.name, pharmacy.address]
+      INSERT INTO Saved_Pharmacies (npi, name, address, phoneNumber)
+      VALUES (?, ?, ?, ?)`,
+    [pharmacy.npi, pharmacy.name, pharmacy.address, pharmacy.phoneNumber ?? null]
   );
 
   return pharmacy;

@@ -5,30 +5,28 @@ import { SavedPharmacy } from '@/api/types';
 
 interface FavoritedPharmacy {
   pharmacy: SavedPharmacy;
-  onUnsave: (id: number) => void;
+  onUnsave: (id: string) => void;
 }
 
 const PharmacyCard = ({ pharmacy, onUnsave }: FavoritedPharmacy) => {
   return (
-    <Card key={pharmacy.id} mode="outlined" style={styles.pharmacy_cards}>
+    <Card key={pharmacy.npi} mode="outlined" style={styles.pharmacy_cards}>
       <Card.Content>
         <View style={styles.header}>
           <Text style={{ fontSize: 18, flex: 1 }} numberOfLines={2}>
-            {pharmacy.pharmacy_name}
+            {pharmacy.name}
           </Text>
-          <TouchableOpacity onPress={() => pharmacy.id && onUnsave(pharmacy.id)}>
+          <TouchableOpacity onPress={() => pharmacy.npi && onUnsave(pharmacy.npi)}>
             <Icon source="star" color="#004E60" size={24} />
           </TouchableOpacity>
         </View>
         <View style={styles.infoRow}>
           <Icon source="map-marker" color="#004E60" size={24} />
-          <Text style={styles.info}>
-            {pharmacy.street}, {pharmacy.city}
-          </Text>
+          <Text style={styles.info}>{pharmacy.address}</Text>
         </View>
         <View style={styles.infoRow}>
           <Icon source="phone-outline" color="#004E60" size={24} />
-          <Text style={styles.info}>{pharmacy.phone_number}</Text>
+          <Text style={styles.info}>{pharmacy.phoneNumber}</Text>
         </View>
       </Card.Content>
     </Card>
