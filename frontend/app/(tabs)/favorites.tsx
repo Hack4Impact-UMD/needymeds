@@ -71,7 +71,7 @@ const FavoritesScreen = () => {
         <Text style={styles.headers}>Favorite Medications</Text>
         {savedMedications.length > 0 ? (
           savedMedications.map((med) => (
-            <MedicationCard key={med.id} medication={med} onUnsave={deleteMedication} />
+            <MedicationCard key={med.id} med={med} onUnsave={deleteMedication} />
           ))
         ) : (
           <View

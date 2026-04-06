@@ -4,25 +4,30 @@ import { Card, Icon } from 'react-native-paper';
 import { SavedMedication } from '@/api/types';
 
 interface FavoritedMedication {
-  medication: SavedMedication;
+  med: SavedMedication;
   onUnsave: (id: number) => void;
 }
 
-const MedicationCard = ({ medication, onUnsave }: FavoritedMedication) => {
+const MedicationCard = ({ med, onUnsave }: FavoritedMedication) => {
+  const pharmacy_address = med.pharmacy_name;
+
   return (
-    <Card key={medication.id} mode="outlined" style={styles.med_cards}>
+    <Card key={med.id} mode="outlined" style={styles.med_cards}>
       <Card.Content>
-        <Text style={{ fontSize: 14, color: '#41484D' }}>$xx.xx</Text>
+        <Text style={{ fontSize: 14, color: '#41484D' }}>
+          ${med.price} • {med.pharmacy_name}
+        </Text>
         <View style={styles.header}>
-          <Text style={{ fontSize: 16, color: '#181C20' }}>{medication.drug_name}</Text>
-          <Icon source="star" color="#004E60" size={24} />
-          <TouchableOpacity onPress={() => medication.id && onUnsave(medication.id)}>
+          <View style={styles.name_container}>
+            <Text style={styles.med_name}>{med.drug_name}</Text>
+          </View>
+          <TouchableOpacity onPress={() => med.id && onUnsave(med.id)} style={styles.star_icon}>
             <Icon source="star" color="#004E60" size={24} />
           </TouchableOpacity>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Text style={{ textDecorationLine: 'underline', color: '#41484D', marginRight: 3 }}>
-            {[medication.form, medication.strength].filter(Boolean).join(' ')}
+            {[med.form, med.strength].filter(Boolean).join(' ')}
           </Text>
           <Icon source="medication" color="#004E60" size={20} />
         </View>
@@ -46,5 +51,15 @@ const styles = StyleSheet.create({
     fontFamily: 'Open Sans',
     backgroundColor: 'transparent',
     borderColor: '#C1C7CE',
+  },
+  med_name: {
+    fontSize: 16,
+    color: '#181C20',
+  },
+  name_container: {
+    width: '80%',
+  },
+  star_icon: {
+    marginHorizontal: 8,
   },
 });

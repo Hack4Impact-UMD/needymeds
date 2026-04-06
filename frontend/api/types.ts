@@ -36,8 +36,8 @@ export interface SavedMedication {
   form?: string;
   strength?: string;
   quantity?: number;
-  last_saved_date?: string;
   price?: string;
+  last_saved_date?: string;
 }
 
 export interface SavedPharmacy {
