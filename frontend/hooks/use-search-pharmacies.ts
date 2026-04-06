@@ -30,13 +30,14 @@ export function useSearchPharmacies(zipCode?: string, radius?: number) {
 
         // Query all pharmacies
         const rows: any[] = await db.getAllAsync(
-          `SELECT name, address_line1, address_line2, city, state, zipcode, phone_no, latitude, longitude 
+          `SELECT npi_id, name, address_line1, address_line2, city, state, zipcode, phone_no, latitude, longitude 
            FROM Pharmacy`
         );
 
         // Map and filter by distance
         const filtered: Pharmacy[] = rows
           .map((row) => ({
+            npi: String(row.npi_id),
             pharmacyName: row.name || '',
             pharmacyStreet1: row.address_line1 || '',
             pharmacyStreet2: row.address_line2 || null,

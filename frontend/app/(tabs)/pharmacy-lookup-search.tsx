@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { ActivityIndicator, Divider, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Pharmacy } from '../../api/types';
+import { Pharmacy, SavedPharmacy } from '../../api/types';
 import getUserLocation from '../../api/userLocation';
 
 import BottomNavBar from '../components/BottomNavBar';
@@ -50,11 +50,13 @@ const PharmacyLocatorScreen = () => {
 
   const navigation = useNavigation();
   const {
-    pharmacies: savedPharmacies,
+    pharmacies: savedPharmaciesFromHook,
     savePharmacy,
     deletePharmacy,
     refreshPharmacies,
   } = useSavedPharmacies();
+
+  const [savedPharmacy, setSavedPharmacy] = useState<SavedPharmacy[]>(savedPharmaciesFromHook);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -63,25 +65,16 @@ const PharmacyLocatorScreen = () => {
     return unsubscribe;
   }, [navigation, refreshPharmacies]);
 
+  useEffect(() => {
+    setSavedPharmacy(savedPharmaciesFromHook);
+  }, [savedPharmaciesFromHook]);
+
   const formatAddress = (pharmacy: Pharmacy) => {
     return `${pharmacy.pharmacyStreet1}, ${pharmacy.pharmacyCity}, ${pharmacy.pharmacyState} ${pharmacy.pharmacyZipCode}`;
   };
 
   const isSaved = (pharmacy: Pharmacy) => {
-    return savedPharmacies.some(
-      (sp) => sp.name === pharmacy.pharmacyName && sp.address === formatAddress(pharmacy)
-      // just match npi instead?
-      // && sp.npi === pharmacy.npi
-    );
-  };
-
-  const getSavedId = (pharmacy: Pharmacy) => {
-    const found = savedPharmacies.find(
-      (sp) => sp.name === pharmacy.pharmacyName && sp.address === formatAddress(pharmacy)
-      // match on npi instead?
-      // return savedPharmacies.find((sp) => sp.npi === pharmacy.npi)?.npi;
-    );
-    return found?.npi;
+    return savedPharmacy.some((sp) => sp.npi === pharmacy.npi);
   };
 
   const toggleStar = (pharmacy: Pharmacy) => {
@@ -89,49 +82,49 @@ const PharmacyLocatorScreen = () => {
 
     // pharmacy is already saved so toggle to unfavorite
     if (saved) {
-      const id = getSavedId(pharmacy);
-      if (id) deletePharmacy(id);
+      setSavedPharmacy((prev) => prev.filter((sp) => sp.npi !== pharmacy.npi)); // or set to []
+      deletePharmacy(pharmacy.npi);
+      refreshPharmacies();
       return;
     }
 
     // pharmacy has not been saved yet so favorite it
-    if (savedPharmacies.length === 0) {
-      savePharmacy({
-        npi: formatAddress(pharmacy),
-        // npi: pharmacy.npi
+    if (savedPharmacy.length === 0) {
+      const newSavedPharmacy: SavedPharmacy = {
+        npi: pharmacy.npi,
         name: pharmacy.pharmacyName,
         address: formatAddress(pharmacy),
         phoneNumber: pharmacy.phoneNumber,
-      });
+      };
+      setSavedPharmacy([newSavedPharmacy]);
+      savePharmacy(newSavedPharmacy);
+      refreshPharmacies();
+      return;
     }
 
     // another pharmacy is currently saved so confirm to replace with new pharmacy
-    Alert.alert(
-      'Replace Favorite Pharmacy',
-      'You already have a saved pharmacy. Do you want to replace it?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Yes',
-          onPress: () => {
-            // remove current favorited pharmacy
-            const current = savedPharmacies[0];
-            if (current?.npi) {
-              // needed ?
-              deletePharmacy(current.npi);
-            }
-            // save new pharmacy
-            savePharmacy({
-              npi: pharmacy.pharmacyName,
-              // npi: pharmacy.npi
-              name: pharmacy.pharmacyName,
-              address: formatAddress(pharmacy),
-              phoneNumber: pharmacy.phoneNumber,
-            });
-          },
+    Alert.alert('Replace Favorited Pharmacy', 'Do you want to save this new pharmacy instead?', [
+      { text: 'Cancel' },
+      {
+        text: 'Replace',
+        onPress: () => {
+          // remove currently favorited pharmacy
+          const current = savedPharmacy[0];
+          if (current?.npi) deletePharmacy(current.npi);
+
+          // save new pharmacy as favorite
+          const newSavedPharmacy: SavedPharmacy = {
+            npi: pharmacy.npi,
+            name: pharmacy.pharmacyName,
+            address: formatAddress(pharmacy),
+            phoneNumber: pharmacy.phoneNumber,
+          };
+          setSavedPharmacy([newSavedPharmacy]);
+          savePharmacy(newSavedPharmacy);
+          refreshPharmacies();
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const { pharmacies, loading, error } = useSearchPharmacies(zipCode, parseFloat(radius));

@@ -16,6 +16,7 @@ export interface DrugSearchResult {
 }
 
 export interface Pharmacy {
+  npi: string;
   pharmacyName: string;
   pharmacyStreet1: string;
   pharmacyStreet2: string;
