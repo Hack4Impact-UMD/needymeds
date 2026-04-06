@@ -3,7 +3,7 @@ import { useSearchPharmacies } from '@/hooks/use-search-pharmacies';
 import { useSavedPharmacies } from '@/hooks/use-saved-pharmacies';
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Alert,
@@ -63,39 +63,75 @@ const PharmacyLocatorScreen = () => {
     return unsubscribe;
   }, [navigation, refreshPharmacies]);
 
+  const formatAddress = (pharmacy: Pharmacy) => {
+    return `${pharmacy.pharmacyStreet1}, ${pharmacy.pharmacyCity}, ${pharmacy.pharmacyState} ${pharmacy.pharmacyZipCode}`;
+  };
+
   const isSaved = (pharmacy: Pharmacy) => {
     return savedPharmacies.some(
-      (sp) =>
-        sp.pharmacy_name === pharmacy.pharmacyName &&
-        sp.street === pharmacy.pharmacyStreet1 &&
-        sp.city === pharmacy.pharmacyCity
+      (sp) => sp.name === pharmacy.pharmacyName && sp.address === formatAddress(pharmacy)
+      // just match npi instead?
+      // && sp.npi === pharmacy.npi
     );
   };
 
   const getSavedId = (pharmacy: Pharmacy) => {
     const found = savedPharmacies.find(
-      (sp) =>
-        sp.pharmacy_name === pharmacy.pharmacyName &&
-        sp.street === pharmacy.pharmacyStreet1 &&
-        sp.city === pharmacy.pharmacyCity
+      (sp) => sp.name === pharmacy.pharmacyName && sp.address === formatAddress(pharmacy)
+      // match on npi instead?
+      // return savedPharmacies.find((sp) => sp.npi === pharmacy.npi)?.npi;
     );
-    return found?.id;
+    return found?.npi;
   };
 
   const toggleStar = (pharmacy: Pharmacy) => {
-    if (isSaved(pharmacy)) {
+    const saved = isSaved(pharmacy);
+
+    // pharmacy is already saved so toggle to unfavorite
+    if (saved) {
       const id = getSavedId(pharmacy);
       if (id) deletePharmacy(id);
-    } else {
+      return;
+    }
+
+    // pharmacy has not been saved yet so favorite it
+    if (savedPharmacies.length === 0) {
       savePharmacy({
-        pharmacy_name: pharmacy.pharmacyName,
-        street: pharmacy.pharmacyStreet1,
-        city: pharmacy.pharmacyCity,
-        state: pharmacy.pharmacyState,
-        zip_code: pharmacy.pharmacyZipCode,
-        phone_number: pharmacy.phoneNumber,
+        npi: formatAddress(pharmacy),
+        // npi: pharmacy.npi
+        name: pharmacy.pharmacyName,
+        address: formatAddress(pharmacy),
+        phoneNumber: pharmacy.phoneNumber,
       });
     }
+
+    // another pharmacy is currently saved so confirm to replace with new pharmacy
+    Alert.alert(
+      'Replace Favorite Pharmacy',
+      'You already have a saved pharmacy. Do you want to replace it?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Yes',
+          onPress: () => {
+            // remove current favorited pharmacy
+            const current = savedPharmacies[0];
+            if (current?.npi) {
+              // needed ?
+              deletePharmacy(current.npi);
+            }
+            // save new pharmacy
+            savePharmacy({
+              npi: pharmacy.pharmacyName,
+              // npi: pharmacy.npi
+              name: pharmacy.pharmacyName,
+              address: formatAddress(pharmacy),
+              phoneNumber: pharmacy.phoneNumber,
+            });
+          },
+        },
+      ]
+    );
   };
 
   const { pharmacies, loading, error } = useSearchPharmacies(zipCode, parseFloat(radius));

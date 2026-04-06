@@ -31,7 +31,7 @@ export interface Pharmacy {
 export interface SavedMedication {
   id?: number;
   drug_name: string;
-  pharmacy_npi?: string;
+  pharmacy_name?: string;
   form?: string;
   strength?: string;
   quantity?: number;
