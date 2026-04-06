@@ -55,7 +55,6 @@ const PharmacyLocatorScreen = () => {
     deletePharmacy,
     refreshPharmacies,
   } = useSavedPharmacies();
-
   const [savedPharmacy, setSavedPharmacy] = useState<SavedPharmacy[]>(savedPharmaciesFromHook);
 
   useEffect(() => {
@@ -74,17 +73,17 @@ const PharmacyLocatorScreen = () => {
   };
 
   const isSaved = (pharmacy: Pharmacy) => {
-    return savedPharmacy.some((sp) => sp.npi === pharmacy.npi);
+    return savedPharmaciesFromHook.some((sp) => sp.npi === pharmacy.npi);
+    // return savedPharmacy.some((sp) => sp.npi === pharmacy.npi);
   };
 
-  const toggleStar = (pharmacy: Pharmacy) => {
+  const toggleStar = async (pharmacy: Pharmacy) => {
     const saved = isSaved(pharmacy);
 
     // pharmacy is already saved so toggle to unfavorite
     if (saved) {
       setSavedPharmacy((prev) => prev.filter((sp) => sp.npi !== pharmacy.npi)); // or set to []
-      deletePharmacy(pharmacy.npi);
-      refreshPharmacies();
+      await deletePharmacy(pharmacy.npi);
       return;
     }
 
@@ -97,8 +96,7 @@ const PharmacyLocatorScreen = () => {
         phoneNumber: pharmacy.phoneNumber,
       };
       setSavedPharmacy([newSavedPharmacy]);
-      savePharmacy(newSavedPharmacy);
-      refreshPharmacies();
+      await savePharmacy(newSavedPharmacy);
       return;
     }
 
@@ -107,10 +105,10 @@ const PharmacyLocatorScreen = () => {
       { text: 'Cancel' },
       {
         text: 'Replace',
-        onPress: () => {
+        onPress: async () => {
           // remove currently favorited pharmacy
           const current = savedPharmacy[0];
-          if (current?.npi) deletePharmacy(current.npi);
+          if (current?.npi) await deletePharmacy(current.npi);
 
           // save new pharmacy as favorite
           const newSavedPharmacy: SavedPharmacy = {
@@ -120,8 +118,7 @@ const PharmacyLocatorScreen = () => {
             phoneNumber: pharmacy.phoneNumber,
           };
           setSavedPharmacy([newSavedPharmacy]);
-          savePharmacy(newSavedPharmacy);
-          refreshPharmacies();
+          await savePharmacy(newSavedPharmacy);
         },
       },
     ]);

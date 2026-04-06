@@ -110,14 +110,13 @@ const MedicationLookupSelectedScreen = () => {
     medications: savedMedsFromHook,
     saveMedication,
     deleteMedication,
-    refreshMedications,
   } = useSavedMedications();
-
   const [savedMedications, setSavedMedications] = useState<SavedMedication[]>(savedMedsFromHook);
 
   const isSaved = (medication: DrugSearchResult) => {
     return savedMedications.some(
       (m) => m.drug_name === medication.labelName && m.pharmacy_name === medication.pharmacyName
+      // && m.pharmacy_address === pharmacyAddress
     );
   };
 
@@ -130,19 +129,23 @@ const MedicationLookupSelectedScreen = () => {
     info: { form: string; strength: string; quantity: string }
   ) => {
     const saved = isSaved(med);
-
     // medication is already saved -> toggle to unfavorite
     if (saved) {
       // get exisitng saved medication with ID
       const current = savedMedications.find(
         (m) => m.drug_name === med.labelName && m.pharmacy_name === med.pharmacyName
       );
+      console.log('before check if has ID');
       // unfavorite
       if (current?.id) {
         setSavedMedications((prev) => prev.filter((m) => m.id !== current.id));
+        console.log('before await delete');
         await deleteMedication(current.id);
-        refreshMedications();
+        console.log('after await delete');
+      } else {
+        console.log('no id');
       }
+      console.log('return');
       return;
 
       // medication has not been saved yet -> favorite it
@@ -151,6 +154,7 @@ const MedicationLookupSelectedScreen = () => {
       const newSavedMed: Omit<SavedMedication, 'id' | 'last_saved_date'> = {
         drug_name: med.labelName,
         pharmacy_name: med.pharmacyName,
+        // pharmacy_address: pharmacyAddress,
         form,
         strength,
         quantity: Number(quantity),
@@ -158,7 +162,6 @@ const MedicationLookupSelectedScreen = () => {
       };
       setSavedMedications((prev) => [...prev, newSavedMed]);
       await saveMedication(newSavedMed);
-      refreshMedications();
       return;
     }
   };
@@ -634,6 +637,7 @@ const MedicationLookupSelectedScreen = () => {
                 // Show results list
                 drugResults.map((result) => {
                   const isStarred = isSaved(result);
+                  // const pharmacyAddress = result.pharmacyAddress;
                   return (
                     <TouchableOpacity
                       key={result.pharmacyName}

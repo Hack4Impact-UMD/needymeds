@@ -11,8 +11,8 @@ export async function create_database() {
       form TEXT,
       strength TEXT,
       quantity INTEGER,
-      last_saved_date TEXT DEFAULT CURRENT_TIMESTAMP,
-      price DECIMAL(10, 2)
+      price DECIMAL(10, 2),
+      last_saved_date TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS Saved_Pharmacies (
