@@ -52,6 +52,9 @@ const DDC = () => {
   async function handleAddToGoogleWallet() {
     try {
       const { url } = await getGoogleWalletUrl(result);
+      if (!url) {
+        throw new Error('Invalid wallet URL');
+      }
       await Linking.openURL(url);
     } catch {
       Alert.alert(t('DDCError'), t('DDCGoogleWalletError'));
