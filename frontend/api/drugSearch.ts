@@ -333,7 +333,7 @@ async function searchDrug(
 
   // Use GSN-based search for ScriptSave (supports GSN + ReferencedBN)
   // For generic: use genericVersion name, for brand: use original drug name
-  const genericReferencedBN = genericVersion || drugName;
+  const genericReferencedBN = genericVersion || activeDrugName;
   const brandReferencedBN = activeDrugName; // Use the brand name for brand searches
 
   const [genericGsnResponse, brandGsnResponse] = await Promise.all([
@@ -562,7 +562,7 @@ export async function searchDrugByPrice(
   }
 
   // Fresh query
-  const searchResults = await searchDrug(drugName, form, radius, zipCode);
+  const searchResults = await searchDrug(form, radius, zipCode);
   const sorted = [...searchResults].sort((a, b) => +a.price - +b.price);
   store.dispatch(setCacheEntry({ key, results: sorted, by: 'price' }));
   return sorted;
@@ -595,7 +595,7 @@ export async function searchDrugByDistance(
   }
 
   // Fresh query
-  const searchResults = await searchDrug(drugName, form, radius, zipCode);
+  const searchResults = await searchDrug(form, radius, zipCode);
   const sorted = [...searchResults].sort((a, b) => +a.distance - +b.distance);
   store.dispatch(setCacheEntry({ key, results: sorted, by: 'distance' }));
   return sorted;

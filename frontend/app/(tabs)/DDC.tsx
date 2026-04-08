@@ -172,9 +172,9 @@ const DDC = () => {
                   </Pressable>
                 </View>
 
-                {Platform.OS === 'android' && (
+                {(Platform.OS === 'android' || __DEV__) && (
                   <Pressable style={styles.actionButtonFull} onPress={handleAddToGoogleWallet}>
-                    <MaterialCommunityIcons name="google-wallet" size={20} color="white" />
+                    <MaterialIcons name="add-card" size={20} color="white" />
                     <Text style={styles.buttonText}>{t('DDCAddToWallet')}</Text>
                   </Pressable>
                 )}
