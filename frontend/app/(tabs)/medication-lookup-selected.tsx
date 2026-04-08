@@ -612,7 +612,7 @@ const MedicationLookupSelectedScreen = () => {
         }
         activeOpacity={0.85}
       >
-        <Text style={styles.availableCouponsText}>Available Coupons </Text>
+        <Text style={styles.availableCouponsText}>{t('AvailableCoupons')} </Text>
         <MaterialIcons name="open-in-new" size={16} color="#004E60" style={{ marginRight: 6 }} />
       </TouchableOpacity>
       <BottomNavBar />
