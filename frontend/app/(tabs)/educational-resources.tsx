@@ -1,8 +1,18 @@
 import { router } from 'expo-router';
 
 import { useTranslation } from 'react-i18next';
-import { Image, Linking, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Card, Divider, Icon, IconButton } from 'react-native-paper';
+import {
+  Image,
+  Linking,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Card } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Colors } from '@/constants/theme';
@@ -10,13 +20,16 @@ import BottomNavBar from '../components/BottomNavBar';
 import DefaultHeader from '../components/DefaultHeader';
 
 const v_logo = require('../assets/vertical_logo.png');
+const BRAND_BLUE = '#236488';
 
 const EducationScreen = () => {
   const { t } = useTranslation();
 
-  const general_faq_url = 'https://needymeds.org/faq';
   const coupon_faq_url = 'https://www.needymeds.org/copay-cards-faqs';
   const nm_url = 'https://needymeds.org/';
+  const about_us_url = 'https://needymeds.org/about-us/';
+  const nm_phone = '(800) 503-6897';
+  const nm_phone_tel = 'tel:8005036897';
 
   const handleLink = (url: string) => {
     Linking.openURL(url);
@@ -31,84 +44,74 @@ const EducationScreen = () => {
         {/* TITLE */}
         <Text style={styles.title}>{t('Header2')}</Text>
 
-        {/* description + left icon */}
-        <View style={styles.subtitle}>
-          <Icon source="book-open-page-variant-outline" color="#41484D" size={30} />
-          <Text style={styles.description}>{t('Text13')}</Text>
-        </View>
-
-        {/* saving tips card */}
-        <Card style={styles.cards}>
-          <Card.Title
-            title={t('Header3')}
-            subtitle={
-              <Text onPress={() => router.push('/(tabs)/prescription-savings-tips')}>
-                {t('CardSecondaryLine1')}
+        {/* NeedyMeds website card (top) */}
+        <Card style={styles.websiteCard} onPress={() => handleLink(nm_url)}>
+          <View style={styles.websiteCardInner}>
+            <Image source={v_logo} style={styles.websiteLogo} resizeMode="contain" />
+            <View style={styles.websiteTextCol}>
+              <Text style={styles.websiteTitle}>{t('Card3')}</Text>
+              <Text style={styles.websiteLine}>
+                {t('WebsiteLabel')} <Text style={styles.websiteLink}>https://needymeds.org/</Text>
               </Text>
-            }
-            left={() => <Icon source="piggy-bank-outline" color="#41484D" size={40} />}
-            style={styles.title_cards}
-            titleStyle={{ marginBottom: -2 }}
-            subtitleStyle={{ letterSpacing: 0.5 }}
-          />
+              <Text style={styles.websiteLine}>
+                {t('NumberLabel')}{' '}
+                <Text style={styles.websiteLink} onPress={() => handleLink(nm_phone_tel)}>
+                  {nm_phone}
+                </Text>
+              </Text>
+            </View>
+          </View>
         </Card>
 
-        {/* FAQ cards */}
-        <Card style={styles.cards}>
-          <Card.Title
-            title={t('FAQ')}
-            subtitle={t('CardSecondaryLine2')}
-            left={() => <Icon source="help-circle-outline" color="#41484D" size={40} />}
-            style={styles.grouped_cards}
-            titleStyle={{ marginBottom: -2 }}
-            subtitleStyle={{ letterSpacing: 0.5 }}
-          />
-          <Divider style={{ marginHorizontal: 16 }} />
-          <Card.Title
-            title={t('Card')}
-            subtitle={t('CardSecondaryLine3')}
-            left={() => <Icon source="forum-outline" color="#41484D" size={40} />}
-            right={() => (
-              <IconButton
-                icon="menu-right"
-                iconColor="#181C20"
-                size={25}
-                onPress={() => handleLink(general_faq_url)}
-              />
-            )}
-            style={styles.grouped_cards}
-            titleStyle={{ marginBottom: -2 }}
-            subtitleStyle={{ letterSpacing: 0.5 }}
-          />
-          <Divider style={{ marginHorizontal: 16 }} />
-          <Card.Title
-            title={t('Card2')}
-            subtitle={t('CardSecondaryLine3')}
-            left={() => <Icon source="currency-usd-off" color="#41484D" size={40} />}
-            right={() => (
-              <IconButton
-                icon="menu-right"
-                iconColor="#181C20"
-                size={25}
-                onPress={() => handleLink(coupon_faq_url)}
-              />
-            )}
-            style={styles.grouped_cards}
-            titleStyle={{ marginBottom: -2 }}
-            subtitleStyle={{ letterSpacing: 0.5 }}
-          />
+        {/* About us */}
+        <View style={styles.sectionHeader}>
+          <MaterialCommunityIcons name="account-multiple-outline" color={BRAND_BLUE} size={30} />
+          <Text style={styles.sectionHeaderText}>{t('AboutUsHeader')}</Text>
+        </View>
+        <Card style={styles.cards} onPress={() => handleLink(about_us_url)}>
+          <View style={styles.linkCardInner}>
+            <Text style={styles.linkCardBody}>{t('AboutUsBody')}</Text>
+            <Pressable onPress={() => handleLink(about_us_url)} hitSlop={10}>
+              <Text style={styles.linkCardLink}>
+                {t('ClickHereToLearnMore')} <Text style={styles.linkArrow}>{'>'}</Text>
+              </Text>
+            </Pressable>
+          </View>
         </Card>
 
-        {/* NeedyMeds website card */}
-        <Card style={styles.cards} onPress={() => handleLink(nm_url)}>
-          <Card.Title
-            title={t('Card3')}
-            subtitle="https://needymeds.org/"
-            left={() => <Image source={v_logo} style={{ width: 40 }} resizeMode="contain" />}
-            style={styles.title_cards}
-            titleNumberOfLines={2}
-            subtitleStyle={{ textDecorationLine: 'underline', letterSpacing: 0.5 }}
-          />
+        {/* Prescription savings tips */}
+        <View style={styles.sectionHeader}>
+          <MaterialCommunityIcons name="piggy-bank-outline" color={BRAND_BLUE} size={30} />
+          <Text style={styles.sectionHeaderText}>{t('Header3')}</Text>
+        </View>
+        <Card style={styles.cards} onPress={() => router.push('/(tabs)/prescription-savings-tips')}>
+          <View style={styles.linkCardInner}>
+            <Text style={styles.linkCardBody}>{t('PrescriptionSavingsTipsBody')}</Text>
+            <Pressable
+              onPress={() => router.push('/(tabs)/prescription-savings-tips')}
+              hitSlop={10}
+            >
+              <Text style={styles.linkCardLink}>
+                {t('ClickHereToLearnMore')} <Text style={styles.linkArrow}>{'>'}</Text>
+              </Text>
+            </Pressable>
+          </View>
+        </Card>
+
+        {/* Manufacturer coupon FAQ */}
+        <View style={styles.sectionHeader}>
+          <MaterialCommunityIcons name="view-dashboard-outline" color={BRAND_BLUE} size={30} />
+          <Text style={styles.sectionHeaderText}>{t('Card2')}</Text>
+        </View>
+        <Card style={styles.cards} onPress={() => handleLink(coupon_faq_url)}>
+          <View style={styles.linkCardInner}>
+            <Text style={styles.linkCardBody}>{t('ManufacturerCouponFaqBody')}</Text>
+            <Pressable onPress={() => handleLink(coupon_faq_url)} hitSlop={10}>
+              <Text style={styles.linkCardLink}>
+                {t('ClickHereToLearnMore')} <Text style={styles.linkArrow}>{'>'}</Text>
+              </Text>
+            </Pressable>
+          </View>
         </Card>
       </ScrollView>
       <BottomNavBar />
@@ -136,31 +139,80 @@ const styles = StyleSheet.create({
     fontFamily: 'Nunito Sans',
     marginBottom: 20,
   },
-  subtitle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: 12,
-    paddingBottom: 20,
+  websiteCard: {
+    marginVertical: 8,
+    width: '100%',
+    backgroundColor: '#F1F4F9',
     fontFamily: 'Open Sans',
+    borderRadius: 12,
   },
-  description: {
+  websiteCardInner: {
+    flexDirection: 'row',
+    gap: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+  },
+  websiteLogo: {
+    width: 44,
+    height: 44,
+  },
+  websiteTextCol: {
+    flex: 1,
+    gap: 6,
+  },
+  websiteTitle: {
     fontSize: 14,
     color: '#181C20',
-    paddingLeft: 15,
     fontFamily: 'Open Sans',
+    fontWeight: '600',
+  },
+  websiteLine: {
+    fontSize: 13,
+    color: '#181C20',
+    fontFamily: 'Open Sans',
+  },
+  websiteLink: {
+    textDecorationLine: 'underline',
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 14,
+    marginBottom: 6,
+  },
+  sectionHeaderText: {
+    fontSize: 20,
+    color: '#181C20',
+    fontFamily: 'Open Sans',
+    fontWeight: '600',
   },
   cards: {
     marginVertical: 8,
     width: '100%',
     backgroundColor: '#F1F4F9',
     fontFamily: 'Open Sans',
+    borderRadius: 12,
   },
-  title_cards: {
-    height: 100,
+  linkCardInner: {
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    gap: 10,
   },
-  grouped_cards: {
-    paddingVertical: 12,
+  linkCardBody: {
+    fontSize: 14,
+    color: '#181C20',
+    fontFamily: 'Open Sans',
+    lineHeight: 20,
+  },
+  linkCardLink: {
+    fontSize: 14,
+    fontFamily: 'OpenSans-SemiBold',
+    color: BRAND_BLUE,
+  },
+  linkArrow: {
+    fontWeight: '700',
   },
 });
 
