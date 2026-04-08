@@ -4,7 +4,7 @@ import * as walletService from '../services/googleWallet.service';
 
 jest.mock('../services/googleWallet.service');
 
-describe('POST /api/wallet/google', () => {
+describe('GET /api/wallet/google', () => {
   it('should return 200 and the wallet URL', async () => {
     (walletService.generateGoogleWalletJwt as jest.Mock).mockResolvedValue('mock_token');
 
@@ -15,7 +15,7 @@ describe('POST /api/wallet/google', () => {
       price: '$10.00',
     };
 
-    const response = await request(app).post('/api/wallet/google').send(cardData);
+    const response = await request(app).get('/api/wallet/google').send(cardData);
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({
@@ -29,7 +29,7 @@ describe('POST /api/wallet/google', () => {
   it('should return 500 if service fails', async () => {
     (walletService.generateGoogleWalletJwt as jest.Mock).mockRejectedValue(new Error('Fail'));
 
-    const response = await request(app).post('/api/wallet/google').send({});
+    const response = await request(app).get('/api/wallet/google').send({});
 
     expect(response.statusCode).toBe(500);
     expect(response.body).toEqual({

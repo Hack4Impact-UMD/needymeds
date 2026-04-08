@@ -17,7 +17,7 @@ export async function createPass({ serial, number }: PassInput) {
 
   const pass = await PKPass.from(
     {
-      model: path.join(__dirname, '../wallet-pass'),
+      model: path.join(__dirname, '../wallet-pass.pass'),
       certificates: {
         signerCert: secret.signerCert,
         signerKey: secret.signerKey,
