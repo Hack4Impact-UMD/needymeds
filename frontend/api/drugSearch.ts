@@ -321,6 +321,7 @@ export function setActiveStrength(
  * @param radius to search within, relative to 'zipCode'.
  */
 async function searchDrug(
+  drugName: string,
   form: string,
   radius: number,
   zipCode: string

@@ -38,6 +38,7 @@ const DDC = () => {
 
   const [showFAQ, setShowFAQ] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showBack, setShowBack] = useState(false);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -75,6 +76,8 @@ const DDC = () => {
                 {t('CardHeader')}
               </Text>
 
+              <View style={styles.divider} />
+
               <View style={styles.medInfoWrapper}>
                 <DDCMedInfoRow
                   result={result}
@@ -83,41 +86,9 @@ const DDC = () => {
                 />
               </View>
 
-              <View style={styles.cardContainer}>
-                <View style={styles.cardSection}>
-                  <Text variant="titleMedium" style={styles.sectionLabel}>
-                    {t('ImageHeader1')}
-                  </Text>
-                  <View style={styles.cardImageWrapper}>
-                    <Image
-                      source={
-                        result.adjudicator === 'DSNT' ? DST_DDCCardFront : ScriptSave_DDCCardFront
-                      }
-                      style={styles.cardImage}
-                      resizeMode="contain"
-                    />
-                  </View>
-                </View>
-
-                <View style={styles.cardSection}>
-                  <Text variant="titleMedium" style={styles.sectionLabel}>
-                    {t('ImageHeader2')}
-                  </Text>
-                  <View style={styles.cardImageWrapper}>
-                    <Image
-                      source={
-                        result.adjudicator === 'DSNT' ? DST_DDCCardBack : ScriptSave_DDCCardBack
-                      }
-                      style={styles.cardImage}
-                      resizeMode="contain"
-                    />
-                  </View>
-                </View>
-              </View>
-
               <View style={styles.actionRow}>
                 <Pressable
-                  style={styles.actionButton}
+                  style={styles.actionButtonCircle}
                   onPress={() => {
                     router.push({
                       pathname: '/ddc-expand',
@@ -140,14 +111,43 @@ const DDC = () => {
                   }}
                 >
                   <MaterialCommunityIcons name="aspect-ratio" size={20} color="white" />
-                  <Text style={styles.buttonText}>{t('ButtonLabel1')}</Text>
                 </Pressable>
 
-                <Pressable style={styles.actionButton} onPress={() => setShowShareModal(true)}>
+                <Pressable
+                  style={styles.actionButtonCircle}
+                  onPress={() => setShowShareModal(true)}
+                >
                   <MaterialIcons name="share" size={20} color="white" />
-                  <Text style={styles.buttonText}>{t('ButtonLabel2')}</Text>
                 </Pressable>
               </View>
+
+              <View style={styles.cardContainer}>
+                <View style={styles.cardSection}>
+                  <View style={styles.cardImageWrapper}>
+                    <Image
+                      source={
+                        showBack
+                          ? result.adjudicator === 'DSNT'
+                            ? DST_DDCCardBack
+                            : ScriptSave_DDCCardBack
+                          : result.adjudicator === 'DSNT'
+                            ? DST_DDCCardFront
+                            : ScriptSave_DDCCardFront
+                      }
+                      style={styles.cardImage}
+                      resizeMode="contain"
+                    />
+                  </View>
+                </View>
+              </View>
+
+              <Pressable style={styles.actionButton} onPress={() => setShowBack(!showBack)}>
+                {showBack ? (
+                  <Text style={styles.buttonText}>{t('ButtonLabel4')}</Text>
+                ) : (
+                  <Text style={styles.buttonText}>{t('ButtonLabel3')}</Text>
+                )}
+              </Pressable>
 
               <View style={styles.footerNote}>
                 <Pressable onPress={() => setShowFAQ(true)}>
@@ -199,8 +199,8 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
-    paddingHorizontal: 50,
-    textAlign: 'center',
+    paddingHorizontal: 10,
+    textAlign: 'left',
     fontWeight: '400',
     color: '#1F2328',
     fontFamily: 'Nunito Sans',
@@ -233,9 +233,9 @@ const styles = StyleSheet.create({
   },
   actionRow: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 25,
-    justifyContent: 'center',
+    gap: 4,
+    marginBottom: 10,
+    justifyContent: 'flex-end',
   },
   actionButton: {
     flex: 1,
@@ -246,6 +246,15 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     paddingVertical: 12,
     paddingHorizontal: 16,
+    marginBottom: 40,
+  },
+  actionButtonCircle: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#236488',
+    borderRadius: 28,
   },
   buttonText: {
     paddingLeft: 10,
@@ -265,5 +274,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 13,
     fontFamily: 'Open Sans',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#C1C7CE',
   },
 });
