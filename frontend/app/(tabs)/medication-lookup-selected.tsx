@@ -489,22 +489,6 @@ const MedicationLookupSelectedScreen = () => {
                 />
                 <Text style={styles.radiusUnit}>miles</Text>
               </View>
-
-              {/* Dropdown with "Detect my location" option */}
-              {zipFocused && zipCode.length !== ZIPCODE_LENGTH && drugResults.length === 0 && (
-                <TouchableOpacity
-                  style={styles.detectLocationButton}
-                  onPress={() => detectZipFromLocation()}
-                  disabled={detectingZip}
-                >
-                  {detectingZip && (
-                    <ActivityIndicator size="small" color="#3B82F6" style={{ marginRight: 6 }} />
-                  )}
-                  <Text style={styles.detectLocationText}>
-                    {detectingZip ? 'Detecting...' : 'Detect my location'}
-                  </Text>
-                </TouchableOpacity>
-              )}
             </View>
           </View>
 
