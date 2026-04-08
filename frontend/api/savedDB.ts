@@ -23,7 +23,7 @@ export async function create_database() {
     CREATE TABLE IF NOT EXISTS Recent_Searches (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       drug_name TEXT NOT NULL UNIQUE, 
-      generic_nme TEXT,
+      generic_name TEXT,
       searched_at TEXT NOT NULL
     );
   `);
