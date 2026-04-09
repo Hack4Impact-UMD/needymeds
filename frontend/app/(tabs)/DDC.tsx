@@ -48,24 +48,8 @@ const DDC = () => {
 
   const [showFAQ, setShowFAQ] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
-  const [isAddingToWallet, setIsAddingToWallet] = useState(false);
-
-  async function handleAddToGoogleWallet() {
-    if (isAddingToWallet) return;
-    setIsAddingToWallet(true);
-
-    try {
-      const { url } = await getGoogleWalletUrl(result);
-      if (!url) {
-        throw new Error('Invalid wallet URL');
-      }
-      await Linking.openURL(url);
-    } catch {
-      Alert.alert(t('DDCError'), t('DDCGoogleWalletError'));
-    } finally {
-      setIsAddingToWallet(false);
-    }
-  }
+  const [showBack, setShowBack] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -103,6 +87,8 @@ const DDC = () => {
                 {t('CardHeader')}
               </Text>
 
+              <View style={styles.divider} />
+
               <View style={styles.medInfoWrapper}>
                 <DDCMedInfoRow
                   result={result}
@@ -111,30 +97,64 @@ const DDC = () => {
                 />
               </View>
 
+              <View style={styles.actionRow}>
+                <Pressable
+                  style={styles.actionButtonCircle}
+                  onPress={() => {
+                    router.push({
+                      pathname: '/ddc-expand',
+                      params: {
+                        drugName: params.drugName,
+                        quantity: params.quantity,
+                        form: params.form,
+                        adjudicator: result.adjudicator,
+                        pharmacyName: params.pharmacyName,
+                        pharmacyAddress: params.pharmacyAddress,
+                        pharmacyPhone: params.pharmacyPhone,
+                        ndc: params.ndc,
+                        labelName: params.labelName,
+                        price: params.price,
+                        latitude: params.latitude,
+                        longitude: params.longitude,
+                        distance: params.distance,
+                      },
+                    });
+                  }}
+                >
+                  <MaterialCommunityIcons name="aspect-ratio" size={20} color="white" />
+                </Pressable>
+
+                <Pressable
+                  style={styles.actionButtonCircle}
+                  onPress={() => setIsFavorited(!isFavorited)}
+                >
+                  <MaterialIcons
+                    name={isFavorited ? 'star' : 'star-border'}
+                    size={20}
+                    color="white"
+                  />
+                </Pressable>
+
+                <Pressable
+                  style={styles.actionButtonCircle}
+                  onPress={() => setShowShareModal(true)}
+                >
+                  <MaterialIcons name="share" size={20} color="white" />
+                </Pressable>
+              </View>
+
               <View style={styles.cardContainer}>
                 <View style={styles.cardSection}>
-                  <Text variant="titleMedium" style={styles.sectionLabel}>
-                    {t('ImageHeader1')}
-                  </Text>
                   <View style={styles.cardImageWrapper}>
                     <Image
                       source={
-                        result.adjudicator === 'DSNT' ? DST_DDCCardFront : ScriptSave_DDCCardFront
-                      }
-                      style={styles.cardImage}
-                      resizeMode="contain"
-                    />
-                  </View>
-                </View>
-
-                <View style={styles.cardSection}>
-                  <Text variant="titleMedium" style={styles.sectionLabel}>
-                    {t('ImageHeader2')}
-                  </Text>
-                  <View style={styles.cardImageWrapper}>
-                    <Image
-                      source={
-                        result.adjudicator === 'DSNT' ? DST_DDCCardBack : ScriptSave_DDCCardBack
+                        showBack
+                          ? result.adjudicator === 'DSNT'
+                            ? DST_DDCCardBack
+                            : ScriptSave_DDCCardBack
+                          : result.adjudicator === 'DSNT'
+                            ? DST_DDCCardFront
+                            : ScriptSave_DDCCardFront
                       }
                       style={styles.cardImage}
                       resizeMode="contain"
@@ -143,51 +163,13 @@ const DDC = () => {
                 </View>
               </View>
 
-              <View style={styles.actionButtonsWrap}>
-                <View style={styles.actionRow}>
-                  <Pressable
-                    style={styles.actionButton}
-                    onPress={() => {
-                      router.push({
-                        pathname: '/ddc-expand',
-                        params: {
-                          drugName: params.drugName,
-                          quantity: params.quantity,
-                          form: params.form,
-                          adjudicator: result.adjudicator,
-                          pharmacyName: params.pharmacyName,
-                          pharmacyAddress: params.pharmacyAddress,
-                          pharmacyPhone: params.pharmacyPhone,
-                          ndc: params.ndc,
-                          labelName: params.labelName,
-                          price: params.price,
-                          latitude: params.latitude,
-                          longitude: params.longitude,
-                          distance: params.distance,
-                        },
-                      });
-                    }}
-                  >
-                    <MaterialCommunityIcons name="aspect-ratio" size={20} color="white" />
-                    <Text style={styles.buttonText}>{t('ButtonLabel1')}</Text>
-                  </Pressable>
-
-                  <Pressable style={styles.actionButton} onPress={() => setShowShareModal(true)}>
-                    <MaterialIcons name="share" size={20} color="white" />
-                    <Text style={styles.buttonText}>{t('ButtonLabel2')}</Text>
-                  </Pressable>
-                </View>
-
-                {Platform.OS === 'android' && (
-                  <Pressable
-                    style={[styles.actionButtonFull]}
-                    onPress={handleAddToGoogleWallet}
-                    disabled={isAddingToWallet}>
-                    <MaterialIcons name="add-card" size={20} color="white" />
-                    <Text style={styles.buttonText}>{t('DDCAddToWallet')}</Text>
-                  </Pressable>
+              <Pressable style={styles.actionButton} onPress={() => setShowBack(!showBack)}>
+                {showBack ? (
+                  <Text style={styles.buttonText}>{t('ButtonLabel4')}</Text>
+                ) : (
+                  <Text style={styles.buttonText}>{t('ButtonLabel3')}</Text>
                 )}
-              </View>
+              </Pressable>
 
               <View style={styles.footerNote}>
                 <Pressable onPress={() => setShowFAQ(true)}>
@@ -239,8 +221,8 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
-    paddingHorizontal: 50,
-    textAlign: 'center',
+    paddingHorizontal: 10,
+    textAlign: 'left',
     fontWeight: '400',
     color: '#1F2328',
     fontFamily: 'Nunito Sans',
@@ -277,8 +259,9 @@ const styles = StyleSheet.create({
   },
   actionRow: {
     flexDirection: 'row',
-    gap: 12,
-    justifyContent: 'center',
+    gap: 4,
+    marginBottom: 10,
+    justifyContent: 'flex-end',
   },
   actionButton: {
     flex: 1,
@@ -289,6 +272,15 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     paddingVertical: 12,
     paddingHorizontal: 16,
+    marginBottom: 40,
+  },
+  actionButtonCircle: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#236488',
+    borderRadius: 28,
   },
   actionButtonFull: {
     width: '100%',
@@ -318,5 +310,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 13,
     fontFamily: 'Open Sans',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#C1C7CE',
   },
 });
