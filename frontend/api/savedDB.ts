@@ -8,6 +8,7 @@ export async function create_database() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       drug_name TEXT NOT NULL,
       pharmacy_name TEXT,
+      pharmacy_address TEXT,
       form TEXT,
       strength TEXT,
       quantity INTEGER,

@@ -154,7 +154,7 @@ const MedicationLookupSelectedScreen = () => {
       const newSavedMed: Omit<SavedMedication, 'id' | 'last_saved_date'> = {
         drug_name: med.labelName,
         pharmacy_name: med.pharmacyName,
-        // pharmacy_address: pharmacyAddress,
+        // pharmacy_address: med.pharmacyAddress,
         form,
         strength,
         quantity: Number(quantity),

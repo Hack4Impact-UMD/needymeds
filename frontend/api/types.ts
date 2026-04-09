@@ -33,6 +33,7 @@ export interface SavedMedication {
   id?: number;
   drug_name: string;
   pharmacy_name?: string;
+  pharmacy_address?: string;
   form?: string;
   strength?: string;
   quantity?: number;
