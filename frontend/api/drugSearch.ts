@@ -545,7 +545,8 @@ export async function searchDrugByPrice(
   includeGeneric: boolean,
   zipCode: string
 ): Promise<DrugSearchResult[]> {
-  const key = `${drugName.toLowerCase()}-${zipCode}-${radius}-${form}-${activeStrength}-${activeQuantity}-${includeGeneric}`;
+  const resolvedDrugName = (activeDrugName || drugName).toLowerCase();
+  const key = `${resolvedDrugName}-${zipCode}-${radius}-${form}-${activeStrength}-${activeQuantity}-${includeGeneric}`;
   const state = store.getState() as any;
   const cachedEntry = state.drugSearch.resultsByPrice[key];
   if (cachedEntry) {
@@ -553,7 +554,7 @@ export async function searchDrugByPrice(
   }
 
   // Reutilize distance-sorted cache if available
-  const byDistanceKey = `${drugName.toLowerCase()}-${zipCode}-${radius}-${form}-${activeStrength}-${activeQuantity}-${includeGeneric}`;
+  const byDistanceKey = `${resolvedDrugName}-${zipCode}-${radius}-${form}-${activeStrength}-${activeQuantity}-${includeGeneric}`;
   const cachedDistanceEntry = state.drugSearch.resultsByDistance[byDistanceKey];
   if (cachedDistanceEntry) {
     const sorted = [...cachedDistanceEntry.results].sort((a, b) => +a.price - +b.price);
@@ -578,7 +579,8 @@ export async function searchDrugByDistance(
   includeGeneric: boolean,
   zipCode: string
 ): Promise<DrugSearchResult[]> {
-  const key = `${drugName.toLowerCase()}-${zipCode}-${radius}-${form}-${activeStrength}-${activeQuantity}-${includeGeneric}`;
+  const resolvedDrugName = (activeDrugName || drugName).toLowerCase();
+  const key = `${resolvedDrugName}-${zipCode}-${radius}-${form}-${activeStrength}-${activeQuantity}-${includeGeneric}`;
   const state = store.getState() as any;
   const cachedEntry = state.drugSearch.resultsByDistance[key];
   if (cachedEntry) {
@@ -586,7 +588,7 @@ export async function searchDrugByDistance(
   }
 
   // Reutilize price-sorted cache if available
-  const byPriceKey = `${drugName.toLowerCase()}-${zipCode}-${radius}-${form}-${activeStrength}-${activeQuantity}-${includeGeneric}`;
+  const byPriceKey = `${resolvedDrugName}-${zipCode}-${radius}-${form}-${activeStrength}-${activeQuantity}-${includeGeneric}`;
   const cachedPriceEntry = state.drugSearch.resultsByPrice[byPriceKey];
   if (cachedPriceEntry) {
     const sorted = [...cachedPriceEntry.results].sort((a, b) => +a.distance - +b.distance);
