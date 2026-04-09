@@ -39,6 +39,7 @@ const DDC = () => {
   const [showFAQ, setShowFAQ] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showBack, setShowBack] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -111,6 +112,17 @@ const DDC = () => {
                   }}
                 >
                   <MaterialCommunityIcons name="aspect-ratio" size={20} color="white" />
+                </Pressable>
+
+                <Pressable
+                  style={styles.actionButtonCircle}
+                  onPress={() => setIsFavorited(!isFavorited)}
+                >
+                  <MaterialIcons
+                    name={isFavorited ? 'star' : 'star-border'}
+                    size={20}
+                    color="white"
+                  />
                 </Pressable>
 
                 <Pressable
