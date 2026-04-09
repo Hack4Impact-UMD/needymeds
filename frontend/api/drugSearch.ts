@@ -334,7 +334,7 @@ async function searchDrug(
 
   // Use GSN-based search for ScriptSave (supports GSN + ReferencedBN)
   // For generic: use genericVersion name, for brand: use original drug name
-  const genericReferencedBN = genericVersion || drugName;
+  const genericReferencedBN = genericVersion || activeDrugName;
   const brandReferencedBN = activeDrugName; // Use the brand name for brand searches
 
   const [genericGsnResponse, brandGsnResponse] = await Promise.all([
@@ -546,7 +546,8 @@ export async function searchDrugByPrice(
   includeGeneric: boolean,
   zipCode: string
 ): Promise<DrugSearchResult[]> {
-  const key = `${drugName.toLowerCase()}-${zipCode}-${radius}-${form}-${activeStrength}-${activeQuantity}-${includeGeneric}`;
+  const resolvedDrugName = (activeDrugName || drugName).toLowerCase();
+  const key = `${resolvedDrugName}-${zipCode}-${radius}-${form}-${activeStrength}-${activeQuantity}-${includeGeneric}`;
   const state = store.getState() as any;
   const cachedEntry = state.drugSearch.resultsByPrice[key];
   if (cachedEntry) {
@@ -554,7 +555,7 @@ export async function searchDrugByPrice(
   }
 
   // Reutilize distance-sorted cache if available
-  const byDistanceKey = `${drugName.toLowerCase()}-${zipCode}-${radius}-${form}-${activeStrength}-${activeQuantity}-${includeGeneric}`;
+  const byDistanceKey = `${resolvedDrugName}-${zipCode}-${radius}-${form}-${activeStrength}-${activeQuantity}-${includeGeneric}`;
   const cachedDistanceEntry = state.drugSearch.resultsByDistance[byDistanceKey];
   if (cachedDistanceEntry) {
     const sorted = [...cachedDistanceEntry.results].sort((a, b) => +a.price - +b.price);
@@ -563,7 +564,7 @@ export async function searchDrugByPrice(
   }
 
   // Fresh query
-  const searchResults = await searchDrug(drugName, form, radius, zipCode);
+  const searchResults = await searchDrug(form, radius, zipCode);
   const sorted = [...searchResults].sort((a, b) => +a.price - +b.price);
   store.dispatch(setCacheEntry({ key, results: sorted, by: 'price' }));
   return sorted;
@@ -579,7 +580,8 @@ export async function searchDrugByDistance(
   includeGeneric: boolean,
   zipCode: string
 ): Promise<DrugSearchResult[]> {
-  const key = `${drugName.toLowerCase()}-${zipCode}-${radius}-${form}-${activeStrength}-${activeQuantity}-${includeGeneric}`;
+  const resolvedDrugName = (activeDrugName || drugName).toLowerCase();
+  const key = `${resolvedDrugName}-${zipCode}-${radius}-${form}-${activeStrength}-${activeQuantity}-${includeGeneric}`;
   const state = store.getState() as any;
   const cachedEntry = state.drugSearch.resultsByDistance[key];
   if (cachedEntry) {
@@ -587,7 +589,7 @@ export async function searchDrugByDistance(
   }
 
   // Reutilize price-sorted cache if available
-  const byPriceKey = `${drugName.toLowerCase()}-${zipCode}-${radius}-${form}-${activeStrength}-${activeQuantity}-${includeGeneric}`;
+  const byPriceKey = `${resolvedDrugName}-${zipCode}-${radius}-${form}-${activeStrength}-${activeQuantity}-${includeGeneric}`;
   const cachedPriceEntry = state.drugSearch.resultsByPrice[byPriceKey];
   if (cachedPriceEntry) {
     const sorted = [...cachedPriceEntry.results].sort((a, b) => +a.distance - +b.distance);
@@ -596,7 +598,7 @@ export async function searchDrugByDistance(
   }
 
   // Fresh query
-  const searchResults = await searchDrug(drugName, form, radius, zipCode);
+  const searchResults = await searchDrug(form, radius, zipCode);
   const sorted = [...searchResults].sort((a, b) => +a.distance - +b.distance);
   store.dispatch(setCacheEntry({ key, results: sorted, by: 'distance' }));
   return sorted;
