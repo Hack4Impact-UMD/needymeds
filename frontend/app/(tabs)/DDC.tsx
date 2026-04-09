@@ -1,8 +1,18 @@
+import { getGoogleWalletUrl } from '@/api/wallet';
 import { Colors } from '@/constants/theme';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import {
+  Alert,
+  Image,
+  Linking,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Adjudicator, DrugSearchResult } from '../../api/types';
@@ -38,6 +48,24 @@ const DDC = () => {
 
   const [showFAQ, setShowFAQ] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [isAddingToWallet, setIsAddingToWallet] = useState(false);
+
+  async function handleAddToGoogleWallet() {
+    if (isAddingToWallet) return;
+    setIsAddingToWallet(true);
+
+    try {
+      const { url } = await getGoogleWalletUrl(result);
+      if (!url) {
+        throw new Error('Invalid wallet URL');
+      }
+      await Linking.openURL(url);
+    } catch {
+      Alert.alert(t('DDCError'), t('DDCGoogleWalletError'));
+    } finally {
+      setIsAddingToWallet(false);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -115,38 +143,50 @@ const DDC = () => {
                 </View>
               </View>
 
-              <View style={styles.actionRow}>
-                <Pressable
-                  style={styles.actionButton}
-                  onPress={() => {
-                    router.push({
-                      pathname: '/ddc-expand',
-                      params: {
-                        drugName: params.drugName,
-                        quantity: params.quantity,
-                        form: params.form,
-                        adjudicator: result.adjudicator,
-                        pharmacyName: params.pharmacyName,
-                        pharmacyAddress: params.pharmacyAddress,
-                        pharmacyPhone: params.pharmacyPhone,
-                        ndc: params.ndc,
-                        labelName: params.labelName,
-                        price: params.price,
-                        latitude: params.latitude,
-                        longitude: params.longitude,
-                        distance: params.distance,
-                      },
-                    });
-                  }}
-                >
-                  <MaterialCommunityIcons name="aspect-ratio" size={20} color="white" />
-                  <Text style={styles.buttonText}>{t('ButtonLabel1')}</Text>
-                </Pressable>
+              <View style={styles.actionButtonsWrap}>
+                <View style={styles.actionRow}>
+                  <Pressable
+                    style={styles.actionButton}
+                    onPress={() => {
+                      router.push({
+                        pathname: '/ddc-expand',
+                        params: {
+                          drugName: params.drugName,
+                          quantity: params.quantity,
+                          form: params.form,
+                          adjudicator: result.adjudicator,
+                          pharmacyName: params.pharmacyName,
+                          pharmacyAddress: params.pharmacyAddress,
+                          pharmacyPhone: params.pharmacyPhone,
+                          ndc: params.ndc,
+                          labelName: params.labelName,
+                          price: params.price,
+                          latitude: params.latitude,
+                          longitude: params.longitude,
+                          distance: params.distance,
+                        },
+                      });
+                    }}
+                  >
+                    <MaterialCommunityIcons name="aspect-ratio" size={20} color="white" />
+                    <Text style={styles.buttonText}>{t('ButtonLabel1')}</Text>
+                  </Pressable>
 
-                <Pressable style={styles.actionButton} onPress={() => setShowShareModal(true)}>
-                  <MaterialIcons name="share" size={20} color="white" />
-                  <Text style={styles.buttonText}>{t('ButtonLabel2')}</Text>
-                </Pressable>
+                  <Pressable style={styles.actionButton} onPress={() => setShowShareModal(true)}>
+                    <MaterialIcons name="share" size={20} color="white" />
+                    <Text style={styles.buttonText}>{t('ButtonLabel2')}</Text>
+                  </Pressable>
+                </View>
+
+                {Platform.OS === 'android' && (
+                  <Pressable
+                    style={[styles.actionButtonFull]}
+                    onPress={handleAddToGoogleWallet}
+                    disabled={isAddingToWallet}>
+                    <MaterialIcons name="add-card" size={20} color="white" />
+                    <Text style={styles.buttonText}>{t('DDCAddToWallet')}</Text>
+                  </Pressable>
+                )}
               </View>
 
               <View style={styles.footerNote}>
@@ -231,14 +271,27 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 180,
   },
+  actionButtonsWrap: {
+    gap: 12,
+    marginBottom: 25,
+  },
   actionRow: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 25,
     justifyContent: 'center',
   },
   actionButton: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#236488',
+    borderRadius: 999,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  actionButtonFull: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
