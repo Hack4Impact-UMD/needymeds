@@ -48,8 +48,12 @@ const DDC = () => {
 
   const [showFAQ, setShowFAQ] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [isAddingToWallet, setIsAddingToWallet] = useState(false);
 
   async function handleAddToGoogleWallet() {
+    if (isAddingToWallet) return;
+    setIsAddingToWallet(true);
+
     try {
       const { url } = await getGoogleWalletUrl(result);
       if (!url) {
@@ -58,6 +62,8 @@ const DDC = () => {
       await Linking.openURL(url);
     } catch {
       Alert.alert(t('DDCError'), t('DDCGoogleWalletError'));
+    } finally {
+      setIsAddingToWallet(false);
     }
   }
 
@@ -172,8 +178,11 @@ const DDC = () => {
                   </Pressable>
                 </View>
 
-                {(Platform.OS === 'android' || __DEV__) && (
-                  <Pressable style={styles.actionButtonFull} onPress={handleAddToGoogleWallet}>
+                {Platform.OS === 'android' && (
+                  <Pressable
+                    style={[styles.actionButtonFull]}
+                    onPress={handleAddToGoogleWallet}
+                    disabled={isAddingToWallet}>
                     <MaterialIcons name="add-card" size={20} color="white" />
                     <Text style={styles.buttonText}>{t('DDCAddToWallet')}</Text>
                   </Pressable>
