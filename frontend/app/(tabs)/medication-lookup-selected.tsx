@@ -12,6 +12,7 @@ import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
+import AdditionalResourcesButton from '../components/medication-lookup/AdditionalResourcesButton';
 import { useTranslation } from 'react-i18next';
 import {
   Alert,
