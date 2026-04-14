@@ -12,7 +12,9 @@ const MedicationCard = ({ med, onUnsave }: FavoritedMedication) => {
   return (
     <Card key={med.id} mode="outlined" style={styles.med_cards}>
       <Card.Content>
-        <Text style={{ fontSize: 14, color: '#41484D' }}>${med.price} • med.pharmacy_name</Text>
+        <Text style={{ fontSize: 14, color: '#41484D' }}>
+          ${med.price} • {med.pharmacy_address}
+        </Text>
         <View style={styles.header}>
           <View style={styles.name_container}>
             <Text style={styles.med_name}>{med.drug_name}</Text>

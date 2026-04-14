@@ -10,7 +10,7 @@ import { DrugSearchResult, SavedMedication } from '@/api/types';
 import getUserLocation from '@/api/userLocation';
 import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -27,12 +27,12 @@ import { ActivityIndicator, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useRecentSearches } from '@/hooks/use-recent-searches';
+import { useSavedMedications } from '@/hooks/use-saved-medications';
 import BottomNavBar from '../components/BottomNavBar';
 import ErrorState, { ErrorStateType } from '../components/ErrorState';
 import LanguageDropdown from '../components/LanguageDropdown';
 import MedicationDetailModal from '../components/medication-lookup/MedicationDetailModal';
 import MedicationSearchbar from '../components/medication-lookup/MedicationSearchbar';
-import { useSavedMedications } from '@/hooks/use-saved-medications';
 
 const ZIPCODE_LENGTH = 5;
 const GENERIC_NAME_TRUNCATE_CUTOFF = 6;
@@ -110,13 +110,24 @@ const MedicationLookupSelectedScreen = () => {
     medications: savedMedsFromHook,
     saveMedication,
     deleteMedication,
+    refreshMedications,
   } = useSavedMedications();
   const [savedMedications, setSavedMedications] = useState<SavedMedication[]>(savedMedsFromHook);
 
+  const navigation = useNavigation();
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      refreshMedications();
+    });
+    return unsubscribe;
+  }, [navigation, refreshMedications]);
+
   const isSaved = (medication: DrugSearchResult) => {
     return savedMedications.some(
-      (m) => m.drug_name === medication.labelName && m.pharmacy_name === medication.pharmacyName
-      // && m.pharmacy_address === pharmacyAddress
+      (m) =>
+        m.drug_name === medication.labelName &&
+        m.pharmacy_name === medication.pharmacyName &&
+        m.pharmacy_address === medication.pharmacyAddress
     );
   };
 
@@ -131,21 +142,18 @@ const MedicationLookupSelectedScreen = () => {
     const saved = isSaved(med);
     // medication is already saved -> toggle to unfavorite
     if (saved) {
-      // get exisitng saved medication with ID
+      // get existing saved medication with ID
       const current = savedMedications.find(
-        (m) => m.drug_name === med.labelName && m.pharmacy_name === med.pharmacyName
+        (m) =>
+          m.drug_name === med.labelName &&
+          m.pharmacy_name === med.pharmacyName &&
+          m.pharmacy_address === med.pharmacyAddress
       );
-      console.log('before check if has ID');
       // unfavorite
       if (current?.id) {
         setSavedMedications((prev) => prev.filter((m) => m.id !== current.id));
-        console.log('before await delete');
         await deleteMedication(current.id);
-        console.log('after await delete');
-      } else {
-        console.log('no id');
       }
-      console.log('return');
       return;
 
       // medication has not been saved yet -> favorite it
@@ -154,7 +162,7 @@ const MedicationLookupSelectedScreen = () => {
       const newSavedMed: Omit<SavedMedication, 'id' | 'last_saved_date'> = {
         drug_name: med.labelName,
         pharmacy_name: med.pharmacyName,
-        // pharmacy_address: pharmacyAddress,
+        pharmacy_address: med.pharmacyAddress,
         form,
         strength,
         quantity: Number(quantity),
@@ -637,7 +645,6 @@ const MedicationLookupSelectedScreen = () => {
                 // Show results list
                 drugResults.map((result) => {
                   const isStarred = isSaved(result);
-                  // const pharmacyAddress = result.pharmacyAddress;
                   return (
                     <TouchableOpacity
                       key={result.pharmacyName}
