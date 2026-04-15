@@ -3,13 +3,34 @@ import { useState } from 'react';
 import { Linking, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 
-const AdditionalResourcesButton = () => {
+interface Medication {
+  ndc: string;
+}
+
+const fallback_url = 'https://www.needymeds.org/search-programs';
+
+const AdditionalResourcesButton = ({ ndc }: Medication) => {
   const [pressed, setPressed] = useState(false);
+  // const [loading, setLoading] = useState(false);
+
+  const handlePress = async () => {
+    // setLoading(true);
+    try {
+      const result = await fetch(`/api/urlapi/lookup?ndc=${encodeURIComponent(ndc)}`);
+      const json = await result.json();
+      const url = json?.data?.result ?? fallback_url;
+      await Linking.openURL(url);
+    } catch {
+      await Linking.openURL(fallback_url);
+    } finally {
+      // setLoading(false);
+    }
+  };
 
   return (
     <TouchableOpacity
       style={[styles.button, pressed && styles.buttonPressed]}
-      onPress={() => Linking.openURL('https://www.needymeds.org/search-programs')}
+      onPress={handlePress}
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
       activeOpacity={1}

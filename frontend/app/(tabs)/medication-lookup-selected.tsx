@@ -562,10 +562,13 @@ const MedicationLookupSelectedScreen = () => {
                 <ActivityIndicator size="large" style={{ marginTop: 200 }} color="#236488" />
               ) : errorType ? (
                 // Show error state
-                <ErrorState
-                  type={errorType}
-                  message="We couldn't load pharmacy results right now. Please check your connection and try again."
-                />
+                <>
+                  <ErrorState
+                    type={errorType}
+                    message="We couldn't load pharmacy results right now. Please check your connection and try again."
+                  />
+                  <AdditionalResourcesButton ndc={drugResults[0]?.ndc ?? ''} />
+                </>
               ) : drugResults.length === 0 ? (
                 // Show initial empty state (before search)
                 <View style={styles.emptyState}>
@@ -601,6 +604,7 @@ const MedicationLookupSelectedScreen = () => {
                   </TouchableOpacity>
                 ))
               )}
+              <AdditionalResourcesButton ndc={drugResults[0].ndc} />
             </View>
           </ScrollView>
         </View>

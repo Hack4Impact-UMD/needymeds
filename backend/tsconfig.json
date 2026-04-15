@@ -14,5 +14,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["src"]
+  "include": ["src"],
+  "extends": "expo/tsconfig.base"
 }
