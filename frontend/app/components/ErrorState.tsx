@@ -1,9 +1,9 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
 
-export type ErrorStateType = 'loading' | 'notFound' | 'noPharmacies' | 'generic';
+export type ErrorStateType = 'loading' | 'notFound' | 'zipCode' | 'noPharmacies' | 'generic';
 
 interface ErrorStateProps {
   type: ErrorStateType;
@@ -11,7 +11,8 @@ interface ErrorStateProps {
   showCallButton?: boolean;
   phoneNumber?: string;
   onCallPress?: () => void;
-  iconName?: keyof typeof MaterialCommunityIcons.glyphMap;
+  iconName?: keyof typeof MaterialCommunityIcons.glyphMap | keyof typeof MaterialIcons.glyphMap;
+  iconSize?: number;
   iconColor?: string;
 }
 
@@ -22,6 +23,7 @@ const ErrorState: React.FC<ErrorStateProps> = ({
   phoneNumber = '8005036897',
   onCallPress,
   iconName = 'magnify',
+  iconSize = 48,
   iconColor = '#41484D',
 }) => {
   const { t } = useTranslation();
@@ -41,6 +43,8 @@ const ErrorState: React.FC<ErrorStateProps> = ({
         return t('LoadingMsg');
       case 'notFound':
         return t('NotFoundMsg');
+      case 'zipCode':
+        return t('EmptyTouchedMsg');
       case 'noPharmacies':
         return t('EmptyMsg2');
       case 'generic':
@@ -53,7 +57,19 @@ const ErrorState: React.FC<ErrorStateProps> = ({
 
   return (
     <View style={styles.container}>
-      <MaterialCommunityIcons name={iconName} size={48} color={iconColor} />
+      {iconName in MaterialCommunityIcons.glyphMap ? (
+        <MaterialCommunityIcons
+          name={iconName as keyof typeof MaterialCommunityIcons.glyphMap}
+          size={iconSize}
+          color={iconColor}
+        />
+      ) : (
+        <MaterialIcons
+          name={iconName as keyof typeof MaterialIcons.glyphMap}
+          size={iconSize}
+          color={iconColor}
+        />
+      )}
       <Text style={styles.messageText}>{displayMessage}</Text>
 
       {showCallButton && (

@@ -321,7 +321,6 @@ export function setActiveStrength(
  * @param radius to search within, relative to 'zipCode'.
  */
 async function searchDrug(
-  drugName: string,
   form: string,
   radius: number,
   zipCode: string
@@ -564,7 +563,7 @@ export async function searchDrugByPrice(
   }
 
   // Fresh query
-  const searchResults = await searchDrug(resolvedDrugName, form, radius, zipCode);
+  const searchResults = await searchDrug(form, radius, zipCode);
   const sorted = [...searchResults].sort((a, b) => +a.price - +b.price);
   store.dispatch(setCacheEntry({ key, results: sorted, by: 'price' }));
   return sorted;
@@ -598,7 +597,7 @@ export async function searchDrugByDistance(
   }
 
   // Fresh query
-  const searchResults = await searchDrug(resolvedDrugName, form, radius, zipCode);
+  const searchResults = await searchDrug(form, radius, zipCode);
   const sorted = [...searchResults].sort((a, b) => +a.distance - +b.distance);
   store.dispatch(setCacheEntry({ key, results: sorted, by: 'distance' }));
   return sorted;
