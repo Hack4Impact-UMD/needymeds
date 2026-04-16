@@ -1,6 +1,7 @@
 console.log('applewallet.service.ts loaded');
 import { PKPass } from 'passkit-generator';
 import path from 'path';
+import fs from 'fs';
 import { getAppleWalletSecret, getAppleWalletWWDRSecret } from '../secrets/secrets';
 
 type PassInput = {
@@ -43,6 +44,12 @@ export async function createPass({ serial, number }: PassInput) {
       value: number,
     });
   }
+
+  const modelDir = path.join(__dirname, '../wallet-pass.pass');
+  pass.addBuffer('icon.png', fs.readFileSync(path.join(modelDir, 'icon.png')));
+  pass.addBuffer('icon@2x.png', fs.readFileSync(path.join(modelDir, 'icon@2x.png')));
+  pass.addBuffer('logo.png', fs.readFileSync(path.join(modelDir, 'logo.png')));
+  pass.addBuffer('logo@2x.png', fs.readFileSync(path.join(modelDir, 'logo@2x.png')));
 
   pass.setBarcodes({
     message: number,
