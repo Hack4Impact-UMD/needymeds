@@ -70,11 +70,7 @@ const EducationScreen = () => {
           />
           <Text style={styles.sectionHeaderText}>{t('AboutUsHeader')}</Text>
         </View>
-        <Card
-          style={styles.cards}
-          onPress={() => router.push('/(tabs)/about-needymeds')}
-          elevation={0}
-        >
+        <Card style={styles.cards} elevation={0}>
           <View style={styles.linkCardInner}>
             <Text style={styles.linkCardBody}>{t('AboutUsBody')}</Text>
             <Pressable onPress={() => router.push('/(tabs)/about-needymeds')} hitSlop={10}>
@@ -94,11 +90,7 @@ const EducationScreen = () => {
           />
           <Text style={styles.sectionHeaderText}>{t('Header3')}</Text>
         </View>
-        <Card
-          style={styles.cards}
-          onPress={() => router.push('/(tabs)/prescription-savings-tips')}
-          elevation={0}
-        >
+        <Card style={styles.cards} elevation={0}>
           <View style={styles.linkCardInner}>
             <Text style={styles.linkCardBody}>{t('PrescriptionSavingsTipsBody')}</Text>
             <Pressable
@@ -121,7 +113,7 @@ const EducationScreen = () => {
           />
           <Text style={styles.sectionHeaderText}>{t('Card2')}</Text>
         </View>
-        <Card style={styles.cards} onPress={() => handleLink(coupon_faq_url)} elevation={0}>
+        <Card style={styles.cards} elevation={0}>
           <View style={styles.linkCardInner}>
             <Text style={styles.linkCardBody}>{t('ManufacturerCouponFaqBody')}</Text>
             <Pressable onPress={() => handleLink(coupon_faq_url)} hitSlop={10}>
@@ -231,7 +223,7 @@ const styles = StyleSheet.create({
   },
   linkCardLink: {
     fontSize: 14,
-    fontFamily: 'OpenSans',
+    fontFamily: 'Open Sans',
     fontWeight: '700',
     color: Colors.default.brandBlue,
   },
