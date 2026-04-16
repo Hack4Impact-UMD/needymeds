@@ -25,7 +25,13 @@ app.use('/api/applewallet', appleWalletRouter);
 
 app.use((err: any, _req: any, res: any, _next: any) => {
   const status = err?.status ?? err?.response?.status ?? 500;
-  const message = err?.message || err?.response?.data?.message || 'Internal Server Error';
+  const message =
+    err?.response?.Message ||
+    err?.response?.message ||
+    err?.response?.data?.Message ||
+    err?.response?.data?.message ||
+    err?.message ||
+    'Internal Server Error';
   res.status(status).json({ ok: false, error: message });
 });
 

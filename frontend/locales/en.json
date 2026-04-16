@@ -34,6 +34,8 @@
   "RadiusInputSuffix": "miles",
   "EmptyPristineMsg": "Tell us how much you're looking for, and where you can pick it up.",
   "EmptyTouchedMsg": "Looks like that's not available here right now. Try checking other zip codes or increasing the search radius.",
+  "LoadingMsg": "We could not load results right now. This happens when the connection is slow or the system is busy.",
+  "NotFoundMsg": "We could not find that drug. You might find it at a pharmacy even if it is not on our discount list. Make sure it is spelled correctly.",
   "FilterChipSortPrice": "By price",
   "FilterChipSortDist": "By distance",
   "FilterChipGenericPrefix": "Include generic",
@@ -58,7 +60,8 @@
   "Text5": "This is a drug discount program, not an insurance plan.",
   "ButtonLabel1": "Expand",
   "ButtonLabel2": "Share",
-  "ButtonLabel3": "Add to wallet",
+  "ButtonLabel3": "View Back of Card",
+  "ButtonLabel4": "View Front of Card",
   "HelpLink1": "Have questions?",
   "HelpLink2": "Learn more about the Drug Discount Card here!",
   "Heading": "Drug Discount Card FAQs",
@@ -127,5 +130,6 @@
   "closeIcon5": "Close and go back",
   "Recent": "Recent",
   "ClearAll": "Clear all",
-  "NA": "n/a"
+  "NA": "n/a",
+  "AvailableCoupons": "Available Coupons"
 }
