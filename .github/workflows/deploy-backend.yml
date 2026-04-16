@@ -6,6 +6,7 @@ on:
       - main
       - staging
       - development
+      - backend-cicd
 
 permissions:
   id-token: write
