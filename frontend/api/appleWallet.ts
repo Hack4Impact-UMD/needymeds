@@ -1,6 +1,4 @@
 import * as FileSystem from 'expo-file-system/legacy';
-// import * as Sharing from 'expo-sharing';
-import PassKit from 'react-native-passkit-wallet';
 
 export async function handleAddToWallet() {
   try {
@@ -22,11 +20,8 @@ export async function handleAddToWallet() {
       encoding: FileSystem.EncodingType.Base64,
     });
 
-    // await Sharing.shareAsync(downloadResult.uri, {
-    //   mimeType: 'application/vnd.apple.pkpass',
-    //   UTI: 'com.apple.pkpass',
-    // });
-
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const PassKit = require('react-native-passkit-wallet').default;
     await PassKit.addPass(base64);
   } catch (error) {
     console.error('Failed to open wallet pass:', error);
