@@ -115,7 +115,11 @@ const MedicationDetailModal = ({
               style={styles.iconButton}
               onPress={() => copyToClipboard(result.pharmacyAddress)}
             >
-              <MaterialCommunityIcons name="content-copy" size={20} color="#181C20" />
+              <MaterialCommunityIcons
+                name="content-copy"
+                size={20}
+                color={Colors.default.neutraldk}
+              />
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.iconButton, styles.primaryAction]}
@@ -136,7 +140,11 @@ const MedicationDetailModal = ({
               style={styles.iconButton}
               onPress={() => copyToClipboard(formattedPhoneNumber)}
             >
-              <MaterialCommunityIcons name="content-copy" size={20} color="#181C20" />
+              <MaterialCommunityIcons
+                name="content-copy"
+                size={20}
+                color={Colors.default.neutraldk}
+              />
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.iconButton, styles.primaryAction]}
@@ -192,7 +200,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '400',
     fontFamily: 'Nunito Sans',
-    color: '#181C20',
+    color: Colors.default.neutraldk,
   },
   couponButton: {
     color: 'white',
@@ -214,13 +222,13 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 14,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
   },
   cardSubtitle: {
     marginTop: 6,
     fontSize: 12,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
   },
   actions: {
@@ -240,7 +248,7 @@ const styles = StyleSheet.create({
   },
   phoneText: {
     fontSize: 16,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
   },
   priceRow: {
@@ -256,12 +264,12 @@ const styles = StyleSheet.create({
   priceLabel: {
     flex: 1,
     fontSize: 14,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'OpenSans-SemiBold',
   },
   priceAmount: {
     fontSize: 14,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'OpenSans-SemiBold',
   },
   ticketButton: {
@@ -274,7 +282,7 @@ const styles = StyleSheet.create({
     minHeight: 44,
     paddingHorizontal: 10,
     borderRadius: 30,
-    backgroundColor: '#236488',
+    backgroundColor: Colors.default.brandBlue,
   },
 });
 

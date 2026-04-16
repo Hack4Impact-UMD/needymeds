@@ -82,7 +82,11 @@ export default function PrescriptionSavingsTips() {
               <View key={idx} style={styles.card}>
                 <Pressable onPress={() => setOpen(isOpen ? null : idx)} style={styles.row}>
                   <Text style={styles.rowTitle}>{item.title}</Text>
-                  <Icon source={isOpen ? 'menu-up' : 'menu-down'} size={20} color="#181C20" />
+                  <Icon
+                    source={isOpen ? 'menu-up' : 'menu-down'}
+                    size={20}
+                    color={Colors.default.neutraldk}
+                  />
                 </Pressable>
 
                 {isOpen && (
@@ -135,11 +139,11 @@ const styles = StyleSheet.create({
   title: {
     maxWidth: '70%',
     textAlign: 'center',
-    fontSize: 32,
+    fontSize: 30,
     lineHeight: 34,
     fontWeight: '400',
     fontFamily: 'Nunito Sans',
-    color: '#181C20',
+    color: Colors.default.neutraldk,
   },
   backButton: {
     position: 'absolute',
@@ -155,7 +159,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     lineHeight: 22,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
   },
   card: {
@@ -172,7 +176,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: 400,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
   },
   body: {
@@ -182,7 +186,7 @@ const styles = StyleSheet.create({
   },
   line: {
     fontSize: 15,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     lineHeight: 22,
     fontFamily: 'Open Sans',
   },
@@ -195,7 +199,7 @@ const styles = StyleSheet.create({
   bullet: {
     fontSize: 20,
     lineHeight: 16,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     marginTop: 2,
   },
 });

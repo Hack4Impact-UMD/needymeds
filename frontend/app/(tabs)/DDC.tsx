@@ -67,7 +67,7 @@ const DDC = () => {
                   <Ionicons
                     name="arrow-back"
                     size={25}
-                    color="#181C20"
+                    color={Colors.default.neutraldk}
                     onPress={() => {
                       router.push({
                         pathname: '/medication-lookup-selected',
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     height: 40,
   },
   sectionLabel: {
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
     fontWeight: '400',
   },
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#236488',
+    backgroundColor: Colors.default.brandBlue,
     borderRadius: 999,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -303,11 +303,11 @@ const styles = StyleSheet.create({
   footerNote: {
     alignItems: 'center',
     paddingHorizontal: 12,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     textDecorationLine: 'underline',
   },
   footerQuestion: {
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     textAlign: 'center',
     fontSize: 13,
     fontFamily: 'Open Sans',

@@ -1,3 +1,4 @@
+import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
@@ -74,7 +75,7 @@ const ErrorState: React.FC<ErrorStateProps> = ({
 
       {showCallButton && (
         <TouchableOpacity style={styles.callButton} onPress={handleCallHelpline}>
-          <MaterialCommunityIcons name="phone" size={18} color="#236488" />
+          <MaterialCommunityIcons name="phone" size={18} color={Colors.default.brandBlue} />
           <Text style={styles.callButtonText}>Call the helpline</Text>
         </TouchableOpacity>
       )}
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   messageText: {
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     textAlign: 'center',
     fontFamily: 'Open Sans',
     lineHeight: 22,
@@ -106,12 +107,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#236488',
+    borderColor: Colors.default.brandBlue,
     marginTop: 10,
     gap: 8,
   },
   callButtonText: {
-    color: '#236488',
+    color: Colors.default.brandBlue,
     fontSize: 15,
     fontFamily: 'Open Sans',
     fontWeight: '400',

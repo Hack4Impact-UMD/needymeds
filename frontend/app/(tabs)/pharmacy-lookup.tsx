@@ -121,8 +121,8 @@ const PharmacyLocatorScreen = () => {
                 maxLength={5}
                 style={styles.textInput}
                 outlineStyle={styles.inputOutline}
-                activeOutlineColor="#236488"
-                textColor="#181C20"
+                activeOutlineColor={Colors.default.brandBlue}
+                textColor={Colors.default.neutraldk}
                 left={
                   <TextInput.Icon
                     icon={() => (
@@ -149,8 +149,8 @@ const PharmacyLocatorScreen = () => {
                 keyboardType="decimal-pad"
                 style={styles.textInput}
                 outlineStyle={styles.inputOutline}
-                textColor="#181C20"
-                activeOutlineColor="#236488"
+                textColor={Colors.default.neutraldk}
+                activeOutlineColor={Colors.default.brandBlue}
                 maxLength={4}
                 right={
                   <TextInput.Affix text={t('RadiusInputSuffix')} textStyle={{ color: '#41484D' }} />
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   detectLocationText: {
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontSize: 16,
     marginLeft: 6,
     fontFamily: 'Open Sans',

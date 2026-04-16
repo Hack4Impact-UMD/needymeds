@@ -1,3 +1,4 @@
+import { Colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useRef, useState } from 'react';
@@ -44,7 +45,7 @@ const DDCExpand = () => {
         <Ionicons
           name="arrow-back"
           size={25}
-          color="#181C20"
+          color={Colors.default.neutraldk}
           onPress={() => {
             router.push({
               pathname: '/DDC',

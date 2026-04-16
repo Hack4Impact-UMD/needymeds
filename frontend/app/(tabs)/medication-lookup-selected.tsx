@@ -379,8 +379,8 @@ const MedicationLookupSelectedScreen = () => {
                     />
                   )}
                   outlineStyle={{ borderRadius: 5 }}
-                  activeOutlineColor="#236488"
-                  textColor="#181C20"
+                  activeOutlineColor={Colors.default.brandBlue}
+                  textColor={Colors.default.neutraldk}
                   style={{ backgroundColor: Colors.default.neutrallt }}
                 />
               </View>
@@ -407,8 +407,8 @@ const MedicationLookupSelectedScreen = () => {
                     />
                   )}
                   outlineStyle={{ borderRadius: 5 }}
-                  activeOutlineColor="#236488"
-                  textColor="#181C20"
+                  activeOutlineColor={Colors.default.brandBlue}
+                  textColor={Colors.default.neutraldk}
                   style={{ backgroundColor: Colors.default.neutrallt }}
                 />
               </View>
@@ -424,8 +424,8 @@ const MedicationLookupSelectedScreen = () => {
                   onChangeText={setQuantity}
                   keyboardType="numeric"
                   outlineStyle={{ borderRadius: 5 }}
-                  activeOutlineColor="#236488"
-                  textColor="#181C20"
+                  activeOutlineColor={Colors.default.brandBlue}
+                  textColor={Colors.default.neutraldk}
                   maxLength={3}
                   style={{ backgroundColor: Colors.default.neutrallt }}
                   disabled={!strength}
@@ -440,8 +440,8 @@ const MedicationLookupSelectedScreen = () => {
                   onChangeText={setZipCode}
                   keyboardType="numeric"
                   outlineStyle={{ borderRadius: 5 }}
-                  activeOutlineColor="#236488"
-                  textColor="#181C20"
+                  activeOutlineColor={Colors.default.brandBlue}
+                  textColor={Colors.default.neutraldk}
                   style={{ backgroundColor: Colors.default.neutrallt }}
                   maxLength={5}
                   disabled={!strength}
@@ -488,8 +488,8 @@ const MedicationLookupSelectedScreen = () => {
                   onChangeText={setRadius}
                   keyboardType="decimal-pad"
                   outlineStyle={{ borderRadius: 5 }}
-                  activeOutlineColor="#236488"
-                  textColor="#181C20"
+                  activeOutlineColor={Colors.default.brandBlue}
+                  textColor={Colors.default.neutraldk}
                   maxLength={4}
                   style={{ backgroundColor: Colors.default.neutrallt }}
                   disabled={!strength}
@@ -565,7 +565,11 @@ const MedicationLookupSelectedScreen = () => {
             <View style={styles.pharmacyListContainer}>
               {isLoading ? (
                 // Show loading state
-                <ActivityIndicator size="large" style={{ marginTop: 200 }} color="#236488" />
+                <ActivityIndicator
+                  size="large"
+                  style={{ marginTop: 200 }}
+                  color={Colors.default.brandBlue}
+                />
               ) : errorType ? (
                 // Show error state
                 <ErrorState
@@ -746,7 +750,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   detectLocationText: {
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontSize: 16,
     marginLeft: 6,
     fontFamily: 'Open Sans',
@@ -767,7 +771,7 @@ const styles = StyleSheet.create({
     top: 20,
     right: 10,
     fontSize: 15,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
   },
   filterContainer: {
@@ -871,7 +875,7 @@ const styles = StyleSheet.create({
   },
   pharmacyLabel: {
     fontSize: 12,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
   },
   pharmacyRight: {
@@ -894,7 +898,7 @@ const styles = StyleSheet.create({
   },
   emptyStateTitle: {
     fontSize: 16,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     textAlign: 'center',
     marginTop: 16,
     fontFamily: 'Open Sans',
@@ -922,7 +926,7 @@ const styles = StyleSheet.create({
   },
   dropdownText: {
     fontSize: 15,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
   },
   dropdownContainer: {

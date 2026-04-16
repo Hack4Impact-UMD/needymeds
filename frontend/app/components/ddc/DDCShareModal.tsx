@@ -1,5 +1,6 @@
 import { Adjudicator, DrugSearchResult } from '@/api/types';
 import { getGoogleWalletUrl } from '@/api/wallet';
+import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { Asset } from 'expo-asset';
 import * as MediaLibrary from 'expo-media-library';
@@ -186,7 +187,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#236488',
+    backgroundColor: Colors.default.brandBlue,
     alignItems: 'center',
     justifyContent: 'center',
   },
