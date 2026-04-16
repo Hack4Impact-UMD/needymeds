@@ -1,12 +1,13 @@
 import * as FileSystem from 'expo-file-system/legacy';
-import * as Sharing from 'expo-sharing';
+// import * as Sharing from 'expo-sharing';
+import PassKit from 'react-native-passkit-wallet';
 
 export async function handleAddToWallet() {
   try {
     const fileUri = FileSystem.cacheDirectory + 'pass.pkpass';
 
     const downloadResult = await FileSystem.downloadAsync(
-      'http://ddcapp-api.needymeds.org/api/applewallet',
+      'https://ddcapp-api.needymeds.org/api/applewallet',
       fileUri
     );
 
@@ -17,10 +18,16 @@ export async function handleAddToWallet() {
       return;
     }
 
-    await Sharing.shareAsync(downloadResult.uri, {
-      mimeType: 'application/vnd.apple.pkpass',
-      UTI: 'com.apple.pkpass',
+    const base64 = await FileSystem.readAsStringAsync(fileUri, {
+      encoding: FileSystem.EncodingType.Base64,
     });
+
+    // await Sharing.shareAsync(downloadResult.uri, {
+    //   mimeType: 'application/vnd.apple.pkpass',
+    //   UTI: 'com.apple.pkpass',
+    // });
+
+    await PassKit.addPass(base64);
   } catch (error) {
     console.error('Failed to open wallet pass:', error);
   }
