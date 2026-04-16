@@ -34,6 +34,8 @@
   "RadiusInputSuffix": "millas",
   "EmptyPristineMsg": "Indique cuánto necesita y dónde desea recogerlo.",
   "EmptyTouchedMsg": "Parece que no está disponible aquí por ahora. Intente con otros códigos postales o amplíe el radio de búsqueda.",
+  "LoadingMsg": "No pudimos cargar los resultados en este momento. Esto puede deberse a una conexión lenta o a que el sistema está ocupado.",
+  "NotFoundMsg": "No encontramos ese medicamento. Es posible que esté disponible en una farmacia aunque no aparezca en nuestra lista de descuentos. Verifique que esté escrito correctamente.",
   "FilterChipSortPrice": "Por precio",
   "FilterChipSortDist": "Por distancia",
   "FilterChipGenericPrefix": "Incluir genérico",

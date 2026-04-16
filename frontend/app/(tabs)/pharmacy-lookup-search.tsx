@@ -240,6 +240,7 @@ const PharmacyLocatorScreen = () => {
               <ErrorState
                 type={errorType}
                 iconName={errorType === 'noPharmacies' ? 'store-outline' : undefined}
+                showCallButton={errorType !== 'noPharmacies'}
               />
             ) : (
               filteredPharmacies.map((pharmacy) => (
