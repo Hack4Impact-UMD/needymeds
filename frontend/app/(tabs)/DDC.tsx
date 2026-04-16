@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { handleAddToWallet } from '../../api/appleWallet';
 import { Adjudicator, DrugSearchResult } from '../../api/types';
 
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
