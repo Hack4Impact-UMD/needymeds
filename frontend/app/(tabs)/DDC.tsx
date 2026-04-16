@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { handleAddToWallet } from '../../api/appleWallet';
 import { Adjudicator, DrugSearchResult } from '../../api/types';
 
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
@@ -146,6 +147,12 @@ const DDC = () => {
                 <Pressable style={styles.actionButton} onPress={() => setShowShareModal(true)}>
                   <MaterialIcons name="share" size={20} color="white" />
                   <Text style={styles.buttonText}>{t('ButtonLabel2')}</Text>
+                </Pressable>
+              </View>
+
+              <View>
+                <Pressable style={styles.actionButton} onPress={() => handleAddToWallet()}>
+                  <Text style={styles.buttonText}>{t('ButtonLabel3')}</Text>
                 </Pressable>
               </View>
 
