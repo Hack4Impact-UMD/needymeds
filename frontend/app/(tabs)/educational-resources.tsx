@@ -27,7 +27,6 @@ const EducationScreen = () => {
 
   const coupon_faq_url = 'https://www.needymeds.org/copay-cards-faqs';
   const nm_url = 'https://needymeds.org/';
-  const about_us_url = 'https://needymeds.org/about-us/';
   const nm_phone = '(800) 503-6897';
   const nm_phone_tel = 'tel:8005036897';
 
@@ -68,10 +67,10 @@ const EducationScreen = () => {
           <MaterialCommunityIcons name="account-multiple-outline" color={BRAND_BLUE} size={30} />
           <Text style={styles.sectionHeaderText}>{t('AboutUsHeader')}</Text>
         </View>
-        <Card style={styles.cards} onPress={() => handleLink(about_us_url)}>
+        <Card style={styles.cards} onPress={() => router.push('/(tabs)/about-needymeds')}>
           <View style={styles.linkCardInner}>
             <Text style={styles.linkCardBody}>{t('AboutUsBody')}</Text>
-            <Pressable onPress={() => handleLink(about_us_url)} hitSlop={10}>
+            <Pressable onPress={() => router.push('/(tabs)/about-needymeds')} hitSlop={10}>
               <Text style={styles.linkCardLink}>
                 {t('ClickHereToLearnMore')} <Text style={styles.linkArrow}>{'>'}</Text>
               </Text>
