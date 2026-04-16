@@ -1,16 +1,7 @@
 import { router } from 'expo-router';
 
 import { useTranslation } from 'react-i18next';
-import {
-  Image,
-  Linking,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Image, Linking, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Card } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -71,11 +62,9 @@ const EducationScreen = () => {
         <Card style={styles.cards} onPress={() => handleLink(about_us_url)}>
           <View style={styles.linkCardInner}>
             <Text style={styles.linkCardBody}>{t('AboutUsBody')}</Text>
-            <Pressable onPress={() => handleLink(about_us_url)} hitSlop={10}>
-              <Text style={styles.linkCardLink}>
-                {t('ClickHereToLearnMore')} <Text style={styles.linkArrow}>{'>'}</Text>
-              </Text>
-            </Pressable>
+            <Text style={styles.linkCardLink}>
+              {t('ClickHereToLearnMore')} <Text style={styles.linkArrow}>{'>'}</Text>
+            </Text>
           </View>
         </Card>
 
@@ -87,14 +76,9 @@ const EducationScreen = () => {
         <Card style={styles.cards} onPress={() => router.push('/(tabs)/prescription-savings-tips')}>
           <View style={styles.linkCardInner}>
             <Text style={styles.linkCardBody}>{t('PrescriptionSavingsTipsBody')}</Text>
-            <Pressable
-              onPress={() => router.push('/(tabs)/prescription-savings-tips')}
-              hitSlop={10}
-            >
-              <Text style={styles.linkCardLink}>
-                {t('ClickHereToLearnMore')} <Text style={styles.linkArrow}>{'>'}</Text>
-              </Text>
-            </Pressable>
+            <Text style={styles.linkCardLink}>
+              {t('ClickHereToLearnMore')} <Text style={styles.linkArrow}>{'>'}</Text>
+            </Text>
           </View>
         </Card>
 
@@ -106,11 +90,9 @@ const EducationScreen = () => {
         <Card style={styles.cards} onPress={() => handleLink(coupon_faq_url)}>
           <View style={styles.linkCardInner}>
             <Text style={styles.linkCardBody}>{t('ManufacturerCouponFaqBody')}</Text>
-            <Pressable onPress={() => handleLink(coupon_faq_url)} hitSlop={10}>
-              <Text style={styles.linkCardLink}>
-                {t('ClickHereToLearnMore')} <Text style={styles.linkArrow}>{'>'}</Text>
-              </Text>
-            </Pressable>
+            <Text style={styles.linkCardLink}>
+              {t('ClickHereToLearnMore')} <Text style={styles.linkArrow}>{'>'}</Text>
+            </Text>
           </View>
         </Card>
       </ScrollView>
