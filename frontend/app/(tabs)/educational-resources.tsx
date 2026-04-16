@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import {
   Image,
@@ -11,7 +12,6 @@ import {
   Text,
   View,
 } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Card } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -20,7 +20,6 @@ import BottomNavBar from '../components/BottomNavBar';
 import DefaultHeader from '../components/DefaultHeader';
 
 const v_logo = require('../assets/vertical_logo.png');
-const BRAND_BLUE = '#236488';
 
 const EducationScreen = () => {
   const { t } = useTranslation();
@@ -44,13 +43,13 @@ const EducationScreen = () => {
         <Text style={styles.title}>{t('Header2')}</Text>
 
         {/* NeedyMeds website card (top) */}
-        <Card style={styles.websiteCard} onPress={() => handleLink(nm_url)}>
+        <Card style={styles.websiteCard} onPress={() => handleLink(nm_url)} elevation={0}>
           <View style={styles.websiteCardInner}>
             <Image source={v_logo} style={styles.websiteLogo} resizeMode="contain" />
             <View style={styles.websiteTextCol}>
               <Text style={styles.websiteTitle}>{t('Card3')}</Text>
               <Text style={styles.websiteLine}>
-                {t('WebsiteLabel')} <Text style={styles.websiteLink}>https://needymeds.org/</Text>
+                {t('WebsiteLabel')} <Text style={styles.websiteLink}>{nm_url}</Text>
               </Text>
               <Text style={styles.websiteLine}>
                 {t('NumberLabel')}{' '}
@@ -64,15 +63,23 @@ const EducationScreen = () => {
 
         {/* About us */}
         <View style={styles.sectionHeader}>
-          <MaterialCommunityIcons name="account-multiple-outline" color={BRAND_BLUE} size={30} />
+          <MaterialCommunityIcons
+            name="account-multiple-outline"
+            color={Colors.default.brandBlue}
+            size={30}
+          />
           <Text style={styles.sectionHeaderText}>{t('AboutUsHeader')}</Text>
         </View>
-        <Card style={styles.cards} onPress={() => router.push('/(tabs)/about-needymeds')}>
+        <Card
+          style={styles.cards}
+          onPress={() => router.push('/(tabs)/about-needymeds')}
+          elevation={0}
+        >
           <View style={styles.linkCardInner}>
             <Text style={styles.linkCardBody}>{t('AboutUsBody')}</Text>
             <Pressable onPress={() => router.push('/(tabs)/about-needymeds')} hitSlop={10}>
               <Text style={styles.linkCardLink}>
-                {t('ClickHereToLearnMore')} <Text style={styles.linkArrow}>{'>'}</Text>
+                {t('ClickHereToLearnMore')} <Text style={styles.linkArrow}> ➤</Text>
               </Text>
             </Pressable>
           </View>
@@ -80,10 +87,18 @@ const EducationScreen = () => {
 
         {/* Prescription savings tips */}
         <View style={styles.sectionHeader}>
-          <MaterialCommunityIcons name="piggy-bank-outline" color={BRAND_BLUE} size={30} />
+          <MaterialCommunityIcons
+            name="piggy-bank-outline"
+            color={Colors.default.brandBlue}
+            size={30}
+          />
           <Text style={styles.sectionHeaderText}>{t('Header3')}</Text>
         </View>
-        <Card style={styles.cards} onPress={() => router.push('/(tabs)/prescription-savings-tips')}>
+        <Card
+          style={styles.cards}
+          onPress={() => router.push('/(tabs)/prescription-savings-tips')}
+          elevation={0}
+        >
           <View style={styles.linkCardInner}>
             <Text style={styles.linkCardBody}>{t('PrescriptionSavingsTipsBody')}</Text>
             <Pressable
@@ -91,7 +106,7 @@ const EducationScreen = () => {
               hitSlop={10}
             >
               <Text style={styles.linkCardLink}>
-                {t('ClickHereToLearnMore')} <Text style={styles.linkArrow}>{'>'}</Text>
+                {t('ClickHereToLearnMore')} <Text style={styles.linkArrow}> ➤</Text>
               </Text>
             </Pressable>
           </View>
@@ -99,15 +114,19 @@ const EducationScreen = () => {
 
         {/* Manufacturer coupon FAQ */}
         <View style={styles.sectionHeader}>
-          <MaterialCommunityIcons name="view-dashboard-outline" color={BRAND_BLUE} size={30} />
+          <MaterialCommunityIcons
+            name="view-dashboard-outline"
+            color={Colors.default.brandBlue}
+            size={30}
+          />
           <Text style={styles.sectionHeaderText}>{t('Card2')}</Text>
         </View>
-        <Card style={styles.cards} onPress={() => handleLink(coupon_faq_url)}>
+        <Card style={styles.cards} onPress={() => handleLink(coupon_faq_url)} elevation={0}>
           <View style={styles.linkCardInner}>
             <Text style={styles.linkCardBody}>{t('ManufacturerCouponFaqBody')}</Text>
             <Pressable onPress={() => handleLink(coupon_faq_url)} hitSlop={10}>
               <Text style={styles.linkCardLink}>
-                {t('ClickHereToLearnMore')} <Text style={styles.linkArrow}>{'>'}</Text>
+                {t('ClickHereToLearnMore')} <Text style={styles.linkArrow}> ➤</Text>
               </Text>
             </Pressable>
           </View>
@@ -130,20 +149,22 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
   },
   title: {
-    paddingHorizontal: 40,
+    paddingHorizontal: 10,
     textAlign: 'center',
-    fontSize: 32,
+    fontSize: 30,
     fontWeight: '400',
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Nunito Sans',
     marginBottom: 20,
   },
   websiteCard: {
     marginVertical: 8,
     width: '100%',
-    backgroundColor: '#F1F4F9',
+    backgroundColor: Colors.default.neutrallt,
     fontFamily: 'Open Sans',
     borderRadius: 12,
+    borderColor: '#C1C7CE',
+    borderWidth: 1,
   },
   websiteCardInner: {
     flexDirection: 'row',
@@ -158,17 +179,18 @@ const styles = StyleSheet.create({
   },
   websiteTextCol: {
     flex: 1,
-    gap: 6,
+    gap: 2,
   },
   websiteTitle: {
-    fontSize: 14,
-    color: '#181C20',
+    marginBottom: 3,
+    fontSize: 15,
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
-    fontWeight: '600',
+    fontWeight: '400',
   },
   websiteLine: {
     fontSize: 13,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
   },
   websiteLink: {
@@ -182,17 +204,19 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   sectionHeaderText: {
-    fontSize: 20,
-    color: '#181C20',
+    fontSize: 16,
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
-    fontWeight: '600',
+    fontWeight: '400',
   },
   cards: {
     marginVertical: 8,
     width: '100%',
-    backgroundColor: '#F1F4F9',
+    backgroundColor: Colors.default.neutrallt,
     fontFamily: 'Open Sans',
     borderRadius: 12,
+    borderColor: '#C1C7CE',
+    borderWidth: 1,
   },
   linkCardInner: {
     paddingVertical: 16,
@@ -200,15 +224,16 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   linkCardBody: {
-    fontSize: 14,
-    color: '#181C20',
+    fontSize: 15,
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
     lineHeight: 20,
   },
   linkCardLink: {
     fontSize: 14,
-    fontFamily: 'OpenSans-SemiBold',
-    color: BRAND_BLUE,
+    fontFamily: 'OpenSans',
+    fontWeight: '700',
+    color: Colors.default.brandBlue,
   },
   linkArrow: {
     fontWeight: '700',

@@ -42,7 +42,13 @@ const MedicationLookupAutocompleteScreen = () => {
   const [errorType, setErrorType] = useState<ErrorStateType | null>(null);
 
   const inputRef = useRef<TextInput>(null);
-  const { recentSearches, addRecentSearch, removeRecentSearch, clearAllRecentSearches, refreshRecentSearches } = useRecentSearches();
+  const {
+    recentSearches,
+    addRecentSearch,
+    removeRecentSearch,
+    clearAllRecentSearches,
+    refreshRecentSearches,
+  } = useRecentSearches();
 
   useFocusEffect(
     useCallback(() => {
@@ -142,13 +148,11 @@ const MedicationLookupAutocompleteScreen = () => {
                         />
                         <View style={styles.resultContent}>
                           <Text style={styles.resultName}>{item.drug_name}</Text>
-                          <Text style={styles.resultGeneric}>
-                            / {item.generic_name ?? t('NA')}
-                          </Text>
+                          <Text style={styles.resultGeneric}>/ {item.generic_name ?? t('NA')}</Text>
                         </View>
                         <TouchableOpacity
                           onPress={() => removeRecentSearch(item.id)}
-                          accessibilityRole='button'
+                          accessibilityRole="button"
                           accessibilityLabel={t('RecentSearchRemove', { drugName: item.drug_name })}
                           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                         >
@@ -167,7 +171,11 @@ const MedicationLookupAutocompleteScreen = () => {
               )
             ) : isLoading ? (
               // Show loading state
-              <ActivityIndicator size="large" style={{ marginTop: 200 }} color="#236488" />
+              <ActivityIndicator
+                size="large"
+                style={{ marginTop: 200 }}
+                color={Colors.default.brandBlue}
+              />
             ) : errorType ? (
               // Show error state
               <ErrorState type={errorType} />
@@ -255,7 +263,7 @@ const styles = StyleSheet.create({
   clearAllText: {
     fontSize: 13,
     fontFamily: 'Open Sans',
-    color: '#236488',
+    color: Colors.default.brandBlue,
   },
   emptyState: {
     maxWidth: '100%',
@@ -265,7 +273,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   emptyText: {
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     textAlign: 'left',
     fontFamily: 'Open Sans',
     lineHeight: 22,
@@ -300,7 +308,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '400',
     fontFamily: 'Open Sans',
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     lineHeight: 22,
   },
   resultGeneric: {

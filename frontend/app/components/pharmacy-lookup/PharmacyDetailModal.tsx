@@ -82,7 +82,11 @@ export default function PharmacyDetailModal({ pharmacy, isOpen, onClose }: Props
               onPress={handleCopyAddress}
               accessibilityLabel={t('content_copyIcon')}
             >
-              <MaterialCommunityIcons name="content-copy" size={20} color="#181C20" />
+              <MaterialCommunityIcons
+                name="content-copy"
+                size={20}
+                color={Colors.default.neutraldk}
+              />
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.copyButton, styles.primaryAction]}
@@ -104,7 +108,11 @@ export default function PharmacyDetailModal({ pharmacy, isOpen, onClose }: Props
               onPress={handleCopyPhone}
               accessibilityLabel={t('content_copyIcon')}
             >
-              <MaterialCommunityIcons name="content-copy" size={20} color="#181C20" />
+              <MaterialCommunityIcons
+                name="content-copy"
+                size={20}
+                color={Colors.default.neutraldk}
+              />
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.copyButton, styles.primaryAction]}
@@ -149,7 +157,7 @@ const styles = StyleSheet.create({
     maxWidth: '80%',
     fontSize: 24,
     fontWeight: '400',
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Nunito Sans',
   },
   card: {
@@ -169,14 +177,14 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
   },
   cardSubtitle: {
     marginTop: 6,
     fontSize: 12,
     fontWeight: '700',
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
   },
   actions: {
@@ -201,7 +209,7 @@ const styles = StyleSheet.create({
   primaryIcon: {
     width: 24,
     height: 24,
-    tintColor: '#236488',
+    tintColor: Colors.default.brandBlue,
   },
   phoneText: {
     fontSize: 16,
