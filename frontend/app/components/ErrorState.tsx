@@ -1,4 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
 
@@ -23,6 +24,8 @@ const ErrorState: React.FC<ErrorStateProps> = ({
   iconName = 'magnify',
   iconColor = '#41484D',
 }) => {
+  const { t } = useTranslation();
+
   const handleCallHelpline = () => {
     if (onCallPress) {
       onCallPress();
@@ -35,14 +38,14 @@ const ErrorState: React.FC<ErrorStateProps> = ({
   const getDefaultMessage = () => {
     switch (type) {
       case 'loading':
-        return 'We could not load results right now. This happens when the connection is slow or the system is busy.';
+        return t('LoadingMsg');
       case 'notFound':
-        return `We could not find that drug. You might find it at a pharmacy even if it is not on our discount list.\nMake sure it is spelled correctly.`;
+        return t('NotFoundMsg');
       case 'noPharmacies':
-        return `We're sorry that there are no matching pharmacies in our network yet. Try checking other ZIP Codes or increasing the search radius.`;
+        return t('EmptyMsg2');
       case 'generic':
       default:
-        return 'Something went wrong. Please try again later.';
+        return t('LoadingMsg');
     }
   };
 
