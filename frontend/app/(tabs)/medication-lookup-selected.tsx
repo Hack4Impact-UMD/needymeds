@@ -274,9 +274,16 @@ const MedicationLookupSelectedScreen = () => {
         if (cancelled) return;
 
         setDrugResults(drugSearchResults);
-      } catch (error) {
+      } catch (error: any) {
         if (!cancelled) {
-          setErrorType('loading');
+          if (
+            error.message.toLowerCase().includes('zip code') ||
+            error.message.toLowerCase().includes('radius')
+          ) {
+            setErrorType('zipCode');
+          } else {
+            setErrorType('loading');
+          }
           setDrugResults([]);
         }
       } finally {
@@ -489,22 +496,6 @@ const MedicationLookupSelectedScreen = () => {
                 />
                 <Text style={styles.radiusUnit}>miles</Text>
               </View>
-
-              {/* Dropdown with "Detect my location" option */}
-              {zipFocused && zipCode.length !== ZIPCODE_LENGTH && drugResults.length === 0 && (
-                <TouchableOpacity
-                  style={styles.detectLocationButton}
-                  onPress={() => detectZipFromLocation()}
-                  disabled={detectingZip}
-                >
-                  {detectingZip && (
-                    <ActivityIndicator size="small" color="#3B82F6" style={{ marginRight: 6 }} />
-                  )}
-                  <Text style={styles.detectLocationText}>
-                    {detectingZip ? 'Detecting...' : 'Detect my location'}
-                  </Text>
-                </TouchableOpacity>
-              )}
             </View>
           </View>
 
@@ -583,7 +574,10 @@ const MedicationLookupSelectedScreen = () => {
                 // Show error state
                 <ErrorState
                   type={errorType}
-                  message="We couldn't load pharmacy results right now. Please check your connection and try again."
+                  iconName={errorType === 'zipCode' ? 'add-shopping-cart' : undefined}
+                  iconSize={errorType === 'zipCode' ? 64 : undefined}
+                  iconColor={errorType === 'zipCode' ? '#555' : undefined}
+                  showCallButton={errorType !== 'zipCode'}
                 />
               ) : drugResults.length === 0 ? (
                 // Show initial empty state (before search)

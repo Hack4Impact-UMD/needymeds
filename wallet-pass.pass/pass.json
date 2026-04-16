@@ -1,0 +1,21 @@
+{
+  "formatVersion": 1,
+  "passTypeIdentifier": "pass.org.needymeds.drug-discount-card",
+  "teamIdentifier": "7GJF6E8SLJ",
+  "organizationName": "NeedyMeds",
+  "description": "Drug Discount Card",
+  "generic": {
+    "primaryFields": [
+      {
+        "key": "cardNumber",
+        "label": "Card #",
+        "value": "90MA019309343023"
+      }
+    ]
+  },
+  "barcode": {
+    "format": "PKBarcodeFormatCode128",
+    "message": "%CARD_BARCODE%",
+    "messageEncoding": "iso-8859-1"
+  }
+}

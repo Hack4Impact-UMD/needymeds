@@ -8,6 +8,7 @@ src/**/*.test.ts
 .gitignore
 **/*.md
 **/*.png
+!src/wallet-pass.pass/*.png
 **/*.jpg
 **/*.jpeg
 **/*.svg

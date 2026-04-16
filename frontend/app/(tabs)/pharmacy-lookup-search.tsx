@@ -170,7 +170,7 @@ const PharmacyLocatorScreen = () => {
                 outlineStyle={styles.inputOutline}
                 textColor={Colors.default.neutraldk}
                 activeOutlineColor={Colors.default.brandBlue}
-                maxLength={4}
+                maxLength={2}
                 right={
                   <TextInput.Affix text={t('RadiusInputSuffix')} textStyle={{ color: '#41484D' }} />
                 }
@@ -244,6 +244,7 @@ const PharmacyLocatorScreen = () => {
               <ErrorState
                 type={errorType}
                 iconName={errorType === 'noPharmacies' ? 'store-outline' : undefined}
+                showCallButton={errorType !== 'noPharmacies'}
               />
             ) : (
               filteredPharmacies.map((pharmacy) => (
