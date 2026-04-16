@@ -3,7 +3,9 @@ name: CI/CD Backend Deployment
 on:
   push:
     branches:
-      - backend-cicd
+      - main
+      - staging
+      - development
 
 permissions:
   id-token: write
