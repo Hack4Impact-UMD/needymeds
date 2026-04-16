@@ -96,6 +96,7 @@ async function performRequest(method: httpMethod, path: string, params: Record<s
       console.error(`[ScriptSaveClient:${instanceId}] 401 received again, not retrying`);
       const err: any = new Error(`ScriptSave returned 401`);
       err.status = 401;
+      err.response = res.data;
       throw err;
     }
 
@@ -107,6 +108,7 @@ async function performRequest(method: httpMethod, path: string, params: Record<s
       );
       const err: any = new Error(`ScriptSave returned ${res.status}`);
       err.status = res.status;
+      err.response = res.data;
       throw err;
     }
 

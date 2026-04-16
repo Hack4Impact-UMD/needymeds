@@ -34,6 +34,8 @@
   "RadiusInputSuffix": "millas",
   "EmptyPristineMsg": "Indique cuánto necesita y dónde desea recogerlo.",
   "EmptyTouchedMsg": "Parece que no está disponible aquí por ahora. Intente con otros códigos postales o amplíe el radio de búsqueda.",
+  "LoadingMsg": "No pudimos cargar los resultados en este momento. Esto puede deberse a una conexión lenta o a que el sistema está ocupado.",
+  "NotFoundMsg": "No encontramos ese medicamento. Es posible que esté disponible en una farmacia aunque no aparezca en nuestra lista de descuentos. Verifique que esté escrito correctamente.",
   "FilterChipSortPrice": "Por precio",
   "FilterChipSortDist": "Por distancia",
   "FilterChipGenericPrefix": "Incluir genérico",
@@ -58,7 +60,8 @@
   "Text5": "Este es un programa de descuento de medicamentos, no un plan de seguro.",
   "ButtonLabel1": "Ampliar",
   "ButtonLabel2": "Compartir",
-  "ButtonLabel3": "Añadir a la billetera",
+  "ButtonLabel3": "Ver el reverso de la tarjeta",
+  "ButtonLabel4": "Ver el anverso de la tarjeta",
   "HelpLink1": "¿Tiene preguntas?",
   "HelpLink2": "Obtenga más información sobre la Tarjeta de Descuento de Medicamentos aquí.",
   "Heading": "Preguntas Frecuentes Tarjeta de Descuento de Medicamentos",
@@ -127,5 +130,6 @@
   "closeIcon5": "Cerrar y regresar",
   "Recent": "Reciente",
   "ClearAll": "Borrar todo",
-  "NA": "n/a"
+  "NA": "n/a",
+  "AvailableCoupons": "Cupones disponibles"
 }

@@ -19,6 +19,13 @@ export async function create_database() {
       name TEXT NOT NULL,
       address TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS Recent_Searches (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      drug_name TEXT NOT NULL UNIQUE, 
+      generic_name TEXT,
+      searched_at TEXT NOT NULL
+    );
   `);
 
   return db;
