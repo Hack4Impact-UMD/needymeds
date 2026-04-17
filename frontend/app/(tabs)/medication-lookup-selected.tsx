@@ -567,14 +567,17 @@ const MedicationLookupSelectedScreen = () => {
                     type={errorType}
                     message="We couldn't load pharmacy results right now. Please check your connection and try again."
                   />
-                  <AdditionalResourcesButton ndc={drugResults[0]?.ndc ?? ''} />
+                  <AdditionalResourcesButton ndc={undefined} loaded={false} />
                 </>
               ) : drugResults.length === 0 ? (
                 // Show initial empty state (before search)
-                <View style={styles.emptyState}>
-                  <MaterialIcons name="add-shopping-cart" size={64} color="#555" />
-                  <Text style={styles.emptyStateTitle}>{t('EmptyPristineMsg')}</Text>
-                </View>
+                <>
+                  <View style={styles.emptyState}>
+                    <MaterialIcons name="add-shopping-cart" size={64} color="#555" />
+                    <Text style={styles.emptyStateTitle}>{t('EmptyPristineMsg')}</Text>
+                  </View>
+                  <AdditionalResourcesButton ndc={undefined} loaded={false} />
+                </>
               ) : (
                 // Show results list
                 drugResults.map((result) => (
@@ -604,21 +607,13 @@ const MedicationLookupSelectedScreen = () => {
                   </TouchableOpacity>
                 ))
               )}
-              <AdditionalResourcesButton ndc={drugResults[0].ndc} />
             </View>
           </ScrollView>
         </View>
       </View>
-      <TouchableOpacity
-        style={styles.availableCouponsButton}
-        onPress={() =>
-          Linking.openURL('https://www.needymeds.org/search-programs?initialSearchTab=coupons')
-        }
-        activeOpacity={0.85}
-      >
-        <Text style={styles.availableCouponsText}>{t('AvailableCoupons')} </Text>
-        <MaterialIcons name="open-in-new" size={16} color="#004E60" style={{ marginRight: 6 }} />
-      </TouchableOpacity>
+      {drugResults.length > 0 && (
+        <AdditionalResourcesButton ndc={drugResults[0]?.ndc ?? ''} loaded={true} />
+      )}
       <BottomNavBar />
 
       {/* Medication Lookup Result Modal */}
@@ -884,7 +879,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 60,
+    paddingTop: 60,
+    paddingBottom: 20,
     paddingHorizontal: 32,
   },
   emptyStateTitle: {
@@ -953,28 +949,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'flex-start',
     gap: 4,
-  },
-  availableCouponsButton: {
-    position: 'absolute',
-    bottom: 100,
-    right: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#B6EBFF',
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    borderRadius: 26,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  availableCouponsText: {
-    color: '#004E60',
-    fontSize: 15,
-    fontFamily: 'Open Sans',
-    fontWeight: '500',
   },
 });
 

@@ -1,59 +1,88 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Linking, StyleSheet, TouchableOpacity } from 'react-native';
+import { Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
+import { apiGet } from '@/api/http';
 
-interface Medication {
-  ndc: string;
+interface Props {
+  ndc?: string;
+  loaded: boolean;
 }
 
-const fallback_url = 'https://www.needymeds.org/search-programs';
+const default_url = 'https://www.needymeds.org/search-programs?initialSearchTab=drugs';
 
-const AdditionalResourcesButton = ({ ndc }: Medication) => {
+const AdditionalResourcesButton = ({ ndc, loaded }: Props) => {
   const [pressed, setPressed] = useState(false);
-  // const [loading, setLoading] = useState(false);
 
   const handlePress = async () => {
-    // setLoading(true);
+    // open coupon url if there's no med ndc provided
+    if (!ndc) {
+      await Linking.openURL(default_url);
+      return;
+    }
+
+    console.log('NDC passed:', ndc, 'length:', ndc.length);
+
     try {
+      /*
       const result = await fetch(`/api/urlapi/lookup?ndc=${encodeURIComponent(ndc)}`);
       const json = await result.json();
-      const url = json?.data?.result ?? fallback_url;
-      await Linking.openURL(url);
-    } catch {
-      await Linking.openURL(fallback_url);
-    } finally {
-      // setLoading(false);
+      const url = json?.data?.result ?? default_url;
+      */
+
+      const result = await apiGet<{ result: string }>('/api/urlapi/lookup', { ndc });
+      await Linking.openURL(result.result ?? default_url);
+    } catch (err) {
+      console.error('FETCH ERROR:', err);
+      await Linking.openURL(default_url);
     }
   };
 
   return (
-    <TouchableOpacity
-      style={[styles.button, pressed && styles.buttonPressed]}
-      onPress={handlePress}
-      onPressIn={() => setPressed(true)}
-      onPressOut={() => setPressed(false)}
-      activeOpacity={1}
-    >
-      <Text style={[styles.text, pressed && styles.textPressed]}>Additional Resources</Text>
-      <MaterialIcons name="open-in-new" size={16} color={pressed ? '#004E60' : '#41484D'} />
-    </TouchableOpacity>
+    <View>
+      <TouchableOpacity
+        style={[
+          styles.buttonBase,
+          loaded ? styles.buttonLoaded : styles.buttonNotLoaded,
+          pressed && styles.buttonPressed,
+        ]}
+        onPress={handlePress}
+        onPressIn={() => setPressed(true)}
+        onPressOut={() => setPressed(false)}
+        activeOpacity={1}
+      >
+        <Text style={[styles.text, pressed && styles.textPressed]}>Additional Resources </Text>
+        <MaterialIcons
+          name="open-in-new"
+          size={16}
+          color={pressed ? '#004E60' : '#41484D'}
+          style={{ marginRight: 6 }}
+        />
+      </TouchableOpacity>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  button: {
+  buttonBase: {
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'center',
-    gap: 8,
-    borderWidth: 1,
-    borderColor: '#C1C7CE',
-    borderRadius: 24,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    marginTop: 24,
-    backgroundColor: 'transparent',
+    backgroundColor: '#F6FAFE',
+    borderColor: '#71787E;',
+    borderRadius: 26,
+    borderWidth: 1,
+    elevation: 3,
+  },
+  buttonLoaded: {
+    position: 'absolute',
+    bottom: 100,
+    right: 16,
+  },
+  buttonNotLoaded: {
+    position: 'relative',
+    alignSelf: 'center',
   },
   buttonPressed: {
     backgroundColor: '#B6EBFF',
@@ -63,6 +92,7 @@ const styles = StyleSheet.create({
     color: '#41484D',
     fontSize: 15,
     fontFamily: 'Open Sans',
+    fontWeight: '500',
   },
   textPressed: {
     color: '#004E60',
