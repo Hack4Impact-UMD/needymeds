@@ -38,9 +38,8 @@ yarn-error.*
 app-example
 
 # generated native folders
-/ios
-/android
-
+android/
+ios/
 .env
 
 google-play-service-account.json
