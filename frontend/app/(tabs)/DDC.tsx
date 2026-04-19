@@ -186,7 +186,7 @@ const DDC = () => {
                   }}
                 >
                   <MaterialIcons name="speaker-notes" size={20} color="white" />
-                  <Text style={styles.buttonText}> Give Feedback </Text>
+                  <Text style={styles.buttonText}> {t('ButtonLabel5')} </Text>
                 </Pressable>
               </View>
 
