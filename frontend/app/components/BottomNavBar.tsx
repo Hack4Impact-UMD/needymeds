@@ -11,7 +11,9 @@ function BottomNavBar() {
   const isMedicationLookupActive = pathname.includes('medication-lookup') || pathname === '/(tabs)';
   const isPharmacyLookupActive = pathname.includes('pharmacy-lookup') || pathname === '/(tabs)';
   const isEducationalResourcesActive =
-    pathname.includes('educational-resources') || pathname === '/(tabs)';
+    pathname.includes('educational-resources') ||
+    pathname.includes('survey') ||
+    pathname === '/(tabs)';
 
   return (
     <View style={styles.mobileWrapper}>

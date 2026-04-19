@@ -1,21 +1,10 @@
-import { getGoogleWalletUrl } from '@/api/wallet';
 import { Colors } from '@/constants/theme';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Alert,
-  Image,
-  Linking,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { handleAddToWallet } from '../../api/appleWallet';
 import { Adjudicator, DrugSearchResult } from '../../api/types';
 
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
@@ -164,13 +153,42 @@ const DDC = () => {
                 </View>
               </View>
 
-              <Pressable style={styles.actionButton} onPress={() => setShowBack(!showBack)}>
-                {showBack ? (
-                  <Text style={styles.buttonText}>{t('ButtonLabel4')}</Text>
-                ) : (
-                  <Text style={styles.buttonText}>{t('ButtonLabel3')}</Text>
-                )}
-              </Pressable>
+              <View>
+                <Pressable style={styles.actionButton} onPress={() => setShowBack(!showBack)}>
+                  {showBack ? (
+                    <Text style={styles.buttonText}>{t('ButtonLabel4')}</Text>
+                  ) : (
+                    <Text style={styles.buttonText}>{t('ButtonLabel3')}</Text>
+                  )}
+                </Pressable>
+
+                <Pressable
+                  style={styles.actionButton}
+                  onPress={() => {
+                    router.push({
+                      pathname: '/survey',
+                      params: {
+                        drugName: params.drugName,
+                        quantity: params.quantity,
+                        form: params.form,
+                        adjudicator: params.adjudicator,
+                        pharmacyName: params.pharmacyName,
+                        pharmacyAddress: params.pharmacyAddress,
+                        pharmacyPhone: params.pharmacyPhone,
+                        ndc: params.ndc,
+                        labelName: params.labelName,
+                        price: params.price,
+                        latitude: params.latitude,
+                        longitude: params.longitude,
+                        distance: params.distance,
+                      },
+                    });
+                  }}
+                >
+                  <MaterialIcons name="speaker-notes" size={20} color="white" />
+                  <Text style={styles.buttonText}> Give Feedback </Text>
+                </Pressable>
+              </View>
 
               <View style={styles.footerNote}>
                 <Pressable onPress={() => setShowFAQ(true)}>
@@ -273,7 +291,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     paddingVertical: 12,
     paddingHorizontal: 16,
-    marginBottom: 40,
+    marginBottom: 35,
   },
   actionButtonCircle: {
     width: 40,
