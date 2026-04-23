@@ -1,4 +1,5 @@
 import * as FileSystem from 'expo-file-system/legacy';
+import PassKit from 'react-native-passkit-wallet';
 import { DrugSearchResult } from './types';
 
 export async function handleAddToWallet(result: DrugSearchResult) {
@@ -24,8 +25,6 @@ export async function handleAddToWallet(result: DrugSearchResult) {
       encoding: FileSystem.EncodingType.Base64,
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const PassKit = require('react-native-passkit-wallet').default;
     await PassKit.addPass(base64);
   } catch (error) {
     console.error('Failed to open wallet pass:', error);
