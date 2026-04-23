@@ -173,7 +173,7 @@ const DDC = () => {
               </Pressable>
 
               {Platform.OS === 'ios' && (
-                <Pressable style={styles.actionButton} onPress={handleAddToWallet}>
+                <Pressable style={styles.actionButton} onPress={() => handleAddToWallet(result)}>
                   <MaterialCommunityIcons name="wallet" size={20} color="white" />
                   <Text style={styles.buttonText}>Add to Apple Wallet</Text>
                 </Pressable>
