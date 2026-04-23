@@ -168,19 +168,7 @@ const DDC = () => {
                     router.push({
                       pathname: '/survey',
                       params: {
-                        drugName: params.drugName,
-                        quantity: params.quantity,
-                        form: params.form,
-                        adjudicator: params.adjudicator,
-                        pharmacyName: params.pharmacyName,
-                        pharmacyAddress: params.pharmacyAddress,
-                        pharmacyPhone: params.pharmacyPhone,
-                        ndc: params.ndc,
-                        labelName: params.labelName,
-                        price: params.price,
-                        latitude: params.latitude,
-                        longitude: params.longitude,
-                        distance: params.distance,
+                        ...params,
                       },
                     });
                   }}

@@ -162,5 +162,14 @@
   "AboutLinkPrivacy": "Privacy Statement",
   "AboutLinkFAQ": "Frequently Asked Questions",
   "AboutLinkCommunity": "Community Guidelines",
-  "AboutLinkDonate": "Donate"
+  "AboutLinkDonate": "Donate",
+  "SurveyHeader": "How was your experience?",
+  "SurveyEmailLabel": "Please enter your email:",
+  "SurveyEmailPlaceholder": "Email Address",
+  "SurveyEmailError": "Please enter a valid email address.",
+  "SurveyCommentsLabel": "Additional comments?",
+  "SurveyCommentsPlaceholder": "Comments",
+  "SurveyDoneBtn": "Done",
+  "SurveyRatingRequired": "Please rate your experience.",
+  "SurveyEmailRequired": "Please enter your email."
 }

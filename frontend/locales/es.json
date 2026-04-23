@@ -162,5 +162,14 @@
   "AboutLinkPrivacy": "Declaración de privacidad",
   "AboutLinkFAQ": "Preguntas frecuentes",
   "AboutLinkCommunity": "Normas de la comunidad",
-  "AboutLinkDonate": "Donar"
+  "AboutLinkDonate": "Donar",
+  "SurveyHeader": "¿Cómo fue su experiencia?",
+  "SurveyEmailLabel": "Por favor, ingrese su correo electrónico:",
+  "SurveyEmailPlaceholder": "Dirección de correo electrónico",
+  "SurveyEmailError": "Por favor, ingrese un correo electrónico válido.",
+  "SurveyCommentsLabel": "¿Comentarios adicionales?",
+  "SurveyCommentsPlaceholder": "Comentarios",
+  "SurveyDoneBtn": "Hecho",
+  "SurveyRatingRequired": "Por favor, califique su experiencia.",
+  "SurveyEmailRequired": "Por favor, ingrese su correo electrónico."
 }
