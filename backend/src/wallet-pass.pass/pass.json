@@ -11,7 +11,9 @@
         "label": "Card #",
         "value": "90MA019309343023"
       }
-    ]
+    ],
+    "secondaryFields": [],
+    "auxiliaryFields": []
   },
   "barcode": {
     "format": "PKBarcodeFormatCode128",
