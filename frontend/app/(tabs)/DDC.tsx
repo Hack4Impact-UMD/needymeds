@@ -172,6 +172,13 @@ const DDC = () => {
                 )}
               </Pressable>
 
+              {Platform.OS === 'ios' && (
+                <Pressable style={styles.actionButton} onPress={() => handleAddToWallet(result)}>
+                  <MaterialCommunityIcons name="wallet" size={20} color="white" />
+                  <Text style={styles.buttonText}>Add to Apple Wallet</Text>
+                </Pressable>
+              )}
+
               <View style={styles.footerNote}>
                 <Pressable onPress={() => setShowFAQ(true)}>
                   <Text style={styles.footerQuestion}>
