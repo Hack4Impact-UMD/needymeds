@@ -8,11 +8,15 @@ router.get('/', async (req, res, next) => {
   console.log('Route hit');
   try {
     console.log('About to call createPass');
-    const cardNumber = '90MA019309343023';
+    const { ndc, labelName, pharmacyName, price } = req.query;
 
     const pkpass = await createPass({
-      serial: cardNumber,
-      number: cardNumber,
+      serial: (ndc as string) || '90MA019309343023',
+      number: (ndc as string) || '90MA019309343023',
+      bin: '015926',
+      pcn: 'PRXIDST',
+      group: 'IDST01',
+      memberId: 'IDST733224411',
     });
 
     res.setHeader('Content-Type', 'application/vnd.apple.pkpass');
