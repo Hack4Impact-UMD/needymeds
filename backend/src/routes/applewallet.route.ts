@@ -8,11 +8,10 @@ router.get('/', async (req, res, next) => {
   console.log('Route hit');
   try {
     console.log('About to call createPass');
-    const { ndc, labelName, pharmacyName, price } = req.query;
 
     const pkpass = await createPass({
-      serial: (ndc as string) || '90MA019309343023',
-      number: (ndc as string) || '90MA019309343023',
+      serial: '90MA019309343023',
+      number: '90MA019309343023',
       bin: '015926',
       pcn: 'PRXIDST',
       group: 'IDST01',
