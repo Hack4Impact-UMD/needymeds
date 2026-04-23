@@ -1,18 +1,8 @@
-import { getGoogleWalletUrl } from '@/api/wallet';
 import { Colors } from '@/constants/theme';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Alert,
-  Image,
-  Linking,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { Image, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { handleAddToWallet } from '../../api/appleWallet';
@@ -175,7 +165,7 @@ const DDC = () => {
               {Platform.OS === 'ios' && (
                 <Pressable style={styles.actionButton} onPress={() => handleAddToWallet(result)}>
                   <MaterialCommunityIcons name="wallet" size={20} color="white" />
-                  <Text style={styles.buttonText}>Add to Apple Wallet</Text>
+                  <Text style={styles.buttonText}>{t('ButtonLabel5')}</Text>
                 </Pressable>
               )}
 

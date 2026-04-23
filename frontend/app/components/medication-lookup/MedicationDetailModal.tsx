@@ -3,6 +3,7 @@ import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomSheetModal from '../BottomSheetModal';
@@ -32,6 +33,8 @@ const MedicationDetailModal = ({
   isOpen,
   onClose,
 }: MedicationDetailModalProps) => {
+  const { t } = useTranslation();
+
   const insets = useSafeAreaInsets();
 
   if (!result) return null;
@@ -163,7 +166,7 @@ const MedicationDetailModal = ({
           <Text style={styles.priceAmount}>${Number(result.price).toFixed(2)}</Text>
         </View>
         <TouchableOpacity style={styles.ticketButton} onPress={openDDC}>
-          <Text style={styles.couponButton}>Get Coupon</Text>
+          <Text style={styles.couponButton}>{t('CouponButtonText')}</Text>
           <MaterialCommunityIcons name="ticket-confirmation-outline" size={22} color="#fff" />
         </TouchableOpacity>
       </View>
