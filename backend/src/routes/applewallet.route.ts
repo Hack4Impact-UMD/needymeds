@@ -11,7 +11,6 @@ router.get('/', async (req, res, next) => {
 
     const pkpass = await createPass({
       serial: '90MA019309343023',
-      number: '90MA019309343023',
       bin: '020750',
       pcn: 'NMeds',
       group: 'NEEDYMED',

@@ -5,13 +5,7 @@
   "organizationName": "NeedyMeds",
   "description": "Drug Discount Card",
   "generic": {
-    "primaryFields": [
-      {
-        "key": "cardNumber",
-        "label": "Card #",
-        "value": "90MA019309343023"
-      }
-    ],
+    "primaryFields": [],
     "secondaryFields": [],
     "auxiliaryFields": []
   },
