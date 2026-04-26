@@ -273,6 +273,7 @@ const MedicationLookupSelectedScreen = () => {
 
         if (cancelled) return;
 
+        setHasSearched(true);
         setDrugResults(drugSearchResults);
       } catch (error: any) {
         if (!cancelled) {
