@@ -127,7 +127,9 @@ const MedicationLookupSelectedScreen = () => {
       (m) =>
         m.drug_name === drugName &&
         m.pharmacy_name === medication.pharmacyName &&
-        m.pharmacy_address === medication.pharmacyAddress
+        m.pharmacy_address === medication.pharmacyAddress &&
+        m.form === form &&
+        m.strength === strength
     );
   };
 
@@ -147,7 +149,9 @@ const MedicationLookupSelectedScreen = () => {
         (m) =>
           m.drug_name === drugName &&
           m.pharmacy_name === med.pharmacyName &&
-          m.pharmacy_address === med.pharmacyAddress
+          m.pharmacy_address === med.pharmacyAddress &&
+          m.form === form &&
+          m.strength === strength
       );
       // unfavorite
       if (current?.id) {
