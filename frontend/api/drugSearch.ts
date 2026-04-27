@@ -506,11 +506,21 @@ async function searchDrug(
     const displayName = includeGeneric && genericVersion ? genericVersion : activeDrugName;
     const constructedLabel = `${displayName} ${activeStrength} ${activeForm}`.toLowerCase();
 
+    // Build full address because ScriptSaveResult's address is only the street
+    const ssStreet = scriptSaveResult.address || scriptSaveResult.Address || '';
+    const ssCity = scriptSaveResult.city || scriptSaveResult.City || '';
+    const ssState = scriptSaveResult.state || scriptSaveResult.State || '';
+    const ssZip = scriptSaveResult.zip || scriptSaveResult.Zip || '';
+    const pharmacyAddress =
+      ssStreet && ssCity && ssState && ssZip
+        ? `${ssStreet}, ${ssCity}, ${ssState} ${ssZip}`
+        : ssStreet;
+
     const convertedResult: DrugSearchResult = {
       adjudicator: 'ScriptSave',
       pharmacyName: scriptSaveResult.pharmacyName || scriptSaveResult.PharmacyName || '',
       pharmacyPhone: scriptSaveResult.phone || scriptSaveResult.Phone || '',
-      pharmacyAddress: scriptSaveResult.address || scriptSaveResult.Address || '',
+      pharmacyAddress,
       ndc: scriptSaveResult.ndc || scriptSaveResult.NDC || '',
       labelName: constructedLabel
         .split(' ')

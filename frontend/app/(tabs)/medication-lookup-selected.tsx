@@ -125,7 +125,7 @@ const MedicationLookupSelectedScreen = () => {
   const isSaved = (medication: DrugSearchResult) => {
     return savedMedications.some(
       (m) =>
-        m.drug_name === medication.labelName &&
+        m.drug_name === drugName &&
         m.pharmacy_name === medication.pharmacyName &&
         m.pharmacy_address === medication.pharmacyAddress
     );
@@ -145,7 +145,7 @@ const MedicationLookupSelectedScreen = () => {
       // get existing saved medication with ID
       const current = savedMedications.find(
         (m) =>
-          m.drug_name === med.labelName &&
+          m.drug_name === drugName &&
           m.pharmacy_name === med.pharmacyName &&
           m.pharmacy_address === med.pharmacyAddress
       );
@@ -160,7 +160,7 @@ const MedicationLookupSelectedScreen = () => {
     } else {
       const { form, strength, quantity } = info;
       const newSavedMed: Omit<SavedMedication, 'id' | 'last_saved_date'> = {
-        drug_name: med.labelName,
+        drug_name: drugName,
         pharmacy_name: med.pharmacyName,
         pharmacy_address: med.pharmacyAddress,
         form,
