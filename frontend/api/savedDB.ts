@@ -7,17 +7,20 @@ export async function create_database() {
     CREATE TABLE IF NOT EXISTS Saved_Medications (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       drug_name TEXT NOT NULL,
-      pharmacy_npi TEXT,
+      pharmacy_name TEXT,
+      pharmacy_address TEXT,
       form TEXT,
       strength TEXT,
       quantity INTEGER,
+      price DECIMAL(10, 2),
       last_saved_date TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS Saved_Pharmacies (
       npi TEXT PRIMARY KEY,
       name TEXT NOT NULL,
-      address TEXT NOT NULL
+      address TEXT NOT NULL,
+      phoneNumber TEXT NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS Recent_Searches (

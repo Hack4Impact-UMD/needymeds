@@ -106,7 +106,7 @@ describe('useSavedPharmacies hook', () => {
     });
 
     expect(mockDb.runAsync).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT OR REPLACE INTO Saved_Pharmacies'),
+      expect.stringContaining('INSERT or REPLACE INTO Saved_Pharmacies'),
       expect.any(Array)
     );
 

@@ -6,11 +6,11 @@ import {
   searchDrugByPrice,
   setActiveStrength,
 } from '@/api/drugSearch';
-import { DrugSearchResult } from '@/api/types';
+import { DrugSearchResult, SavedMedication } from '@/api/types';
 import getUserLocation from '@/api/userLocation';
 import { Colors } from '@/constants/theme';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -28,6 +28,7 @@ import { ActivityIndicator, Text, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useRecentSearches } from '@/hooks/use-recent-searches';
+import { useSavedMedications } from '@/hooks/use-saved-medications';
 import BottomNavBar from '../components/BottomNavBar';
 import ErrorState, { ErrorStateType } from '../components/ErrorState';
 import LanguageDropdown from '../components/LanguageDropdown';
@@ -104,6 +105,79 @@ const MedicationLookupSelectedScreen = () => {
   // Track the last initialized drugName to avoid re-initializing when coming back from DDC
   const [lastInitializedDrug, setLastInitializedDrug] = useState('');
   const { addRecentSearch } = useRecentSearches();
+
+  // Saving the medications
+  const {
+    medications: savedMedsFromHook,
+    saveMedication,
+    deleteMedication,
+    refreshMedications,
+  } = useSavedMedications();
+  const [savedMedications, setSavedMedications] = useState<SavedMedication[]>(savedMedsFromHook);
+
+  const navigation = useNavigation();
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      refreshMedications();
+    });
+    return unsubscribe;
+  }, [navigation, refreshMedications]);
+
+  const isSaved = (medication: DrugSearchResult) => {
+    return savedMedications.some(
+      (m) =>
+        m.drug_name === drugName &&
+        m.pharmacy_name === medication.pharmacyName &&
+        m.pharmacy_address === medication.pharmacyAddress &&
+        m.form === form &&
+        m.strength === strength
+    );
+  };
+
+  useEffect(() => {
+    setSavedMedications(savedMedsFromHook);
+  }, [savedMedsFromHook]);
+
+  const toggleStar = async (
+    med: DrugSearchResult,
+    info: { form: string; strength: string; quantity: string }
+  ) => {
+    const saved = isSaved(med);
+    // medication is already saved -> toggle to unfavorite
+    if (saved) {
+      // get existing saved medication with ID
+      const current = savedMedications.find(
+        (m) =>
+          m.drug_name === drugName &&
+          m.pharmacy_name === med.pharmacyName &&
+          m.pharmacy_address === med.pharmacyAddress &&
+          m.form === form &&
+          m.strength === strength
+      );
+      // unfavorite
+      if (current?.id) {
+        setSavedMedications((prev) => prev.filter((m) => m.id !== current.id));
+        await deleteMedication(current.id);
+      }
+      return;
+
+      // medication has not been saved yet -> favorite it
+    } else {
+      const { form, strength, quantity } = info;
+      const newSavedMed: Omit<SavedMedication, 'id' | 'last_saved_date'> = {
+        drug_name: drugName,
+        pharmacy_name: med.pharmacyName,
+        pharmacy_address: med.pharmacyAddress,
+        form,
+        strength,
+        quantity: Number(quantity),
+        price: med.price,
+      };
+      setSavedMedications((prev) => [...prev, newSavedMed]);
+      await saveMedication(newSavedMed);
+      return;
+    }
+  };
 
   useEffect(() => {
     if (!drugName) return;
@@ -588,32 +662,45 @@ const MedicationLookupSelectedScreen = () => {
                 </View>
               ) : (
                 // Show results list
-                drugResults.map((result) => (
-                  <TouchableOpacity
-                    key={result.pharmacyName}
-                    style={styles.pharmacyItem}
-                    onPress={() => setSelectedDrugResult(result)}
-                  >
-                    <View style={styles.pharmacyLeft}>
-                      <View style={styles.pharmacyIcon}>
-                        <MaterialIcons name="confirmation-number" size={24} color="#41484D" />
-                      </View>
-                      <View style={styles.pharmacyInfo}>
-                        <View style={[styles.pharmacyHeader, styles.pharmacyHeaderColumn]}>
-                          <Text style={styles.pharmacyLabel}>{result.labelName}</Text>
-                          <Text style={styles.pharmacyName}>{result.pharmacyName}</Text>
+                drugResults.map((result) => {
+                  const isStarred = isSaved(result);
+                  return (
+                    <TouchableOpacity
+                      key={result.pharmacyName}
+                      style={styles.pharmacyItem}
+                      onPress={() => setSelectedDrugResult(result)}
+                    >
+                      <View style={styles.pharmacyLeft}>
+                        <TouchableOpacity
+                          style={styles.starIcon}
+                          onPress={() => toggleStar(result, { form, strength, quantity })}
+                          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                        >
+                          <MaterialCommunityIcons
+                            name={isStarred ? 'star' : 'star-outline'}
+                            size={24}
+                            color="#004E60"
+                          />
+                        </TouchableOpacity>
+                        <View style={styles.pharmacyInfo}>
+                          <View style={[styles.pharmacyHeader, styles.pharmacyHeaderColumn]}>
+                            <Text style={styles.pharmacyLabel}>{result.labelName}</Text>
+                            <Text style={styles.pharmacyName}>{result.pharmacyName}</Text>
+                          </View>
+                          <Text style={styles.pharmacyPrice}>
+                            ${Number(result.price).toFixed(2)}
+                          </Text>
                         </View>
-                        <Text style={styles.pharmacyPrice}>${Number(result.price).toFixed(2)}</Text>
                       </View>
-                    </View>
-                    <View style={styles.pharmacyRight}>
-                      <Text style={styles.pharmacyDistance}>
-                        {`${Number(result.distance).toFixed(1)}mi`}
-                      </Text>
-                      <MaterialCommunityIcons name="chevron-right" size={20} color="#41484D" />
-                    </View>
-                  </TouchableOpacity>
-                ))
+                      <View style={styles.pharmacyRight}>
+                        <Text style={styles.pharmacyDistance}>
+                          {`${Number(result.distance).toFixed(1)}mi`}
+                        </Text>
+                        <MaterialCommunityIcons name="chevron-right" size={20} color="#41484D" />
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })
               )}
             </View>
           </ScrollView>
@@ -834,7 +921,7 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 12,
   },
-  pharmacyIcon: {
+  starIcon: {
     width: 44,
     height: 44,
     borderRadius: 8,
