@@ -1,7 +1,7 @@
 import { getGoogleWalletUrl } from '@/api/wallet';
 import { Colors } from '@/constants/theme';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { router, useLocalSearchParams, useNavigation } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Alert,
@@ -15,9 +15,10 @@ import {
 } from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { handleAddToWallet } from '../../api/appleWallet';
-import { Adjudicator, DrugSearchResult } from '../../api/types';
+import { handleAddToWallet as handleAddToAppleWallet } from '../../api/appleWallet';
+import { Adjudicator, DrugSearchResult, SavedMedication } from '../../api/types';
 
+import { useSavedMedications } from '@/hooks/use-saved-medications';
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import DDCMedInfoRow from '../components/ddc/DDCMedInfoRow';
 import DDCShareModal from '../components/ddc/DDCShareModal';
@@ -50,7 +51,75 @@ const DDC = () => {
   const [showFAQ, setShowFAQ] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showBack, setShowBack] = useState(false);
-  const [isFavorited, setIsFavorited] = useState(false);
+
+  const {
+    medications: savedMedsFromHook,
+    saveMedication,
+    deleteMedication,
+    refreshMedications,
+  } = useSavedMedications();
+
+  const navigation = useNavigation();
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      refreshMedications();
+    });
+    return unsubscribe;
+  }, [navigation, refreshMedications]);
+
+  const isFavorited = savedMedsFromHook.some(
+    (m) =>
+      m.drug_name === params.drugName &&
+      m.pharmacy_name === params.pharmacyName &&
+      m.pharmacy_address === params.pharmacyAddress &&
+      m.form === params.form &&
+      m.strength === params.strength
+  );
+
+  const toggleFavorite = async () => {
+    if (isFavorited) {
+      const current = savedMedsFromHook.find(
+        (m) =>
+          m.drug_name === params.drugName &&
+          m.pharmacy_name === params.pharmacyName &&
+          m.pharmacy_address === params.pharmacyAddress &&
+          m.form === params.form &&
+          m.strength === params.strength
+      );
+      if (current?.id) {
+        await deleteMedication(current.id);
+      }
+    } else {
+      const newSavedMed: Omit<SavedMedication, 'id' | 'last_saved_date'> = {
+        drug_name: String(params.drugName),
+        pharmacy_name: String(params.pharmacyName),
+        pharmacy_address: String(params.pharmacyAddress),
+        form: String(params.form),
+        strength: String(params.strength),
+        quantity: Number(params.quantity),
+        price: String(params.price),
+      };
+      await saveMedication(newSavedMed);
+    }
+    await refreshMedications();
+  };
+
+  async function handleAddToWallet() {
+    if (Platform.OS === 'ios') {
+      await handleAddToAppleWallet(result);
+    } else {
+      await handleAddToGoogleWallet();
+    }
+  }
+
+  async function handleAddToGoogleWallet() {
+    try {
+      const { url } = await getGoogleWalletUrl(result);
+      await Linking.openURL(url);
+    } catch (error) {
+      Alert.alert('Error', 'Could not add to Google Wallet.');
+    }
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -125,15 +194,8 @@ const DDC = () => {
                   <MaterialCommunityIcons name="aspect-ratio" size={20} color="white" />
                 </Pressable>
 
-                <Pressable
-                  style={styles.actionButtonCircle}
-                  onPress={() => setIsFavorited(!isFavorited)}
-                >
-                  <MaterialIcons
-                    name={isFavorited ? 'star' : 'star-border'}
-                    size={20}
-                    color="white"
-                  />
+                <Pressable style={styles.actionButtonCircle} onPress={() => toggleFavorite()}>
+                  <MaterialIcons name="star" size={20} color={isFavorited ? '#C7E7FF' : 'white'} />
                 </Pressable>
 
                 <Pressable
@@ -172,12 +234,10 @@ const DDC = () => {
                 )}
               </Pressable>
 
-              {Platform.OS === 'ios' && (
-                <Pressable style={styles.actionButton} onPress={() => handleAddToWallet(result)}>
-                  <MaterialCommunityIcons name="wallet" size={20} color="white" />
-                  <Text style={styles.buttonText}>Add to Apple Wallet</Text>
-                </Pressable>
-              )}
+              <Pressable style={styles.actionButton} onPress={handleAddToWallet}>
+                <MaterialIcons name="add-card" size={20} color="white" />
+                <Text style={styles.buttonText}>Add to Wallet</Text>
+              </Pressable>
 
               <View style={styles.footerNote}>
                 <Pressable onPress={() => setShowFAQ(true)}>
@@ -280,7 +340,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     paddingVertical: 12,
     paddingHorizontal: 16,
-    marginBottom: 40,
+    marginBottom: 30,
   },
   actionButtonCircle: {
     width: 40,

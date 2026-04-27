@@ -1,11 +1,10 @@
 import { Adjudicator, DrugSearchResult } from '@/api/types';
-import { getGoogleWalletUrl } from '@/api/wallet';
 import { Colors } from '@/constants/theme';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Asset } from 'expo-asset';
 import * as MediaLibrary from 'expo-media-library';
 import * as Sharing from 'expo-sharing';
-import { Alert, Linking, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import BottomSheetModal from '../BottomSheetModal';
 
 interface DDCShareModalProps {
@@ -62,15 +61,6 @@ const DDCShareModal = ({ isOpen, onClose, adjudicator, result }: DDCShareModalPr
     }
   }
 
-  async function handleGoogleWallet() {
-    try {
-      const { url } = await getGoogleWalletUrl(result);
-      await Linking.openURL(url);
-    } catch (error) {
-      Alert.alert('Error', 'Could not add to Google Wallet.');
-    }
-  }
-
   return (
     <BottomSheetModal visible={isOpen} onClose={onClose} animationDuration={300}>
       <View style={styles.bottomSheet}>
@@ -99,18 +89,6 @@ const DDCShareModal = ({ isOpen, onClose, adjudicator, result }: DDCShareModalPr
           </View>
           <Text style={styles.sheetText}>Download to device</Text>
         </TouchableOpacity>
-
-        {Platform.OS === 'android' && (
-          <>
-            <View style={styles.separator} />
-            <TouchableOpacity style={styles.sheetRow} onPress={handleGoogleWallet}>
-              <View style={styles.iconCircle}>
-                <MaterialCommunityIcons name="wallet" size={24} color="#fff" />
-              </View>
-              <Text style={styles.sheetText}>Add to Google Wallet</Text>
-            </TouchableOpacity>
-          </>
-        )}
       </View>
     </BottomSheetModal>
   );

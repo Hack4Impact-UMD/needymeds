@@ -113,7 +113,6 @@ const MedicationLookupSelectedScreen = () => {
     deleteMedication,
     refreshMedications,
   } = useSavedMedications();
-  const [savedMedications, setSavedMedications] = useState<SavedMedication[]>(savedMedsFromHook);
 
   const navigation = useNavigation();
   useEffect(() => {
@@ -124,7 +123,7 @@ const MedicationLookupSelectedScreen = () => {
   }, [navigation, refreshMedications]);
 
   const isSaved = (medication: DrugSearchResult) => {
-    return savedMedications.some(
+    return savedMedsFromHook.some(
       (m) =>
         m.drug_name === drugName &&
         m.pharmacy_name === medication.pharmacyName &&
@@ -134,10 +133,6 @@ const MedicationLookupSelectedScreen = () => {
     );
   };
 
-  useEffect(() => {
-    setSavedMedications(savedMedsFromHook);
-  }, [savedMedsFromHook]);
-
   const toggleStar = async (
     med: DrugSearchResult,
     info: { form: string; strength: string; quantity: string }
@@ -146,7 +141,7 @@ const MedicationLookupSelectedScreen = () => {
     // medication is already saved -> toggle to unfavorite
     if (saved) {
       // get existing saved medication with ID
-      const current = savedMedications.find(
+      const current = savedMedsFromHook.find(
         (m) =>
           m.drug_name === drugName &&
           m.pharmacy_name === med.pharmacyName &&
@@ -156,7 +151,6 @@ const MedicationLookupSelectedScreen = () => {
       );
       // unfavorite
       if (current?.id) {
-        setSavedMedications((prev) => prev.filter((m) => m.id !== current.id));
         await deleteMedication(current.id);
       }
       return;
@@ -173,7 +167,6 @@ const MedicationLookupSelectedScreen = () => {
         quantity: Number(quantity),
         price: med.price,
       };
-      setSavedMedications((prev) => [...prev, newSavedMed]);
       await saveMedication(newSavedMed);
       return;
     }
