@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
 import { useNavigation } from 'expo-router';
+import { useEffect } from 'react';
 import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Divider, Icon } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,9 +12,12 @@ import PharmacyCard from '../components/favorite-page/PharmacyCard';
 
 import { useSavedMedications } from '@/hooks/use-saved-medications';
 import { useSavedPharmacies } from '@/hooks/use-saved-pharmacies';
+import { useTranslation } from 'react-i18next';
 
 const FavoritesScreen = () => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
+
   const { pharmacies: savedPharmacies, deletePharmacy, refreshPharmacies } = useSavedPharmacies();
   const {
     medications: savedMedications,
@@ -37,11 +40,11 @@ const FavoritesScreen = () => {
         <DefaultHeader />
 
         {/* TITLE */}
-        <Text style={styles.title}>Your Favorites</Text>
+        <Text style={styles.title}>{t('FavoritesTitle')}</Text>
         <Divider />
 
         {/* favorite pharmacy */}
-        <Text style={styles.headers}>Favorite Pharmacy</Text>
+        <Text style={styles.headers}>{t('FavoritePharmacy')}</Text>
         {savedPharmacies.length > 0 ? (
           savedPharmacies.map((pharmacy) => (
             <PharmacyCard key={pharmacy.npi} pharmacy={pharmacy} onUnsave={deletePharmacy} />
@@ -57,10 +60,10 @@ const FavoritesScreen = () => {
           >
             <Icon source="store-plus-outline" color="#41484D" size={56} />
             <Text style={{ margin: 5, fontSize: 14, color: '#181C20' }}>
-              No Favorite Pharmacy Yet!
+              {t('NoFavoritePharmacy')}
             </Text>
             <Text style={{ margin: 2, fontSize: 12, color: '#41484D' }}>
-              {`Click 'Pharmacies' to save one.`}
+              {t('NoFavoritePharmacyTip')}
             </Text>
           </View>
         )}
@@ -68,7 +71,7 @@ const FavoritesScreen = () => {
         <Divider style={{ marginTop: 16 }} />
 
         {/* favorite medications */}
-        <Text style={styles.headers}>Favorite Medications</Text>
+        <Text style={styles.headers}>{t('FavoriteMedications')}</Text>
         {savedMedications.length > 0 ? (
           savedMedications.map((med) => (
             <MedicationCard key={med.id} med={med} onUnsave={deleteMedication} />
@@ -84,10 +87,10 @@ const FavoritesScreen = () => {
           >
             <Icon source="ticket-confirmation-outline" color="#41484D" size={56} />
             <Text style={{ margin: 5, fontSize: 14, color: '#181C20' }}>
-              No Favorite Medications Yet!
+              {t('NoFavoriteMedications')}
             </Text>
             <Text style={{ margin: 2, fontSize: 12, color: '#41484D' }}>
-              {`Click 'Drug Prices' to find medications.`}
+              {t('NoFavoriteMedicationsTip')}
             </Text>
           </View>
         )}

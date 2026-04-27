@@ -127,5 +127,12 @@
   "closeIcon5": "Cerrar y regresar",
   "Recent": "Reciente",
   "ClearAll": "Borrar todo",
-  "NA": "n/a"
+  "NA": "n/a",
+  "FavoritesTitle": "Favoritos",
+  "FavoritePharmacy": "Farmacia Favorita",
+  "NoFavoritePharmacy": "¡Aún no tienes una farmacia favorita!",
+  "NoFavoritePharmacyTip": "Haz clic en “Farmacias” para guardar una.",
+  "FavoriteMedications": "Medicamentos Favoritos",
+  "NoFavoriteMedications": "¡Aún no tienes medicamentos favoritos!",
+  "NoFavoriteMedicationsTip": "Haz clic en 'Precios' para encontrar medicamentos."
 }
