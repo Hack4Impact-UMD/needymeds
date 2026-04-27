@@ -62,7 +62,12 @@ describe('savePharmacy', () => {
       runAsync: jest.fn().mockResolvedValue({ changes: 1 }),
     });
 
-    const input = { npi: '1234567890', name: 'CVS Pharmacy', address: '123 Sycamore St' };
+    const input = {
+      npi: '1234567890',
+      name: 'CVS Pharmacy',
+      address: '123 Sycamore St',
+      phoneNumber: '123456789',
+    };
     const result = await savePharmacy(db as any, input);
 
     expect(db.runAsync).toHaveBeenCalledTimes(1);
@@ -75,7 +80,7 @@ describe('savePharmacy', () => {
 
     expect(db.runAsync).toHaveBeenCalledWith(
       expect.stringContaining('INSERT or REPLACE INTO Saved_Pharmacies'),
-      ['1234567890', 'CVS Pharmacy', '123 Sycamore St']
+      ['1234567890', 'CVS Pharmacy', '123 Sycamore St', '123456789']
     );
   });
 });
