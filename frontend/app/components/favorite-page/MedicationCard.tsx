@@ -1,7 +1,3 @@
-import { useEffect, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Card, Icon } from 'react-native-paper';
-import { SavedMedication } from '@/api/types';
 import {
   getStrengthsForForm,
   initializeDrugSearch,
@@ -9,6 +5,10 @@ import {
   searchDrugByPrice,
   setActiveStrength,
 } from '@/api/drugSearch';
+import { SavedMedication } from '@/api/types';
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Card, Icon } from 'react-native-paper';
 
 interface FavoritedMedication {
   med: SavedMedication;
@@ -66,22 +66,12 @@ const MedicationCard = ({ med, onUnsave }: FavoritedMedication) => {
     };
   }, [med, med.drug_name, med.form, med.strength, med.quantity, med.pharmacy_address]);
 
-  // render the price line in the component
-  const renderPrice = () => {
-    if (price == null) {
-      return <Text style={{ fontSize: 14, color: '#41484D' }}>Price or address unavailable</Text>;
-    }
-    return (
-      <Text style={{ fontSize: 14, color: '#41484D' }}>
-        ${price} • {med.pharmacy_address}
-      </Text>
-    );
-  };
-
   return (
     <Card key={med.id} mode="outlined" style={styles.med_cards}>
       <Card.Content>
-        {renderPrice()}
+        <Text style={{ fontSize: 14, color: '#41484D' }}>
+          {price ? `$${price}` : 'Fetching price...'} • {med.pharmacy_address}
+        </Text>
         <View style={styles.header}>
           <View style={styles.name_container}>
             <Text style={styles.med_name}>{med.drug_name}</Text>
