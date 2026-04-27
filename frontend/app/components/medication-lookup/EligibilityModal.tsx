@@ -60,7 +60,7 @@ const EligibilityModal = ({
             }}
           >
             <Text style={styles.modalFooterText}>{t('FooterLink')}</Text>
-            <MaterialCommunityIcons name="open-in-new" size={18} color="#181C20" />
+            <MaterialCommunityIcons name="open-in-new" size={18} color={Colors.default.neutraldk} />
           </TouchableOpacity>
         </View>
       </View>
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     textDecorationLine: 'underline',
     fontFamily: 'Open Sans',
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontWeight: '400',
   },
 });

@@ -216,8 +216,8 @@ const PharmacyLocatorScreen = () => {
                 maxLength={5}
                 style={styles.textInput}
                 outlineStyle={styles.inputOutline}
-                activeOutlineColor="#236488"
-                textColor="#181C20"
+                activeOutlineColor={Colors.default.brandBlue}
+                textColor={Colors.default.neutraldk}
                 left={
                   <TextInput.Icon
                     icon={() => (
@@ -244,9 +244,9 @@ const PharmacyLocatorScreen = () => {
                 keyboardType="decimal-pad"
                 style={styles.textInput}
                 outlineStyle={styles.inputOutline}
-                textColor="#181C20"
-                activeOutlineColor="#236488"
-                maxLength={4}
+                textColor={Colors.default.neutraldk}
+                activeOutlineColor={Colors.default.brandBlue}
+                maxLength={2}
                 right={
                   <TextInput.Affix text={t('RadiusInputSuffix')} textStyle={{ color: '#41484D' }} />
                 }
@@ -280,8 +280,8 @@ const PharmacyLocatorScreen = () => {
               mode="outlined"
               style={styles.textInput}
               outlineStyle={styles.inputOutline}
-              textColor="#181C20"
-              activeOutlineColor="#236488"
+              textColor={Colors.default.neutraldk}
+              activeOutlineColor={Colors.default.brandBlue}
               maxLength={20}
               right={
                 filterTextFocused ? (
@@ -306,7 +306,11 @@ const PharmacyLocatorScreen = () => {
 
           <ScrollView showsVerticalScrollIndicator={false} onTouchStart={Keyboard.dismiss}>
             {loading ? (
-              <ActivityIndicator size="large" style={{ marginTop: 200 }} color="#236488" />
+              <ActivityIndicator
+                size="large"
+                style={{ marginTop: 200 }}
+                color={Colors.default.brandBlue}
+              />
             ) : pharmacies.length === 0 ? (
               <View style={styles.emptyContainer}>
                 <MaterialIcons name="add-business" size={41} color="#41484D" />
@@ -316,6 +320,7 @@ const PharmacyLocatorScreen = () => {
               <ErrorState
                 type={errorType}
                 iconName={errorType === 'noPharmacies' ? 'store-outline' : undefined}
+                showCallButton={errorType !== 'noPharmacies'}
               />
             ) : (
               filteredPharmacies.map((pharmacy) => {
@@ -399,7 +404,7 @@ const styles = StyleSheet.create({
   },
   breadcrumb: {
     fontSize: 16,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
   },
   inputsContainer: {
@@ -441,7 +446,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   detectLocationText: {
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontSize: 16,
     marginLeft: 6,
     fontFamily: 'Open Sans',

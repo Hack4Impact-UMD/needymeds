@@ -44,7 +44,7 @@ const WelcomeScreen = () => {
               <Button
                 mode="contained"
                 onPress={() => router.navigate('/medication-lookup')}
-                buttonColor="#236488"
+                buttonColor={Colors.default.brandBlue}
                 textColor={Colors.default.neutrallt}
                 style={styles.primaryButton}
                 contentStyle={styles.primaryButtonContent}
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   },
   title: {
     textAlign: 'center',
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontSize: 28,
     lineHeight: 36,
     fontWeight: '400',
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto',
     textAlign: 'center',
     lineHeight: 20,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontSize: 14,
     paddingHorizontal: 8,
     letterSpacing: 0.25,

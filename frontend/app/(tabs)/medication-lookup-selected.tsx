@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Alert,
   Keyboard,
+  Linking,
   Platform,
   ScrollView,
   StyleSheet,
@@ -346,11 +347,18 @@ const MedicationLookupSelectedScreen = () => {
 
         if (cancelled) return;
 
-        setDrugResults(drugSearchResults);
         setHasSearched(true);
-      } catch (error) {
+        setDrugResults(drugSearchResults);
+      } catch (error: any) {
         if (!cancelled) {
-          setErrorType('loading');
+          if (
+            error.message.toLowerCase().includes('zip code') ||
+            error.message.toLowerCase().includes('radius')
+          ) {
+            setErrorType('zipCode');
+          } else {
+            setErrorType('loading');
+          }
           setDrugResults([]);
         }
       } finally {
@@ -446,8 +454,8 @@ const MedicationLookupSelectedScreen = () => {
                     />
                   )}
                   outlineStyle={{ borderRadius: 5 }}
-                  activeOutlineColor="#236488"
-                  textColor="#181C20"
+                  activeOutlineColor={Colors.default.brandBlue}
+                  textColor={Colors.default.neutraldk}
                   style={{ backgroundColor: Colors.default.neutrallt }}
                 />
               </View>
@@ -474,8 +482,8 @@ const MedicationLookupSelectedScreen = () => {
                     />
                   )}
                   outlineStyle={{ borderRadius: 5 }}
-                  activeOutlineColor="#236488"
-                  textColor="#181C20"
+                  activeOutlineColor={Colors.default.brandBlue}
+                  textColor={Colors.default.neutraldk}
                   style={{ backgroundColor: Colors.default.neutrallt }}
                 />
               </View>
@@ -491,8 +499,8 @@ const MedicationLookupSelectedScreen = () => {
                   onChangeText={setQuantity}
                   keyboardType="numeric"
                   outlineStyle={{ borderRadius: 5 }}
-                  activeOutlineColor="#236488"
-                  textColor="#181C20"
+                  activeOutlineColor={Colors.default.brandBlue}
+                  textColor={Colors.default.neutraldk}
                   maxLength={3}
                   style={{ backgroundColor: Colors.default.neutrallt }}
                   disabled={!strength}
@@ -507,8 +515,8 @@ const MedicationLookupSelectedScreen = () => {
                   onChangeText={setZipCode}
                   keyboardType="numeric"
                   outlineStyle={{ borderRadius: 5 }}
-                  activeOutlineColor="#236488"
-                  textColor="#181C20"
+                  activeOutlineColor={Colors.default.brandBlue}
+                  textColor={Colors.default.neutraldk}
                   style={{ backgroundColor: Colors.default.neutrallt }}
                   maxLength={5}
                   disabled={!strength}
@@ -555,8 +563,8 @@ const MedicationLookupSelectedScreen = () => {
                   onChangeText={setRadius}
                   keyboardType="decimal-pad"
                   outlineStyle={{ borderRadius: 5 }}
-                  activeOutlineColor="#236488"
-                  textColor="#181C20"
+                  activeOutlineColor={Colors.default.brandBlue}
+                  textColor={Colors.default.neutraldk}
                   maxLength={4}
                   style={{ backgroundColor: Colors.default.neutrallt }}
                   disabled={!strength}
@@ -632,12 +640,19 @@ const MedicationLookupSelectedScreen = () => {
             <View style={styles.pharmacyListContainer}>
               {isLoading ? (
                 // Show loading state
-                <ActivityIndicator size="large" style={{ marginTop: 200 }} color="#236488" />
+                <ActivityIndicator
+                  size="large"
+                  style={{ marginTop: 200 }}
+                  color={Colors.default.brandBlue}
+                />
               ) : errorType ? (
                 // Show error state
                 <ErrorState
                   type={errorType}
-                  message="We couldn't load pharmacy results right now. Please check your connection and try again."
+                  iconName={errorType === 'zipCode' ? 'add-shopping-cart' : undefined}
+                  iconSize={errorType === 'zipCode' ? 64 : undefined}
+                  iconColor={errorType === 'zipCode' ? '#555' : undefined}
+                  showCallButton={errorType !== 'zipCode'}
                 />
               ) : drugResults.length === 0 ? (
                 // Show initial empty state (before search)
@@ -691,6 +706,16 @@ const MedicationLookupSelectedScreen = () => {
           </ScrollView>
         </View>
       </View>
+      <TouchableOpacity
+        style={styles.availableCouponsButton}
+        onPress={() =>
+          Linking.openURL('https://www.needymeds.org/search-programs?initialSearchTab=coupons')
+        }
+        activeOpacity={0.85}
+      >
+        <Text style={styles.availableCouponsText}>{t('AvailableCoupons')} </Text>
+        <MaterialIcons name="open-in-new" size={16} color="#004E60" style={{ marginRight: 6 }} />
+      </TouchableOpacity>
       <BottomNavBar />
 
       {/* Medication Lookup Result Modal */}
@@ -813,7 +838,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   detectLocationText: {
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontSize: 16,
     marginLeft: 6,
     fontFamily: 'Open Sans',
@@ -834,7 +859,7 @@ const styles = StyleSheet.create({
     top: 20,
     right: 10,
     fontSize: 15,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
   },
   filterContainer: {
@@ -938,7 +963,7 @@ const styles = StyleSheet.create({
   },
   pharmacyLabel: {
     fontSize: 12,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
   },
   pharmacyRight: {
@@ -961,7 +986,7 @@ const styles = StyleSheet.create({
   },
   emptyStateTitle: {
     fontSize: 16,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     textAlign: 'center',
     marginTop: 16,
     fontFamily: 'Open Sans',
@@ -989,7 +1014,7 @@ const styles = StyleSheet.create({
   },
   dropdownText: {
     fontSize: 15,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
   },
   dropdownContainer: {
@@ -1025,6 +1050,28 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'flex-start',
     gap: 4,
+  },
+  availableCouponsButton: {
+    position: 'absolute',
+    bottom: 100,
+    right: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#B6EBFF',
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 26,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  availableCouponsText: {
+    color: '#004E60',
+    fontSize: 15,
+    fontFamily: 'Open Sans',
+    fontWeight: '500',
   },
 });
 

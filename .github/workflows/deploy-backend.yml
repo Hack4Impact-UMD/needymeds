@@ -3,7 +3,13 @@ name: CI/CD Backend Deployment
 on:
   push:
     branches:
+      - main
+      - staging
+      - development
       - backend-cicd
+    paths:
+      - '.github/workflows/**'
+      - 'backend/**'
 
 permissions:
   id-token: write

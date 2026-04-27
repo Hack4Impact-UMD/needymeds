@@ -1,8 +1,10 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Colors } from '@/constants/theme';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
 
-export type ErrorStateType = 'loading' | 'notFound' | 'noPharmacies' | 'generic';
+export type ErrorStateType = 'loading' | 'notFound' | 'zipCode' | 'noPharmacies' | 'generic';
 
 interface ErrorStateProps {
   type: ErrorStateType;
@@ -10,7 +12,8 @@ interface ErrorStateProps {
   showCallButton?: boolean;
   phoneNumber?: string;
   onCallPress?: () => void;
-  iconName?: keyof typeof MaterialCommunityIcons.glyphMap;
+  iconName?: keyof typeof MaterialCommunityIcons.glyphMap | keyof typeof MaterialIcons.glyphMap;
+  iconSize?: number;
   iconColor?: string;
 }
 
@@ -21,8 +24,11 @@ const ErrorState: React.FC<ErrorStateProps> = ({
   phoneNumber = '8005036897',
   onCallPress,
   iconName = 'magnify',
+  iconSize = 48,
   iconColor = '#41484D',
 }) => {
+  const { t } = useTranslation();
+
   const handleCallHelpline = () => {
     if (onCallPress) {
       onCallPress();
@@ -35,14 +41,16 @@ const ErrorState: React.FC<ErrorStateProps> = ({
   const getDefaultMessage = () => {
     switch (type) {
       case 'loading':
-        return 'We could not load results right now. This happens when the connection is slow or the system is busy.';
+        return t('LoadingMsg');
       case 'notFound':
-        return `We could not find that drug. You might find it at a pharmacy even if it is not on our discount list.\nMake sure it is spelled correctly.`;
+        return t('NotFoundMsg');
+      case 'zipCode':
+        return t('EmptyTouchedMsg');
       case 'noPharmacies':
-        return `We're sorry that there are no matching pharmacies in our network yet. Try checking other ZIP Codes or increasing the search radius.`;
+        return t('EmptyMsg2');
       case 'generic':
       default:
-        return 'Something went wrong. Please try again later.';
+        return t('LoadingMsg');
     }
   };
 
@@ -50,12 +58,24 @@ const ErrorState: React.FC<ErrorStateProps> = ({
 
   return (
     <View style={styles.container}>
-      <MaterialCommunityIcons name={iconName} size={48} color={iconColor} />
+      {iconName in MaterialCommunityIcons.glyphMap ? (
+        <MaterialCommunityIcons
+          name={iconName as keyof typeof MaterialCommunityIcons.glyphMap}
+          size={iconSize}
+          color={iconColor}
+        />
+      ) : (
+        <MaterialIcons
+          name={iconName as keyof typeof MaterialIcons.glyphMap}
+          size={iconSize}
+          color={iconColor}
+        />
+      )}
       <Text style={styles.messageText}>{displayMessage}</Text>
 
       {showCallButton && (
         <TouchableOpacity style={styles.callButton} onPress={handleCallHelpline}>
-          <MaterialCommunityIcons name="phone" size={18} color="#236488" />
+          <MaterialCommunityIcons name="phone" size={18} color={Colors.default.brandBlue} />
           <Text style={styles.callButtonText}>Call the helpline</Text>
         </TouchableOpacity>
       )}
@@ -71,7 +91,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   messageText: {
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     textAlign: 'center',
     fontFamily: 'Open Sans',
     lineHeight: 22,
@@ -87,12 +107,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#236488',
+    borderColor: Colors.default.brandBlue,
     marginTop: 10,
     gap: 8,
   },
   callButtonText: {
-    color: '#236488',
+    color: Colors.default.brandBlue,
     fontSize: 15,
     fontFamily: 'Open Sans',
     fontWeight: '400',

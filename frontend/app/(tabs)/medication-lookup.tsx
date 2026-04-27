@@ -50,7 +50,12 @@ const MedicationLookupScreen = () => {
           </TouchableOpacity>
 
           {/* Blue Background */}
-          <CustomBackgroundShape top={290} color="#236488" maxWidth={700} maxHeight={1500} />
+          <CustomBackgroundShape
+            top={290}
+            color={Colors.default.brandBlue}
+            maxWidth={700}
+            maxHeight={1500}
+          />
           {/* Eligible Link */}
           <TouchableRipple
             onPress={() => setShowEligibilityModal(true)}

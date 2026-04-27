@@ -5,9 +5,13 @@
   "organizationName": "NeedyMeds",
   "description": "Drug Discount Card",
   "generic": {
-    "primaryFields": [],
-    "secondaryFields": [],
-    "auxiliaryFields": []
+    "primaryFields": [
+      {
+        "key": "cardNumber",
+        "label": "Card #",
+        "value": "90MA019309343023"
+      }
+    ]
   },
   "barcode": {
     "format": "PKBarcodeFormatCode128",

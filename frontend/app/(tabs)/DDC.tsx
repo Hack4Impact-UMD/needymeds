@@ -1,10 +1,21 @@
+import { getGoogleWalletUrl } from '@/api/wallet';
 import { Colors } from '@/constants/theme';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import {
+  Alert,
+  Image,
+  Linking,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { handleAddToWallet } from '../../api/appleWallet';
 import { Adjudicator, DrugSearchResult } from '../../api/types';
 
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
@@ -38,6 +49,8 @@ const DDC = () => {
 
   const [showFAQ, setShowFAQ] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showBack, setShowBack] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -54,7 +67,7 @@ const DDC = () => {
                   <Ionicons
                     name="arrow-back"
                     size={25}
-                    color="#181C20"
+                    color={Colors.default.neutraldk}
                     onPress={() => {
                       router.push({
                         pathname: '/medication-lookup-selected',
@@ -75,6 +88,8 @@ const DDC = () => {
                 {t('CardHeader')}
               </Text>
 
+              <View style={styles.divider} />
+
               <View style={styles.medInfoWrapper}>
                 <DDCMedInfoRow
                   result={result}
@@ -83,41 +98,9 @@ const DDC = () => {
                 />
               </View>
 
-              <View style={styles.cardContainer}>
-                <View style={styles.cardSection}>
-                  <Text variant="titleMedium" style={styles.sectionLabel}>
-                    {t('ImageHeader1')}
-                  </Text>
-                  <View style={styles.cardImageWrapper}>
-                    <Image
-                      source={
-                        result.adjudicator === 'DSNT' ? DST_DDCCardFront : ScriptSave_DDCCardFront
-                      }
-                      style={styles.cardImage}
-                      resizeMode="contain"
-                    />
-                  </View>
-                </View>
-
-                <View style={styles.cardSection}>
-                  <Text variant="titleMedium" style={styles.sectionLabel}>
-                    {t('ImageHeader2')}
-                  </Text>
-                  <View style={styles.cardImageWrapper}>
-                    <Image
-                      source={
-                        result.adjudicator === 'DSNT' ? DST_DDCCardBack : ScriptSave_DDCCardBack
-                      }
-                      style={styles.cardImage}
-                      resizeMode="contain"
-                    />
-                  </View>
-                </View>
-              </View>
-
               <View style={styles.actionRow}>
                 <Pressable
-                  style={styles.actionButton}
+                  style={styles.actionButtonCircle}
                   onPress={() => {
                     router.push({
                       pathname: '/ddc-expand',
@@ -140,14 +123,61 @@ const DDC = () => {
                   }}
                 >
                   <MaterialCommunityIcons name="aspect-ratio" size={20} color="white" />
-                  <Text style={styles.buttonText}>{t('ButtonLabel1')}</Text>
                 </Pressable>
 
-                <Pressable style={styles.actionButton} onPress={() => setShowShareModal(true)}>
+                <Pressable
+                  style={styles.actionButtonCircle}
+                  onPress={() => setIsFavorited(!isFavorited)}
+                >
+                  <MaterialIcons
+                    name={isFavorited ? 'star' : 'star-border'}
+                    size={20}
+                    color="white"
+                  />
+                </Pressable>
+
+                <Pressable
+                  style={styles.actionButtonCircle}
+                  onPress={() => setShowShareModal(true)}
+                >
                   <MaterialIcons name="share" size={20} color="white" />
-                  <Text style={styles.buttonText}>{t('ButtonLabel2')}</Text>
                 </Pressable>
               </View>
+
+              <View style={styles.cardContainer}>
+                <View style={styles.cardSection}>
+                  <View style={styles.cardImageWrapper}>
+                    <Image
+                      source={
+                        showBack
+                          ? result.adjudicator === 'DSNT'
+                            ? DST_DDCCardBack
+                            : ScriptSave_DDCCardBack
+                          : result.adjudicator === 'DSNT'
+                            ? DST_DDCCardFront
+                            : ScriptSave_DDCCardFront
+                      }
+                      style={styles.cardImage}
+                      resizeMode="contain"
+                    />
+                  </View>
+                </View>
+              </View>
+
+              <Pressable style={styles.actionButton} onPress={() => setShowBack(!showBack)}>
+                {showBack ? (
+                  <Text style={styles.buttonText}>{t('ButtonLabel4')}</Text>
+                ) : (
+                  <Text style={styles.buttonText}>{t('ButtonLabel3')}</Text>
+                )}
+              </Pressable>
+
+              {Platform.OS === 'ios' && (
+                <Pressable style={styles.actionButton} onPress={() => handleAddToWallet(result)}>
+                  <MaterialCommunityIcons name="wallet" size={20} color="white" />
+                  <Text style={styles.buttonText}>Add to Apple Wallet</Text>
+                </Pressable>
+              )}
 
               <View style={styles.footerNote}>
                 <Pressable onPress={() => setShowFAQ(true)}>
@@ -199,8 +229,8 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
-    paddingHorizontal: 50,
-    textAlign: 'center',
+    paddingHorizontal: 10,
+    textAlign: 'left',
     fontWeight: '400',
     color: '#1F2328',
     fontFamily: 'Nunito Sans',
@@ -220,7 +250,7 @@ const styles = StyleSheet.create({
     height: 40,
   },
   sectionLabel: {
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
     fontWeight: '400',
   },
@@ -231,14 +261,37 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 180,
   },
-  actionRow: {
-    flexDirection: 'row',
+  actionButtonsWrap: {
     gap: 12,
     marginBottom: 25,
-    justifyContent: 'center',
+  },
+  actionRow: {
+    flexDirection: 'row',
+    gap: 4,
+    marginBottom: 10,
+    justifyContent: 'flex-end',
   },
   actionButton: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.default.brandBlue,
+    borderRadius: 999,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginBottom: 40,
+  },
+  actionButtonCircle: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#236488',
+    borderRadius: 28,
+  },
+  actionButtonFull: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -257,13 +310,17 @@ const styles = StyleSheet.create({
   footerNote: {
     alignItems: 'center',
     paddingHorizontal: 12,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     textDecorationLine: 'underline',
   },
   footerQuestion: {
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     textAlign: 'center',
     fontSize: 13,
     fontFamily: 'Open Sans',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#C1C7CE',
   },
 });

@@ -19,5 +19,6 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY package.json ./
+COPY src/wallet-pass.pass ./dist/wallet-pass.pass
 EXPOSE 3000
 CMD ["node", "dist/server.js"]

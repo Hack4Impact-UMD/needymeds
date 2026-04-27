@@ -1,3 +1,4 @@
+import { Colors } from '@/constants/theme';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Divider, IconButton } from 'react-native-paper';
 
@@ -49,7 +50,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     lineHeight: 24,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
   },
   resultSubtitle: {
     fontSize: 14,

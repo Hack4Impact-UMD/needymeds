@@ -5,9 +5,10 @@ export const Colors = {
     neutrallt: '#F6FAFE',
     primary: '#6E9FC0',
     secondary: '#3A6270',
-    neutraldk: '#000000',
+    neutraldk: '#181C20',
     accent: '#FE6300',
     tabIconSelected: '#0a7ea4',
+    brandBlue: '#236488',
   },
 };
 

@@ -1,3 +1,4 @@
+import { Colors } from '@/constants/theme';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Divider, Text } from 'react-native-paper';
@@ -67,19 +68,19 @@ const styles = StyleSheet.create({
   },
   subLabel: {
     fontSize: 14,
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
     fontWeight: '400',
   },
   name: {
     fontSize: 16,
     maxWidth: '70%',
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontFamily: 'Open Sans',
     fontWeight: '400',
   },
   price: {
-    color: '#181C20',
+    color: Colors.default.neutraldk,
     fontWeight: '400',
     fontFamily: 'Open Sans',
   },
