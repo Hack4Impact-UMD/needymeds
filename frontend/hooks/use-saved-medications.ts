@@ -1,7 +1,7 @@
 import { create_database } from '@/api/savedDB';
 import {
   deleteMedication as deleteMedicationDB,
-  getAllMedications,
+  getAllMedications as getAllMedicationsDB,
   saveMedication as saveMedicationDB,
 } from '@/api/savedMedicationsCRUD';
 import { SavedMedication } from '@/api/types';
@@ -43,7 +43,7 @@ export function useSavedMedications() {
     setLoading(true);
     setError(null);
     try {
-      const rows = await getAllMedications(database);
+      const rows = await getAllMedicationsDB(database);
       setMedications(rows);
     } catch (err: any) {
       setError(err.message || 'Failed to load saved medications');

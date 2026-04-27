@@ -17,7 +17,9 @@ export async function savePharmacy(
 
 // retrieve all saved pharmacies
 export async function getAllPharmacies(db: SQLite.SQLiteDatabase): Promise<SavedPharmacy[]> {
-  const rows = await db.getAllAsync<SavedPharmacy>(`SELECT * FROM Saved_Pharmacies`);
+  const rows = await db.getAllAsync<SavedPharmacy>(
+    'SELECT * FROM Saved_Pharmacies ORDER BY name ASC'
+  );
 
   return rows;
 }
