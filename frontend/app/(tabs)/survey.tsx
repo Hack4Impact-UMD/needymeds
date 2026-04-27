@@ -4,6 +4,7 @@ import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { submitSurvey } from '../../api/survey';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -40,7 +41,9 @@ const Survey = () => {
     return EMAIL_REGEX.test(text);
   };
 
-  const handleDone = () => {
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleDone = async () => {
     if (rating === 0) {
       Alert.alert(t('SurveyRatingRequired'), '');
       return;
@@ -57,10 +60,20 @@ const Survey = () => {
       return;
     }
 
-    // Logic for submitting the survey could go here (e.g., API call)
-
-    // Navigate back to the previous page (DDC)
-    handleBack();
+    setSubmitting(true);
+    try {
+      await submitSurvey({
+        rating,
+        email: trimmedEmail,
+        comments: comments.trim() || undefined,
+        drugName: params.drugName ? String(params.drugName) : undefined,
+      });
+      handleBack();
+    } catch {
+      Alert.alert('Submission failed', 'Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleRatingPress = (star: number) => {
@@ -157,8 +170,9 @@ const Survey = () => {
 
               <View style={styles.doneButtonContainer}>
                 <Pressable
-                  style={({ pressed }) => [styles.doneButton, { opacity: pressed ? 0.8 : 1 }]}
+                  style={({ pressed }) => [styles.doneButton, { opacity: pressed || submitting ? 0.8 : 1 }]}
                   onPress={handleDone}
+                  disabled={submitting}
                   accessibilityRole="button"
                   accessibilityLabel={t('SurveyDoneBtn')}
                 >

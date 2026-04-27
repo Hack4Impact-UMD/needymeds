@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "^3.600.0",
+    "@aws-sdk/client-ses": "^3.1037.0",
     "axios": "^1.13.5",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",

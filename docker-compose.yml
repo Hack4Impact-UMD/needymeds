@@ -7,4 +7,5 @@ services:
       - '9000:3000'
     environment:
       - NODE_ENV=production
+      - SES_FROM_EMAIL=info@needymeds.org
     restart: unless-stopped
