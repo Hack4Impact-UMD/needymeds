@@ -39,13 +39,16 @@ export default function PharmacyDetailModal({ pharmacy, isOpen, onClose }: Props
   const handleCopyAddress = async () => {
     const fullAddress = [addressLine, cityStateZip].filter(Boolean).join(', ');
     await Clipboard.setStringAsync(fullAddress);
-    Alert.alert('Copied', `Copied "${fullAddress}" to clipboard`);
+    Alert.alert(t('Copied'), `${t('CopiedAlert1Part1')}${fullAddress}${t('CopiedAlert1Part2')}`);
   };
 
   const handleCopyPhone = async () => {
     if (!data.phoneNumber) return;
     await Clipboard.setStringAsync(formattedPhoneNumber);
-    Alert.alert('Copied', `Copied "${formattedPhoneNumber}" to clipboard`);
+    Alert.alert(
+      t('Copied'),
+      `${t('CopiedAlert1Part1')}${formattedPhoneNumber}${t('CopiedAlert1Part2')}`
+    );
   };
 
   const handleDirections = () => {

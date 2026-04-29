@@ -2,6 +2,7 @@ import { Colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 
 const DST_DDCCardFront = require('../assets/DST_DDCDetailsFront.png');
@@ -10,6 +11,8 @@ const ScriptSave_DDCCardFront = require('../assets/ScriptSave_DDCDetailsFront.pn
 const ScriptSave_DDCCardBack = require('../assets/ScriptSave_DDCBackDetails.png');
 
 const DDCExpand = () => {
+  const { t } = useTranslation();
+
   const params = useLocalSearchParams();
   const adjudicator = params.adjudicator as string;
 
@@ -70,7 +73,7 @@ const DDCExpand = () => {
       </View>
 
       <View style={styles.cardWrapper}>
-        <Text style={styles.flipHint}>Tap card to flip:</Text>
+        <Text style={styles.flipHint}>{t('DDCTapToFlip')}</Text>
 
         <Pressable onPress={flipCard} style={styles.flipContainer}>
           <Animated.Image

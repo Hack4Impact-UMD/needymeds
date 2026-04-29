@@ -44,9 +44,7 @@ export async function createPass({ serial, bin, pcn, group, memberId }: PassInpu
     { key: 'bin', label: 'BIN', value: bin },
     { key: 'pcn', label: 'PCN', value: pcn }
   );
-  pass.auxiliaryFields.push(
-    { key: 'group', label: 'GROUP', value: group },
-  );
+  pass.auxiliaryFields.push({ key: 'group', label: 'GROUP', value: group });
 
   pass.setBarcodes({
     message: memberId,

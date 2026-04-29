@@ -69,10 +69,10 @@ const PharmacyLocatorScreen = () => {
       if (userLocationResult?.userZipCode) {
         setZipCode(userLocationResult.userZipCode);
       } else {
-        Alert.alert('Location', 'Could not detect ZIP code.');
+        Alert.alert(t('Location'), t('LocationAlert1'));
       }
     } catch (err) {
-      Alert.alert('Location', 'Error detecting location');
+      Alert.alert(t('Location'), t('LocationAlert2'));
     } finally {
       setDetectingZip(false);
       setZipFocused(false);

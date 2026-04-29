@@ -4,6 +4,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { Asset } from 'expo-asset';
 import * as MediaLibrary from 'expo-media-library';
 import * as Sharing from 'expo-sharing';
+import { useTranslation } from 'react-i18next';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import BottomSheetModal from '../BottomSheetModal';
 
@@ -15,6 +16,8 @@ interface DDCShareModalProps {
 }
 
 const DDCShareModal = ({ isOpen, onClose, adjudicator, result }: DDCShareModalProps) => {
+  const { t } = useTranslation();
+
   async function ensureAssetUri(): Promise<string> {
     const ddcImage =
       adjudicator === 'DSNT'
@@ -32,16 +35,16 @@ const DDCShareModal = ({ isOpen, onClose, adjudicator, result }: DDCShareModalPr
 
       const isAvailable = await Sharing.isAvailableAsync();
       if (!isAvailable) {
-        Alert.alert('Sharing not available', 'Sharing is not supported on this device.');
+        Alert.alert(t('SharingNotAvailable'), t('SharingNotAvailableAlert1'));
         return;
       }
 
       await Sharing.shareAsync(uri, {
         mimeType: 'image/png',
-        dialogTitle: 'Share Drug Discount Card',
+        dialogTitle: t('DDCShare'),
       });
     } catch (error) {
-      Alert.alert('Error', 'Could not share image.');
+      Alert.alert(t('Error'), t('ErrorAlert1'));
     }
   }
 
@@ -49,15 +52,15 @@ const DDCShareModal = ({ isOpen, onClose, adjudicator, result }: DDCShareModalPr
     try {
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission required', 'Permission to save photos is required.');
+        Alert.alert(t('PermissionRequired'), t('PermissionRequiredAlert1'));
         return;
       }
 
       const uri = await ensureAssetUri();
       await MediaLibrary.saveToLibraryAsync(uri);
-      Alert.alert('Success', 'Image saved to your photo library!');
+      Alert.alert(t('Success'), t('SuccessAlert1'));
     } catch (error) {
-      Alert.alert('Error', 'Could not save image.');
+      Alert.alert(t('Error'), t('ErrorAlert2'));
     }
   }
 
@@ -70,15 +73,15 @@ const DDCShareModal = ({ isOpen, onClose, adjudicator, result }: DDCShareModalPr
           <MaterialIcons name="close" size={26} color="#111827" />
         </TouchableOpacity>
 
-        <Text style={styles.sheetTitle}>Share Drug Discount Card</Text>
+        <Text style={styles.sheetTitle}>{t('DDCShare')}</Text>
 
-        <Text style={styles.sheetSubTitle}>Send image to:</Text>
+        <Text style={styles.sheetSubTitle}>{t('DDCSend')}</Text>
 
         <TouchableOpacity style={styles.sheetRow} onPress={handleShareDDCImage}>
           <View style={styles.iconCircle}>
             <MaterialIcons name="sms" size={24} color="#fff" />
           </View>
-          <Text style={styles.sheetText}>Share</Text>
+          <Text style={styles.sheetText}>{t('Share')}</Text>
         </TouchableOpacity>
 
         <View style={styles.separator} />
@@ -87,7 +90,7 @@ const DDCShareModal = ({ isOpen, onClose, adjudicator, result }: DDCShareModalPr
           <View style={styles.iconCircle}>
             <MaterialIcons name="file-download" size={24} color="#fff" />
           </View>
-          <Text style={styles.sheetText}>Download to device</Text>
+          <Text style={styles.sheetText}>{t('DDCDownload')}</Text>
         </TouchableOpacity>
       </View>
     </BottomSheetModal>
