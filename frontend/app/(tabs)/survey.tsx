@@ -4,19 +4,19 @@ import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { submitSurvey } from '../../api/survey';
 import {
   Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { submitSurvey } from '../../api/survey';
 import BottomNavBar from '../components/BottomNavBar';
 import DefaultHeader from '../components/DefaultHeader';
 
@@ -117,18 +117,18 @@ const Survey = () => {
           <DefaultHeader />
           <View style={styles.pageBody}>
             <View style={styles.pageHeader}>
-              <Pressable
-                onPress={handleBack}
-                style={({ pressed }) => [styles.backButton, { opacity: pressed ? 0.6 : 1 }]}
-                accessibilityRole="button"
-                accessibilityLabel={t('arrow_backIcon')}
-              >
-                <Ionicons name="arrow-back" size={25} color={Colors.default.neutraldk} />
-              </Pressable>
+              <View style={styles.backButton}>
+                <Ionicons
+                  name="arrow-back"
+                  size={25}
+                  color={Colors.default.neutraldk}
+                  onPress={handleBack}
+                />
+              </View>
             </View>
 
             <View style={styles.surveyContainer}>
-              <Text style={styles.pageTitle}>Survey</Text>
+              <Text style={styles.pageTitle}>{t('SurveyTitle')}</Text>
 
               <View style={styles.inputSection}>
                 <Text style={styles.label}>
@@ -143,7 +143,7 @@ const Survey = () => {
                 </Text>
                 <TextInput
                   style={styles.textInput}
-                  placeholder={t('SurveyEmailPlaceholder')}
+                  placeholder={t('EmailAddress')}
                   placeholderTextColor="#6B7280"
                   value={email}
                   onChangeText={setEmail}
@@ -158,7 +158,7 @@ const Survey = () => {
                 <Text style={styles.label}>{t('SurveyCommentsLabel')}</Text>
                 <TextInput
                   style={[styles.textInput, styles.commentsInput]}
-                  placeholder={t('SurveyCommentsPlaceholder')}
+                  placeholder={t('Comments')}
                   placeholderTextColor="#6B7280"
                   value={comments}
                   onChangeText={setComments}
@@ -170,13 +170,23 @@ const Survey = () => {
 
               <View style={styles.doneButtonContainer}>
                 <Pressable
-                  style={({ pressed }) => [styles.doneButton, { opacity: pressed || submitting ? 0.8 : 1 }]}
+                  style={
+                    email.length > 0 && rating > 0 ? styles.doneButtonFilled : styles.doneButton
+                  }
                   onPress={handleDone}
                   disabled={submitting}
                   accessibilityRole="button"
-                  accessibilityLabel={t('SurveyDoneBtn')}
+                  accessibilityLabel={t('Done')}
                 >
-                  <Text style={styles.doneButtonText}>{t('SurveyDoneBtn')}</Text>
+                  <Text
+                    style={
+                      email.length > 0 && rating > 0
+                        ? styles.doneButtonFilledText
+                        : styles.doneButtonText
+                    }
+                  >
+                    {t('Done')}
+                  </Text>
                 </Pressable>
               </View>
             </View>
@@ -199,11 +209,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 100,
+    padding: 20,
   },
   pageBody: {
-    padding: 20,
-    gap: 15,
+    gap: 5,
   },
   pageHeader: {
     flexDirection: 'row',
@@ -217,7 +226,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.05)',
   },
   surveyContainer: {
     flex: 1,
@@ -236,7 +244,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '400',
     color: Colors.default.neutraldk,
     marginBottom: 12,
     fontFamily: 'Open Sans',
@@ -269,23 +277,34 @@ const styles = StyleSheet.create({
   doneButtonContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginTop: 10,
+    marginTop: -10,
   },
   doneButton: {
-    backgroundColor: Colors.default.brandBlue,
-    paddingVertical: 14,
+    backgroundColor: Colors.default.neutrallt,
+    borderColor: '#41484D',
+    borderWidth: 1,
+    paddingVertical: 10,
     paddingHorizontal: 40,
-    borderRadius: 999,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    borderRadius: 50,
+  },
+  doneButtonFilled: {
+    backgroundColor: Colors.default.brandBlue,
+    borderColor: Colors.default.brandBlue,
+    borderWidth: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 40,
+    borderRadius: 50,
   },
   doneButtonText: {
-    color: 'white',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     fontFamily: 'Open Sans',
+    color: '#41484D',
+  },
+  doneButtonFilledText: {
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'Open Sans',
+    color: '#FFFFFF',
   },
 });

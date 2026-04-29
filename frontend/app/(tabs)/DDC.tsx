@@ -117,7 +117,7 @@ const DDC = () => {
       const { url } = await getGoogleWalletUrl(result);
       await Linking.openURL(url);
     } catch (error) {
-      Alert.alert('Error', 'Could not add to Google Wallet.');
+      Alert.alert(t('Error'), t('ErrorAlert3'));
     }
   }
 
@@ -247,13 +247,13 @@ const DDC = () => {
                   }}
                 >
                   <MaterialIcons name="speaker-notes" size={20} color="white" />
-                  <Text style={styles.buttonText}> {t('ButtonLabel5')} </Text>
+                  <Text style={styles.buttonText}> {t('ButtonLabel6')} </Text>
                 </Pressable>
               </View>
 
               <Pressable style={styles.actionButton} onPress={handleAddToWallet}>
                 <MaterialIcons name="add-card" size={20} color="white" />
-                <Text style={styles.buttonText}>Add to Wallet</Text>
+                <Text style={styles.buttonText}>{t('ButtonLabel5')}</Text>
               </Pressable>
 
               <View style={styles.footerNote}>

@@ -1,6 +1,6 @@
 import { Colors } from '@/constants/theme';
-import { useSearchPharmacies } from '@/hooks/use-search-pharmacies';
 import { useSavedPharmacies } from '@/hooks/use-saved-pharmacies';
+import { useSearchPharmacies } from '@/hooks/use-search-pharmacies';
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -101,10 +101,10 @@ const PharmacyLocatorScreen = () => {
     }
 
     // another pharmacy is currently saved so confirm to replace with new pharmacy
-    Alert.alert('Replace Favorited Pharmacy', 'Do you want to save this new pharmacy instead?', [
-      { text: 'Cancel' },
+    Alert.alert(t('ReplacePharmacy'), t('ReplacePharmacyAlert1'), [
+      { text: t('Cancel') },
       {
-        text: 'Replace',
+        text: t('Replace'),
         onPress: async () => {
           // remove currently favorited pharmacy
           const current = savedPharmacy[0];
@@ -167,10 +167,10 @@ const PharmacyLocatorScreen = () => {
       if (userLocationResult?.userZipCode) {
         setZipCode(userLocationResult.userZipCode);
       } else {
-        Alert.alert('Location', 'Could not detect ZIP code.');
+        Alert.alert(t('Location'), t('LocationAlert1'));
       }
     } catch (err) {
-      Alert.alert('Location', 'Error detecting location');
+      Alert.alert(t('Location'), t('LocationAlert2'));
     } finally {
       setDetectingZip(false);
       setZipFocused(false);
