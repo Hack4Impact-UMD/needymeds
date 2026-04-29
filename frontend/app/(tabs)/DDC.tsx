@@ -226,13 +226,18 @@ const DDC = () => {
                 </View>
               </View>
 
-              <View>
+              <View style={styles.actionButtonsWrap}>
                 <Pressable style={styles.actionButton} onPress={() => setShowBack(!showBack)}>
                   {showBack ? (
                     <Text style={styles.buttonText}>{t('ButtonLabel4')}</Text>
                   ) : (
                     <Text style={styles.buttonText}>{t('ButtonLabel3')}</Text>
                   )}
+                </Pressable>
+
+                <Pressable style={styles.actionButton} onPress={handleAddToWallet}>
+                  <MaterialIcons name="add-card" size={20} color="white" />
+                  <Text style={styles.buttonText}>{t('ButtonLabel5')}</Text>
                 </Pressable>
 
                 <Pressable
@@ -250,11 +255,6 @@ const DDC = () => {
                   <Text style={styles.buttonText}> {t('ButtonLabel6')} </Text>
                 </Pressable>
               </View>
-
-              <Pressable style={styles.actionButton} onPress={handleAddToWallet}>
-                <MaterialIcons name="add-card" size={20} color="white" />
-                <Text style={styles.buttonText}>{t('ButtonLabel5')}</Text>
-              </Pressable>
 
               <View style={styles.footerNote}>
                 <Pressable onPress={() => setShowFAQ(true)}>
@@ -339,8 +339,8 @@ const styles = StyleSheet.create({
     height: 180,
   },
   actionButtonsWrap: {
-    gap: 12,
-    marginBottom: 25,
+    gap: 5,
+    marginBottom: 50,
   },
   actionRow: {
     flexDirection: 'row',
@@ -354,10 +354,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.default.brandBlue,
-    borderRadius: 999,
+    borderRadius: 50,
     paddingVertical: 12,
     paddingHorizontal: 16,
-    marginBottom: 35,
+    marginTop: 25,
   },
   actionButtonCircle: {
     width: 40,
@@ -373,15 +373,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#236488',
-    borderRadius: 999,
+    borderRadius: 50,
     paddingVertical: 12,
     paddingHorizontal: 16,
   },
   buttonText: {
-    paddingLeft: 10,
+    paddingLeft: 7,
     color: 'white',
-    fontSize: 16,
-    fontWeight: '400',
+    fontSize: 15,
+    fontWeight: '500',
     fontFamily: 'Open Sans',
   },
   footerNote: {
