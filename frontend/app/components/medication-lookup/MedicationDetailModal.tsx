@@ -50,7 +50,7 @@ const MedicationDetailModal = ({
 
   const copyToClipboard = async (text: string) => {
     await Clipboard.setStringAsync(text);
-    Alert.alert('Copied', `Copied "${text}" to clipboard`);
+    Alert.alert(t('Copied'), `${t('CopiedAlert1Part1')}${text}${t('CopiedAlert1Part2')}`);
   };
 
   const openMaps = (address: string) => {
