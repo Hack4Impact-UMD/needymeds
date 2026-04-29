@@ -15,17 +15,25 @@ export interface RecentSearch {
  * Custom hook to manage recent medication searches in the local SQLite database.
  */
 export function useRecentSearches() {
-  const dbReadyPromise = useRef<Promise<SQLiteDatabase>>(create_database());
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
+  const dbRef = useRef<SQLiteDatabase | null>(null);
 
   useEffect(() => {
     let isCancelled = false;
 
-    dbReadyPromise.current.then(async (db) => {
-      if (!isCancelled) {
-        await loadRecent(db);
+    async function init() {
+      try {
+        const db = await create_database();
+        if (!isCancelled) {
+          dbRef.current = db;
+          await loadRecent(db);
+        }
+      } catch (err) {
+        console.error('Recent searches init error:', err);
       }
-    });
+    }
+
+    init();
 
     return () => {
       isCancelled = true;
@@ -33,40 +41,56 @@ export function useRecentSearches() {
   }, []);
 
   async function loadRecent(db?: SQLiteDatabase) {
-    const database = db ?? (await dbReadyPromise.current);
+    try {
+      const database = db ?? dbRef.current;
+      if (!database) return;
 
-    const rows = await database.getAllAsync<RecentSearch>(
-      `SELECT * FROM Recent_Searches ORDER BY searched_at DESC LIMIT ${MAX_RECENT_SEARCHES}`
-    );
-    setRecentSearches(rows);
+      const rows = await database.getAllAsync<RecentSearch>(
+        'SELECT * FROM Recent_Searches ORDER BY searched_at DESC LIMIT 10'
+      );
+      setRecentSearches(rows);
+    } catch (err) {
+      console.error('Failed to load recent searches:', err);
+    }
   }
 
   async function addRecentSearch(drugName: string, genericName: string | null) {
-    const db = await dbReadyPromise.current;
+    try {
+      const db = dbRef.current || (await create_database());
+      if (!dbRef.current) dbRef.current = db;
 
-    await db.runAsync(
-      `INSERT INTO Recent_Searches (drug_name, generic_name, searched_at)
-       VALUES (?, ?, ?)
-       ON CONFLICT(drug_name) DO UPDATE SET
-         generic_name = excluded.generic_name,
-         searched_at = excluded.searched_at`,
-      [drugName, genericName, new Date().toISOString()]
-    );
-    await loadRecent(db);
+      await db.runAsync(
+        'INSERT INTO Recent_Searches (drug_name, generic_name, searched_at) VALUES (?, ?, ?) ON CONFLICT(drug_name) DO UPDATE SET generic_name = excluded.generic_name, searched_at = excluded.searched_at',
+        [drugName, genericName, new Date().toISOString()]
+      );
+      await loadRecent(db);
+    } catch (err) {
+      console.error('Failed to add recent search:', err);
+    }
   }
 
   async function removeRecentSearch(id: number) {
-    const db = await dbReadyPromise.current;
+    try {
+      const db = dbRef.current;
+      if (!db) return;
 
-    await db.runAsync('DELETE FROM Recent_Searches WHERE id = ?', [id]);
-    await loadRecent(db);
+      await db.runAsync('DELETE FROM Recent_Searches WHERE id = ?', [id]);
+      await loadRecent(db);
+    } catch (err) {
+      console.error('Failed to remove recent search:', err);
+    }
   }
 
   async function clearAllRecentSearches() {
-    const db = await dbReadyPromise.current;
+    try {
+      const db = dbRef.current;
+      if (!db) return;
 
-    await db.runAsync('DELETE FROM Recent_Searches');
-    await loadRecent(db);
+      await db.runAsync('DELETE FROM Recent_Searches');
+      await loadRecent(db);
+    } catch (err) {
+      console.error('Failed to clear recent searches:', err);
+    }
   }
 
   return {

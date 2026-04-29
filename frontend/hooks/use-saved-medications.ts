@@ -25,6 +25,7 @@ export function useSavedMedications() {
           await loadMedications(db);
         }
       } catch (err: any) {
+        console.error('Saved medications init error:', err);
         if (!isCancelled) setError(err.message || 'Failed to initialize database');
       }
     }
@@ -46,6 +47,7 @@ export function useSavedMedications() {
       const rows = await getAllMedicationsDB(database);
       setMedications(rows);
     } catch (err: any) {
+      console.error('Failed to load saved medications:', err);
       setError(err.message || 'Failed to load saved medications');
     } finally {
       setLoading(false);
@@ -65,6 +67,7 @@ export function useSavedMedications() {
       await saveMedicationDB(db, med);
       await loadMedications(db);
     } catch (err: any) {
+      console.error('Failed to save medication:', err);
       setError(err.message || 'Failed to save medication');
     } finally {
       setLoading(false);
@@ -88,6 +91,7 @@ export function useSavedMedications() {
       }
       await loadMedications(db);
     } catch (err: any) {
+      console.error('Failed to delete medication:', err);
       setError(err.message || 'Failed to delete medication');
     } finally {
       setLoading(false);

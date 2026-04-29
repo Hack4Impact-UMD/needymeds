@@ -67,37 +67,45 @@ const DDC = () => {
     return unsubscribe;
   }, [navigation, refreshMedications]);
 
+  const drugName = params.drugName ? String(params.drugName) : '';
+  const pharmacyName = params.pharmacyName ? String(params.pharmacyName) : '';
+  const pharmacyAddress = params.pharmacyAddress ? String(params.pharmacyAddress) : '';
+  const form = params.form ? String(params.form) : '';
+  const strength = params.strength ? String(params.strength) : '';
+  const quantity = params.quantity ? Number(params.quantity) : 0;
+  const price = params.price ? String(params.price) : '';
+
   const isFavorited = savedMedsFromHook.some(
     (m) =>
-      m.drug_name === params.drugName &&
-      m.pharmacy_name === params.pharmacyName &&
-      m.pharmacy_address === params.pharmacyAddress &&
-      m.form === params.form &&
-      m.strength === params.strength
+      m.drug_name === drugName &&
+      m.pharmacy_name === pharmacyName &&
+      m.pharmacy_address === pharmacyAddress &&
+      m.form === form &&
+      m.strength === strength
   );
 
   const toggleFavorite = async () => {
     if (isFavorited) {
       const current = savedMedsFromHook.find(
         (m) =>
-          m.drug_name === params.drugName &&
-          m.pharmacy_name === params.pharmacyName &&
-          m.pharmacy_address === params.pharmacyAddress &&
-          m.form === params.form &&
-          m.strength === params.strength
+          m.drug_name === drugName &&
+          m.pharmacy_name === pharmacyName &&
+          m.pharmacy_address === pharmacyAddress &&
+          m.form === form &&
+          m.strength === strength
       );
       if (current?.id) {
         await deleteMedication(current.id);
       }
     } else {
       const newSavedMed: Omit<SavedMedication, 'id' | 'last_saved_date'> = {
-        drug_name: String(params.drugName),
-        pharmacy_name: String(params.pharmacyName),
-        pharmacy_address: String(params.pharmacyAddress),
-        form: String(params.form),
-        strength: String(params.strength),
-        quantity: Number(params.quantity),
-        price: String(params.price),
+        drug_name: drugName,
+        pharmacy_name: pharmacyName,
+        pharmacy_address: pharmacyAddress,
+        form: form,
+        strength: strength,
+        quantity: isNaN(quantity) ? 0 : quantity,
+        price: price,
       };
       await saveMedication(newSavedMed);
     }
