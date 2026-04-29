@@ -12,6 +12,7 @@ function BottomNavBar() {
   const isPharmacyLookupActive = pathname.includes('pharmacy-lookup') || pathname === '/(tabs)';
   const isEducationalResourcesActive =
     pathname.includes('educational-resources') || pathname === '/(tabs)';
+  const isFavoritesActive = pathname.includes('favorites') || pathname === '/(tabs)';
 
   return (
     <View style={styles.mobileWrapper}>
@@ -72,6 +73,37 @@ function BottomNavBar() {
             {t('PharmaciesTab')}
           </Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.navItem}
+          activeOpacity={0.85}
+          onPress={() => router.push('favorites')}
+        >
+          <View
+            style={{
+              width: 60,
+              height: 30,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 30,
+              backgroundColor: isFavoritesActive ? '#B6EBFF' : '#EBEEF3',
+            }}
+          >
+            <MaterialCommunityIcons
+              name={isFavoritesActive ? 'star' : 'star-outline'}
+              size={24}
+              color="#004E60"
+            />
+          </View>
+
+          <Text
+            variant="labelMedium"
+            style={[styles.navLabel, isFavoritesActive && styles.navLabelActive]}
+          >
+            {t('FavoritesTab')}
+          </Text>
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.navItem}
           activeOpacity={0.85}

@@ -11,6 +11,7 @@
   "DrugPricesTab": "Precios",
   "PharmaciesTab": "Farmacias",
   "ResourcesTab": "Recursos",
+  "FavoritesTab": "Favoritos",
   "Header": "Ahorre en",
   "ListItem1": "Medicamentos con prescripción médica.",
   "ListItem2": "Medicamentos de venta libre si están escritos en una receta.",
@@ -163,5 +164,12 @@
   "AboutLinkPrivacy": "Declaración de privacidad",
   "AboutLinkFAQ": "Preguntas frecuentes",
   "AboutLinkCommunity": "Normas de la comunidad",
-  "AboutLinkDonate": "Donar"
+  "AboutLinkDonate": "Donar",
+  "FavoritesTitle": "Favoritos",
+  "FavoritePharmacy": "Farmacia Favorita",
+  "NoFavoritePharmacy": "¡Aún no tienes una farmacia favorita!",
+  "NoFavoritePharmacyTip": "Haz clic en “Farmacias” para guardar una.",
+  "FavoriteMedications": "Medicamentos Favoritos",
+  "NoFavoriteMedications": "¡Aún no tienes medicamentos favoritos!",
+  "NoFavoriteMedicationsTip": "Haz clic en 'Precios' para encontrar medicamentos."
 }

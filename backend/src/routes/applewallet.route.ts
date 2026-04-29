@@ -8,11 +8,13 @@ router.get('/', async (req, res, next) => {
   console.log('Route hit');
   try {
     console.log('About to call createPass');
-    const cardNumber = '90MA019309343023';
 
     const pkpass = await createPass({
-      serial: cardNumber,
-      number: cardNumber,
+      serial: '90MA019309343023',
+      bin: '020750',
+      pcn: 'NMeds',
+      group: 'NEEDYMED',
+      memberId: '90MA019309343023',
     });
 
     res.setHeader('Content-Type', 'application/vnd.apple.pkpass');

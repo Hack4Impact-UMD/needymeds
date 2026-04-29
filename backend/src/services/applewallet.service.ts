@@ -1,15 +1,17 @@
 console.log('applewallet.service.ts loaded');
 import { PKPass } from 'passkit-generator';
 import path from 'path';
-import fs from 'fs';
 import { getAppleWalletSecret, getAppleWalletWWDRSecret } from '../secrets/secrets';
 
 type PassInput = {
   serial: string;
-  number: string;
+  bin: string;
+  pcn: string;
+  group: string;
+  memberId: string;
 };
 
-export async function createPass({ serial, number }: PassInput) {
+export async function createPass({ serial, bin, pcn, group, memberId }: PassInput) {
   /*Gets the secret from AWS*/
   console.log('Reached the Create Pass function');
   const secret = await getAppleWalletSecret();
@@ -32,27 +34,20 @@ export async function createPass({ serial, number }: PassInput) {
     }
   );
 
-  // Replace existing cardNumber field if present
-  const existingFieldIndex = pass.primaryFields.findIndex((f: any) => f.key === 'cardNumber');
+  pass.primaryFields.push({
+    key: 'memberId',
+    label: 'MEMBER ID',
+    value: memberId,
+  });
 
-  if (existingFieldIndex !== -1) {
-    pass.primaryFields[existingFieldIndex].value = number;
-  } else {
-    pass.primaryFields.push({
-      key: 'cardNumber',
-      label: 'Card #',
-      value: number,
-    });
-  }
-
-  const modelDir = path.join(__dirname, '../wallet-pass.pass');
-  pass.addBuffer('icon.png', fs.readFileSync(path.join(modelDir, 'icon.png')));
-  pass.addBuffer('icon@2x.png', fs.readFileSync(path.join(modelDir, 'icon@2x.png')));
-  pass.addBuffer('logo.png', fs.readFileSync(path.join(modelDir, 'logo.png')));
-  pass.addBuffer('logo@2x.png', fs.readFileSync(path.join(modelDir, 'logo@2x.png')));
+  pass.secondaryFields.push(
+    { key: 'bin', label: 'BIN', value: bin },
+    { key: 'pcn', label: 'PCN', value: pcn }
+  );
+  pass.auxiliaryFields.push({ key: 'group', label: 'GROUP', value: group });
 
   pass.setBarcodes({
-    message: number,
+    message: memberId,
     format: 'PKBarcodeFormatCode128',
     messageEncoding: 'iso-8859-1',
   });

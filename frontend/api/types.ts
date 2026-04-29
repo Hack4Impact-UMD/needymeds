@@ -16,6 +16,7 @@ export interface DrugSearchResult {
 }
 
 export interface Pharmacy {
+  npi: string;
   pharmacyName: string;
   pharmacyStreet1: string;
   pharmacyStreet2: string;
@@ -31,17 +32,20 @@ export interface Pharmacy {
 export interface SavedMedication {
   id?: number;
   drug_name: string;
-  pharmacy_npi?: string;
+  pharmacy_name?: string;
+  pharmacy_address?: string;
   form?: string;
   strength?: string;
   quantity?: number;
+  price?: string;
   last_saved_date?: string;
 }
 
 export interface SavedPharmacy {
-  npi: string;       
+  npi: string;
   name: string;
   address: string;
+  phoneNumber: string;
 }
 
 /* Requests */
