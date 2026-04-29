@@ -6,6 +6,7 @@ export async function create_database() {
 
     await db.execAsync('PRAGMA journal_mode = WAL;');
 
+    // 1. Saved_Medications
     await db.execAsync(`
       CREATE TABLE IF NOT EXISTS Saved_Medications (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -14,7 +15,7 @@ export async function create_database() {
       );
     `);
 
-    const columns = [
+    const medColumns = [
       'pharmacy_name TEXT',
       'pharmacy_address TEXT',
       'form TEXT',
@@ -22,23 +23,29 @@ export async function create_database() {
       'quantity INTEGER',
       'price TEXT',
     ];
-
-    for (const column of columns) {
+    for (const column of medColumns) {
       try {
         await db.execAsync(`ALTER TABLE Saved_Medications ADD COLUMN ${column};`);
-      } catch (e) {
-        // Column already exists, ignore
-      }
+      } catch (e) {}
     }
 
+    // 2. Saved_Pharmacies
     await db.execAsync(`
       CREATE TABLE IF NOT EXISTS Saved_Pharmacies (
         npi TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        address TEXT NOT NULL,
-        phoneNumber TEXT NOT NULL
+        name TEXT NOT NULL
       );
+    `);
 
+    const pharmacyColumns = ['address TEXT', 'phoneNumber TEXT'];
+    for (const column of pharmacyColumns) {
+      try {
+        await db.execAsync(`ALTER TABLE Saved_Pharmacies ADD COLUMN ${column};`);
+      } catch (e) {}
+    }
+
+    // 3. Recent_Searches
+    await db.execAsync(`
       CREATE TABLE IF NOT EXISTS Recent_Searches (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         drug_name TEXT NOT NULL UNIQUE, 
@@ -49,7 +56,7 @@ export async function create_database() {
 
     return db;
   } catch (error) {
-    console.error('Failed to initialize saved_data database:', error);
+    console.error('Critical database init error:', error);
     throw error;
   }
 }

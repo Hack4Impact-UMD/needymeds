@@ -55,7 +55,6 @@ const PharmacyLocatorScreen = () => {
     deletePharmacy,
     refreshPharmacies,
   } = useSavedPharmacies();
-  const [savedPharmacy, setSavedPharmacy] = useState<SavedPharmacy[]>(savedPharmaciesFromHook);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -64,17 +63,12 @@ const PharmacyLocatorScreen = () => {
     return unsubscribe;
   }, [navigation, refreshPharmacies]);
 
-  useEffect(() => {
-    setSavedPharmacy(savedPharmaciesFromHook);
-  }, [savedPharmaciesFromHook]);
-
   const formatAddress = (pharmacy: Pharmacy) => {
     return `${pharmacy.pharmacyStreet1}, ${pharmacy.pharmacyCity}, ${pharmacy.pharmacyState} ${pharmacy.pharmacyZipCode}`;
   };
 
   const isSaved = (pharmacy: Pharmacy) => {
     return savedPharmaciesFromHook.some((sp) => sp.npi === pharmacy.npi);
-    // return savedPharmacy.some((sp) => sp.npi === pharmacy.npi);
   };
 
   const toggleStar = async (pharmacy: Pharmacy) => {
@@ -82,46 +76,20 @@ const PharmacyLocatorScreen = () => {
 
     // pharmacy is already saved so toggle to unfavorite
     if (saved) {
-      setSavedPharmacy((prev) => prev.filter((sp) => sp.npi !== pharmacy.npi)); // or set to []
       await deletePharmacy(pharmacy.npi);
+      await refreshPharmacies();
       return;
     }
 
     // pharmacy has not been saved yet so favorite it
-    if (savedPharmacy.length === 0) {
-      const newSavedPharmacy: SavedPharmacy = {
-        npi: pharmacy.npi,
-        name: pharmacy.pharmacyName,
-        address: formatAddress(pharmacy),
-        phoneNumber: pharmacy.phoneNumber,
-      };
-      setSavedPharmacy([newSavedPharmacy]);
-      await savePharmacy(newSavedPharmacy);
-      return;
-    }
-
-    // another pharmacy is currently saved so confirm to replace with new pharmacy
-    Alert.alert(t('ReplacePharmacy'), t('ReplacePharmacyAlert1'), [
-      { text: t('Cancel') },
-      {
-        text: t('Replace'),
-        onPress: async () => {
-          // remove currently favorited pharmacy
-          const current = savedPharmacy[0];
-          if (current?.npi) await deletePharmacy(current.npi);
-
-          // save new pharmacy as favorite
-          const newSavedPharmacy: SavedPharmacy = {
-            npi: pharmacy.npi,
-            name: pharmacy.pharmacyName,
-            address: formatAddress(pharmacy),
-            phoneNumber: pharmacy.phoneNumber,
-          };
-          setSavedPharmacy([newSavedPharmacy]);
-          await savePharmacy(newSavedPharmacy);
-        },
-      },
-    ]);
+    const newSavedPharmacy: SavedPharmacy = {
+      npi: pharmacy.npi,
+      name: pharmacy.pharmacyName,
+      address: formatAddress(pharmacy),
+      phoneNumber: pharmacy.phoneNumber || '',
+    };
+    await savePharmacy(newSavedPharmacy);
+    await refreshPharmacies();
   };
 
   const { pharmacies, loading, error } = useSearchPharmacies(zipCode, parseFloat(radius));
