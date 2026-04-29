@@ -7,9 +7,9 @@ export async function savePharmacy(
   pharmacy: SavedPharmacy
 ): Promise<SavedPharmacy> {
   await db.runAsync(
-    `INSERT or REPLACE INTO Saved_Pharmacies (npi, name, address)
-     VALUES (?, ?, ?)`,
-    [pharmacy.npi, pharmacy.name, pharmacy.address]
+    `INSERT or REPLACE INTO Saved_Pharmacies (npi, name, address, phoneNumber)
+      VALUES (?, ?, ?, ?)`,
+    [pharmacy.npi, pharmacy.name, pharmacy.address, pharmacy.phoneNumber ?? null]
   );
 
   return pharmacy;
@@ -17,7 +17,9 @@ export async function savePharmacy(
 
 // retrieve all saved pharmacies
 export async function getAllPharmacies(db: SQLite.SQLiteDatabase): Promise<SavedPharmacy[]> {
-  const rows = await db.getAllAsync<SavedPharmacy>(`SELECT * FROM Saved_Pharmacies`);
+  const rows = await db.getAllAsync<SavedPharmacy>(
+    'SELECT * FROM Saved_Pharmacies ORDER BY name ASC'
+  );
 
   return rows;
 }

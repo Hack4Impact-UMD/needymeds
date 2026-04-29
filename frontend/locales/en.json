@@ -5,12 +5,13 @@
   "SecondaryTxt": "No sign-up or personal information needed.",
   "LangControlEN": "English",
   "LangControlES": "Español",
-  "FooterLinkCopyright": "Copyright © 2025 by NeedyMeds, Inc.",
+  "FooterLinkCopyright": "Copyright © 2026 by NeedyMeds, Inc.",
   "FooterLinkTnC": "Terms & Conditions",
   "FooterLinkPrivacy": "Privacy Policy",
   "DrugPricesTab": "Drug Prices",
   "PharmaciesTab": "Pharmacies",
   "ResourcesTab": "Resources",
+  "FavoritesTab": "Favorites",
   "Header": "Save on",
   "ListItem1": "Prescription drugs.",
   "ListItem2": "Over-the-counter medicines if written on a prescription blank.",
@@ -171,5 +172,12 @@
   "SurveyCommentsPlaceholder": "Comments",
   "SurveyDoneBtn": "Done",
   "SurveyRatingRequired": "Please rate your experience.",
-  "SurveyEmailRequired": "Please enter your email."
+  "SurveyEmailRequired": "Please enter your email.",
+  "FavoritesTitle": "Your Favorites",
+  "FavoritePharmacy": "Favorite Pharmacy",
+  "NoFavoritePharmacy": "No Favorite Pharmacy Yet!",
+  "NoFavoritePharmacyTip": "Click 'Pharmacies' to save one.",
+  "FavoriteMedications": "Favorite Medications",
+  "NoFavoriteMedications": "No Favorite Medications Yet!",
+  "NoFavoriteMedicationsTip": "Click 'Drug Prices' to find medications."
 }

@@ -1,4 +1,9 @@
 import { create_database } from '@/api/savedDB';
+import {
+  deletePharmacy as deletePharmacyDB,
+  getAllPharmacies as getAllPharmaciesDB,
+  savePharmacy as savePharmacyDB,
+} from '@/api/savedPharmaciesCRUD';
 import { SavedPharmacy } from '@/api/types';
 import { SQLiteDatabase } from 'expo-sqlite';
 import { useEffect, useRef, useState } from 'react';
@@ -42,9 +47,7 @@ export function useSavedPharmacies() {
     setLoading(true);
     setError(null);
     try {
-      const rows = await database.getAllAsync<SavedPharmacy>(
-        'SELECT * FROM Saved_Pharmacies ORDER BY name ASC'
-      );
+      const rows = await getAllPharmaciesDB(database);
       setPharmacies(rows);
     } catch (err: any) {
       setError(err.message || 'Failed to load saved pharmacies');
@@ -63,11 +66,7 @@ export function useSavedPharmacies() {
     setLoading(true);
     setError(null);
     try {
-      await db.runAsync(
-        `INSERT OR REPLACE INTO Saved_Pharmacies (npi, name, address)
-         VALUES (?, ?, ?)`,
-        [pharmacy.npi, pharmacy.name, pharmacy.address]
-      );
+      await savePharmacyDB(db, pharmacy);
       await loadPharmacies(db);
     } catch (err: any) {
       setError(err.message || 'Failed to save pharmacy');
@@ -86,7 +85,7 @@ export function useSavedPharmacies() {
     setLoading(true);
     setError(null);
     try {
-      await db.runAsync('DELETE FROM Saved_Pharmacies WHERE npi = ?', [npi]);
+      await deletePharmacyDB(db, npi);
       await loadPharmacies(db);
     } catch (err: any) {
       setError(err.message || 'Failed to delete pharmacy');

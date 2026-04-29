@@ -5,12 +5,13 @@
   "SecondaryTxt": "No necesita registrarse ni compartir información personal.",
   "LangControlEN": "English",
   "LangControlES": "Español",
-  "FooterLinkCopyright": "© 2025 NeedyMeds, Inc. Todos los derechos reservados.",
+  "FooterLinkCopyright": "© 2026 NeedyMeds, Inc. Todos los derechos reservados.",
   "FooterLinkTnC": "Términos y condiciones",
   "FooterLinkPrivacy": "Política de privacidad",
   "DrugPricesTab": "Precios",
   "PharmaciesTab": "Farmacias",
   "ResourcesTab": "Recursos",
+  "FavoritesTab": "Favoritos",
   "Header": "Ahorre en",
   "ListItem1": "Medicamentos con prescripción médica.",
   "ListItem2": "Medicamentos de venta libre si están escritos en una receta.",
@@ -171,5 +172,12 @@
   "SurveyCommentsPlaceholder": "Comentarios",
   "SurveyDoneBtn": "Hecho",
   "SurveyRatingRequired": "Por favor, califique su experiencia.",
-  "SurveyEmailRequired": "Por favor, ingrese su correo electrónico."
+  "SurveyEmailRequired": "Por favor, ingrese su correo electrónico.",
+  "FavoritesTitle": "Favoritos",
+  "FavoritePharmacy": "Farmacia Favorita",
+  "NoFavoritePharmacy": "¡Aún no tienes una farmacia favorita!",
+  "NoFavoritePharmacyTip": "Haz clic en “Farmacias” para guardar una.",
+  "FavoriteMedications": "Medicamentos Favoritos",
+  "NoFavoriteMedications": "¡Aún no tienes medicamentos favoritos!",
+  "NoFavoriteMedicationsTip": "Haz clic en 'Precios' para encontrar medicamentos."
 }

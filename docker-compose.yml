@@ -5,6 +5,8 @@ services:
     container_name: needymeds-mobile-app
     ports:
       - '9000:3000'
+    env_file:
+      - /etc/environment
     environment:
       - NODE_ENV=production
       - SES_FROM_EMAIL=info@needymeds.org

@@ -16,14 +16,16 @@ export async function saveMedication(
   // insert new saved med into database
   const result = await db.runAsync(
     `INSERT INTO Saved_Medications
-            (drug_name, pharmacy_npi, form, strength, quantity, last_saved_date)
-        VALUES (?, ?, ?, ?, ?, ?)`,
+            (drug_name, pharmacy_name, pharmacy_address, form, strength, quantity, price, last_saved_date)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       med.drug_name,
-      med.pharmacy_npi ?? null,
+      med.pharmacy_name ?? null,
+      med.pharmacy_address ?? null,
       med.form ?? null,
       med.strength ?? null,
       med.quantity ?? null,
+      med.price ?? null,
       now,
     ]
   );

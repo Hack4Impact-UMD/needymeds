@@ -114,7 +114,7 @@ describe('useSavedMedications hook', () => {
 
     expect(mockDb.runAsync).toHaveBeenCalledWith(
       expect.stringContaining('INSERT INTO Saved_Medications'),
-      ['Saved Drug', null, null, null, 5, expect.any(String)]
+      ['Saved Drug', null, null, null, null, 5, null, expect.any(String)]
     );
 
     await waitFor(() => {
