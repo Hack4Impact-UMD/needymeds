@@ -31,6 +31,10 @@ const Survey = () => {
   const [comments, setComments] = useState('');
 
   const handleBack = () => {
+    setRating(0);
+    setEmail('');
+    setComments('');
+
     router.push({
       pathname: '/DDC',
       params: { ...params },
